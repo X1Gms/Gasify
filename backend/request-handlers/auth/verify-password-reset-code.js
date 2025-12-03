@@ -5,6 +5,7 @@ const { mysqlPool } = require("../../db/mysql-pool");
 
 /**
  * Handles user password reset code verification requests.
+ * It verifies if the code is valid and not expired.
  *
  * @param {express.Request} req
  * @param {express.Response} res
