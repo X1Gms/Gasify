@@ -378,6 +378,7 @@
       },
       "patch": {
         "summary": "Update current user",
+        "description": "Update user profile information. Password fields are optional - if provided, both password and passwordConfirmation must be included and meet security requirements.",
         "tags": ["Me"],
         "security": [
           {
@@ -392,10 +393,20 @@
                 "$ref": "#/components/schemas/UpdateUserRequestBody"
               },
               "examples": {
-                "update": {
+                "updateProfile": {
+                  "summary": "Update only profile information",
                   "value": {
                     "full_name": "John Lee",
                     "email": "john.lee@example.com"
+                  }
+                },
+                "updateWithPassword": {
+                  "summary": "Update profile and password",
+                  "value": {
+                    "full_name": "John Lee",
+                    "email": "john.lee@example.com",
+                    "password": "NewPassword123!",
+                    "passwordConfirmation": "NewPassword123!"
                   }
                 }
               }
@@ -409,6 +420,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request - missing required fields, invalid email format, password validation failed, or passwords do not match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                },
+                "examples": {
+                  "missingFields": {
+                    "summary": "Missing required fields",
+                    "value": {
+                      "message": "Missing fields, expected: full_name, email"
+                    }
+                  },
+                  "invalidEmail": {
+                    "summary": "Invalid email format",
+                    "value": {
+                      "message": "Invalid email format"
+                    }
+                  },
+                  "passwordMismatch": {
+                    "summary": "Passwords do not match",
+                    "value": {
+                      "message": "Passwords do not match"
+                    }
+                  },
+                  "invalidPassword": {
+                    "summary": "Password does not meet requirements",
+                    "value": {
+                      "message": "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+                    }
+                  },
+                  "incompletePasswordFields": {
+                    "summary": "Both password fields required",
+                    "value": {
+                      "message": "Both password and passwordConfirmation are required"
+                    }
+                  }
                 }
               }
             }
@@ -770,11 +823,24 @@
         "type": "object",
         "properties": {
           "full_name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 3,
+            "description": "User's full name (minimum 3 characters)"
           },
           "email": {
             "type": "string",
-            "format": "email"
+            "format": "email",
+            "description": "User's email address"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "description": "New password (optional). Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character. If provided, passwordConfirmation is also required."
+          },
+          "passwordConfirmation": {
+            "type": "string",
+            "minLength": 8,
+            "description": "Password confirmation (required if password is provided). Must match the password field."
           }
         },
         "required": ["full_name", "email"]

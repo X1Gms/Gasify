@@ -9,10 +9,10 @@ const { updateMeHandler } = require("../request-handlers/me/update-me");
 const { deleteMeHandler } = require("../request-handlers/me/delete-me");
 const {
   getMeNotificationsHandler,
-} = require("../request-handlers/me/get-me-notifications");
+} = require("../request-handlers/me/get-my-notifications");
 const {
   updateMeNotificationHandler,
-} = require("../request-handlers/me/update-me-notification");
+} = require("../request-handlers/me/update-my-notification");
 
 const router = Router();
 

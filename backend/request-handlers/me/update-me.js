@@ -1,7 +1,9 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const mysql = require("mysql2");
 
-const { emailRegex } = require("../../utils/regexes");
+const { emailRegex, passwordRegex } = require("../../utils/regexes");
+const options = require("../../config/options.json");
 const { mysqlPool } = require("../../db/mysql-pool");
 
 /**
@@ -16,13 +18,13 @@ function updateMeHandler(req, res) {
 
   // todo: check if this is enough or if we still need more fields
   // destructuring request body
-  let { full_name, email } = req.body;
+  let { full_name, email, password, passwordConfirmation } = req.body;
 
   // validate request body
   if (!full_name || !email) {
-    return res
-      .status(400)
-      .json({ message: "Missing fields, expected: full_name, email" });
+    return res.status(400).json({
+      message: "Missing fields, expected: full_name, email",
+    });
   }
 
   // trim full_name
@@ -40,23 +42,76 @@ function updateMeHandler(req, res) {
     return res.status(400).json({ message: "Invalid email format" });
   }
 
-  // update user
-  const upateUserSql = mysql.format(
-    "UPDATE user SET full_name = ?, email = ? WHERE id = ?",
-    [full_name, email, userId]
-  );
+  // check if password fields are provided
+  const isPasswordUpdate = password || passwordConfirmation;
 
-  mysqlPool.query(upateUserSql, (err, rows) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+  if (isPasswordUpdate) {
+    // if one password field is provided, both must be provided
+    if (!password || !passwordConfirmation) {
+      return res.status(400).json({
+        message: "Both password and passwordConfirmation are required",
+      });
     }
 
-    if (rows.affectedRows === 0) {
-      return res.status(404).json({ message: "User not found" });
+    // validate passwords match
+    if (password !== passwordConfirmation) {
+      return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    return res.status(200).json({ message: "User updated successfully" });
-  });
+    // validate password format using passwordRegex
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      });
+    }
+
+    // hash password and update user with password
+    const saltRounds = options.auth.saltRounds;
+    bcrypt.hash(password, saltRounds, (hashErr, hashedPassword) => {
+      if (hashErr) {
+        console.error(hashErr);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+
+      // update user with password
+      const updateUserSql = mysql.format(
+        "UPDATE user SET full_name = ?, email = ?, password_hash = ? WHERE id = ?",
+        [full_name, email, hashedPassword, userId]
+      );
+
+      mysqlPool.query(updateUserSql, (err, rows) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: "Internal server error" });
+        }
+
+        if (rows.affectedRows === 0) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({ message: "User updated successfully" });
+      });
+    });
+  } else {
+    // update user without password
+    const updateUserSql = mysql.format(
+      "UPDATE user SET full_name = ?, email = ? WHERE id = ?",
+      [full_name, email, userId]
+    );
+
+    mysqlPool.query(updateUserSql, (err, rows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+
+      if (rows.affectedRows === 0) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      return res.status(200).json({ message: "User updated successfully" });
+    });
+  }
 }
 module.exports.updateMeHandler = updateMeHandler;
