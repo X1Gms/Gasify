@@ -167,7 +167,7 @@
         },
         "responses": {
           "200": {
-            "description": "Password reset request processed",
+            "description": "Password reset email sent successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -233,7 +233,7 @@
         },
         "responses": {
           "200": {
-            "description": "Verification result",
+            "description": "Password reset code verified successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -292,7 +292,7 @@
         },
         "responses": {
           "200": {
-            "description": "Password reset processed",
+            "description": "Password reset successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -396,14 +396,14 @@
                 "updateProfile": {
                   "summary": "Update only profile information",
                   "value": {
-                    "full_name": "John Lee",
+                    "fullName": "John Lee",
                     "email": "john.lee@example.com"
                   }
                 },
                 "updateWithPassword": {
                   "summary": "Update profile and password",
                   "value": {
-                    "full_name": "John Lee",
+                    "fullName": "John Lee",
                     "email": "john.lee@example.com",
                     "password": "NewPassword123!",
                     "passwordConfirmation": "NewPassword123!"
@@ -425,7 +425,7 @@
             }
           },
           "400": {
-            "description": "Invalid request - missing required fields, invalid email format, password validation failed, or passwords do not match",
+            "description": "Invalid request",
             "content": {
               "application/json": {
                 "schema": {
@@ -435,7 +435,7 @@
                   "missingFields": {
                     "summary": "Missing required fields",
                     "value": {
-                      "message": "Missing fields, expected: full_name, email"
+                      "message": "Missing fields, expected: fullName, email"
                     }
                   },
                   "invalidEmail": {
@@ -646,7 +646,7 @@
             }
           },
           "400": {
-            "description": "Invalid request body or parameters",
+            "description": "Invalid request",
             "content": {
               "application/json": {
                 "schema": {
@@ -822,7 +822,7 @@
       "UpdateUserRequestBody": {
         "type": "object",
         "properties": {
-          "full_name": {
+          "fullName": {
             "type": "string",
             "minLength": 3,
             "description": "User's full name (minimum 3 characters)"
@@ -843,7 +843,7 @@
             "description": "Password confirmation (required if password is provided). Must match the password field."
           }
         },
-        "required": ["full_name", "email"]
+        "required": ["fullName", "email"]
       },
       "DeleteMeRequestBody": {
         "type": "object",

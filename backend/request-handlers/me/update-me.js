@@ -18,20 +18,20 @@ function updateMeHandler(req, res) {
 
   // todo: check if this is enough or if we still need more fields
   // destructuring request body
-  let { full_name, email, password, passwordConfirmation } = req.body;
+  let { fullName, email, password, passwordConfirmation } = req.body;
 
   // validate request body
-  if (!full_name || !email) {
+  if (!fullName || !email) {
     return res.status(400).json({
-      message: "Missing fields, expected: full_name, email",
+      message: "Missing fields, expected: fullName, email",
     });
   }
 
-  // trim full_name
-  full_name = full_name.trim();
+  // trim fullName
+  fullName = fullName.trim();
 
-  // validate full_name
-  if (full_name.length < 3) {
+  // validate fullName
+  if (fullName.length < 3) {
     return res
       .status(400)
       .json({ message: "Full name must be at least 3 characters long" });
@@ -44,7 +44,6 @@ function updateMeHandler(req, res) {
 
   // check if password fields are provided
   const isPasswordUpdate = password || passwordConfirmation;
-
   if (isPasswordUpdate) {
     // if one password field is provided, both must be provided
     if (!password || !passwordConfirmation) {
@@ -65,8 +64,16 @@ function updateMeHandler(req, res) {
           "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
       });
     }
+  }
 
-    // hash password and update user with password
+  // prepare fields to update
+  const updateFields = {
+    full_name: fullName, // maps API fullName to db full_name
+    email,
+  };
+
+  // if password update is requested, hash it first then update
+  if (isPasswordUpdate) {
     const saltRounds = options.auth.saltRounds;
     bcrypt.hash(password, saltRounds, (hashErr, hashedPassword) => {
       if (hashErr) {
@@ -74,44 +81,44 @@ function updateMeHandler(req, res) {
         return res.status(500).json({ message: "Internal server error" });
       }
 
-      // update user with password
-      const updateUserSql = mysql.format(
-        "UPDATE user SET full_name = ?, email = ?, password_hash = ? WHERE id = ?",
-        [full_name, email, hashedPassword, userId]
-      );
-
-      mysqlPool.query(updateUserSql, (err, rows) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ message: "Internal server error" });
-        }
-
-        if (rows.affectedRows === 0) {
-          return res.status(404).json({ message: "User not found" });
-        }
-
-        return res.status(200).json({ message: "User updated successfully" });
-      });
+      // add hashed password to update fields
+      updateFields.password_hash = hashedPassword;
+      executeUpdate(updateFields, userId, res);
     });
   } else {
-    // update user without password
-    const updateUserSql = mysql.format(
-      "UPDATE user SET full_name = ?, email = ? WHERE id = ?",
-      [full_name, email, userId]
-    );
-
-    mysqlPool.query(updateUserSql, (err, rows) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Internal server error" });
-      }
-
-      if (rows.affectedRows === 0) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      return res.status(200).json({ message: "User updated successfully" });
-    });
+    // update without password
+    executeUpdate(updateFields, userId, res);
   }
 }
 module.exports.updateMeHandler = updateMeHandler;
+
+/**
+ * Helper function to execute the update query
+ * @param {Object} updateFields - Object containing fields to update
+ * @param {string|number} userId - The ID of the user to update
+ * @param {express.Response} res - Express response object
+ */
+function executeUpdate(updateFields, userId, res) {
+  // build dynamic SQL query
+  const fields = Object.keys(updateFields);
+  const values = Object.values(updateFields);
+  const setClause = fields.map((field) => `${field} = ?`).join(", ");
+
+  // update user with dynamic fields
+  const updateUserSql = mysql.format(
+    `UPDATE user SET ${setClause} WHERE id = ?`,
+    [...values, userId]
+  );
+  mysqlPool.query(updateUserSql, (err, rows) => {
+    if (err) {
+      console.error("Error updating user:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if (rows.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ message: "User updated successfully" });
+  });
+}
