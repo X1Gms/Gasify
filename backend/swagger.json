@@ -768,13 +768,6 @@
             "properties": {
               "id": {
                 "type": "integer"
-              },
-              "fullName": {
-                "type": "string"
-              },
-              "email": {
-                "type": "string",
-                "format": "email"
               }
             }
           }
