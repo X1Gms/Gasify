@@ -20,7 +20,7 @@ function deleteMeHandler(req, res) {
   if (!password) {
     return res
       .status(400)
-      .json({ message: "Missing fields, expected: password" });
+      .json({ success: false, message: "Missing fields, expected: password" });
   }
 
   // get user password
@@ -31,23 +31,32 @@ function deleteMeHandler(req, res) {
   mysqlPool.query(getUserSql, (err, results) => {
     if (err) {
       console.error("Error fetching user for password verification:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
     if (results.length === 0) {
-      // no content on purpose
-      return res.status(204).send();
+      // return standard success response even if user not found (idempotent-ish) or 404?
+      // Existing code returned 204.
+      return res
+        .status(200)
+        .json({ success: true, message: "User deleted successfully" });
     }
 
     const hashedPassword = results[0].password_hash;
     bcrypt.compare(password, hashedPassword, (err, isMatch) => {
       if (err) {
         console.error("Error comparing passwords:", err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
       }
 
       if (!isMatch) {
-        return res.status(401).json({ message: "Incorrect password" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Incorrect password" });
       }
 
       // delete user
@@ -57,15 +66,21 @@ function deleteMeHandler(req, res) {
       mysqlPool.query(deleteUserSql, (err, result) => {
         if (err) {
           console.error("Error deleting user:", err);
-          return res.status(500).json({ message: "Internal server error" });
+          return res
+            .status(500)
+            .json({ success: false, message: "Internal server error" });
         }
 
         if (result.affectedRows === 0) {
           // this case should ideally not be hit if the user was found for password check
-          return res.status(204).send();
+          return res
+            .status(200)
+            .json({ success: true, message: "User deleted successfully" });
         }
 
-        return res.status(204).send();
+        return res
+          .status(200)
+          .json({ success: true, message: "User deleted successfully" });
       });
     });
   });

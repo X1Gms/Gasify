@@ -23,6 +23,7 @@ function updateMeHandler(req, res) {
   // validate request body
   if (!fullName || !email) {
     return res.status(400).json({
+      success: false,
       message: "Missing fields, expected: fullName, email",
     });
   }
@@ -32,14 +33,17 @@ function updateMeHandler(req, res) {
 
   // validate fullName
   if (fullName.length < 3) {
-    return res
-      .status(400)
-      .json({ message: "Full name must be at least 3 characters long" });
+    return res.status(400).json({
+      success: false,
+      message: "Full name must be at least 3 characters long",
+    });
   }
 
   // check if email is valid using the util function
   if (!emailRegex.test(email)) {
-    return res.status(400).json({ message: "Invalid email format" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid email format" });
   }
 
   // check if password fields are provided
@@ -48,18 +52,22 @@ function updateMeHandler(req, res) {
     // if one password field is provided, both must be provided
     if (!password || !passwordConfirmation) {
       return res.status(400).json({
+        success: false,
         message: "Both password and passwordConfirmation are required",
       });
     }
 
     // validate passwords match
     if (password !== passwordConfirmation) {
-      return res.status(400).json({ message: "Passwords do not match" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Passwords do not match" });
     }
 
     // validate password format using passwordRegex
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
+        success: false,
         message:
           "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
       });
@@ -78,7 +86,9 @@ function updateMeHandler(req, res) {
     bcrypt.hash(password, saltRounds, (hashErr, hashedPassword) => {
       if (hashErr) {
         console.error(hashErr);
-        return res.status(500).json({ message: "Internal server error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
       }
 
       // add hashed password to update fields
@@ -112,13 +122,19 @@ function executeUpdate(updateFields, userId, res) {
   mysqlPool.query(updateUserSql, (err, rows) => {
     if (err) {
       console.error("Error updating user:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
     if (rows.affectedRows === 0) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    return res.status(200).json({ message: "User updated successfully" });
+    return res
+      .status(200)
+      .json({ success: true, message: "User updated successfully" });
   });
 }

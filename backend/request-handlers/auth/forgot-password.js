@@ -22,6 +22,7 @@ function forgotPasswordHandler(req, res) {
   // validate request body
   if (!email) {
     return res.status(400).json({
+      success: false,
       message: "Missing fields, expected: email",
     });
   }
@@ -33,7 +34,9 @@ function forgotPasswordHandler(req, res) {
   mysqlPool.query(getUserByEmailSql, (err, result) => {
     if (err) {
       console.error("Error getting user:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
     // if user does not exist, still respond with neutral message to prevent user enumeration
@@ -56,7 +59,9 @@ function forgotPasswordHandler(req, res) {
     mysqlPool.query(checkCodeSql, (err, result) => {
       if (err) {
         console.error("Error checking code:", err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
       }
 
       if (result.length > 0) {
@@ -78,7 +83,9 @@ function forgotPasswordHandler(req, res) {
       mysqlPool.query(deleteOldCodesSql, (err) => {
         if (err) {
           console.error("Error deleting old codes:", err);
-          return res.status(500).json({ message: "Internal server error" });
+          return res
+            .status(500)
+            .json({ success: false, message: "Internal server error" });
         }
 
         function generateUniqueCode() {
@@ -93,7 +100,9 @@ function forgotPasswordHandler(req, res) {
           mysqlPool.query(checkCodeSql, (err, result) => {
             if (err) {
               console.error("Error checking code:", err);
-              return res.status(500).json({ message: "Internal server error" });
+              return res
+                .status(500)
+                .json({ success: false, message: "Internal server error" });
             }
 
             // if code exists, generate a new one
@@ -119,7 +128,7 @@ function forgotPasswordHandler(req, res) {
                 console.error("Error inserting code:", err);
                 return res
                   .status(500)
-                  .json({ message: "Internal server error" });
+                  .json({ success: false, message: "Internal server error" });
               }
 
               const emailText = `

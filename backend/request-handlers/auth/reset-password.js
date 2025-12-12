@@ -20,6 +20,7 @@ function resetPasswordHandler(req, res) {
   // validate request body
   if (!email || !code || !password || !passwordConfirmation) {
     return res.status(400).json({
+      success: false,
       message:
         "Missing fields, expected: email, code, password, passwordConfirmation",
     });
@@ -28,6 +29,7 @@ function resetPasswordHandler(req, res) {
   // validate password format
   if (!passwordRegex.test(password)) {
     return res.status(400).json({
+      success: false,
       message:
         "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
     });
@@ -36,6 +38,7 @@ function resetPasswordHandler(req, res) {
   // validate password confirmation
   if (password !== passwordConfirmation) {
     return res.status(400).json({
+      success: false,
       message: "Passwords do not match",
     });
   }
@@ -51,7 +54,9 @@ function resetPasswordHandler(req, res) {
   mysqlPool.query(getUserByEmailSql, (err, result) => {
     if (err) {
       console.error("Error getting user:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
     // neutral response if user does not exist to prevent exposure of emails
@@ -69,7 +74,9 @@ function resetPasswordHandler(req, res) {
     mysqlPool.query(getCodeSql, (err, result) => {
       if (err) {
         console.error("Error checking Password Reset Code:", err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
       }
 
       // neutral response for invalid or missing code
@@ -93,7 +100,9 @@ function resetPasswordHandler(req, res) {
       bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
         if (err) {
           console.error("Error hashing password:", err);
-          return res.status(500).json({ message: "Internal server error" });
+          return res
+            .status(500)
+            .json({ success: false, message: "Internal server error" });
         }
 
         // update user password
@@ -104,7 +113,9 @@ function resetPasswordHandler(req, res) {
         mysqlPool.query(updatePasswordSql, (err) => {
           if (err) {
             console.error("Error updating password:", err);
-            return res.status(500).json({ message: "Internal server error" });
+            return res
+              .status(500)
+              .json({ success: false, message: "Internal server error" });
           }
 
           // mark recovery code as used

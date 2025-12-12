@@ -17,6 +17,7 @@ function verifyPasswordResetCodeHandler(req, res) {
   // validate request body
   if (!email || !code) {
     return res.status(400).json({
+      success: false,
       message: "Missing fields, expected: email, code",
     });
   }
@@ -29,7 +30,9 @@ function verifyPasswordResetCodeHandler(req, res) {
   mysqlPool.query(getUserByEmailSql, (err, result) => {
     if (err) {
       console.error("Error getting user:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
     const user = result[0];
@@ -39,7 +42,10 @@ function verifyPasswordResetCodeHandler(req, res) {
       // neutral response to prevent user enumeration
       return res
         .status(200)
-        .json({ message: "Invalid or expired password reset code" });
+        .json({
+          success: false,
+          message: "Invalid or expired password reset code",
+        });
     }
 
     // check if code is valid
@@ -50,16 +56,23 @@ function verifyPasswordResetCodeHandler(req, res) {
     mysqlPool.query(checkCodeSql, (err, result) => {
       if (err) {
         console.error("Error checking code:", err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
       }
 
       if (result.length === 0) {
         return res
           .status(200)
-          .json({ message: "Invalid or expired password reset code" });
+          .json({
+            success: false,
+            message: "Invalid or expired password reset code",
+          });
       }
 
-      return res.status(200).json({ message: "Password reset code is valid" });
+      return res
+        .status(200)
+        .json({ success: true, message: "Password reset code is valid" });
     });
   });
 }

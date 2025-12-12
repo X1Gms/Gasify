@@ -20,10 +20,12 @@ function getMeNotificationsHandler(req, res) {
   mysqlPool.query(getUserNotificationsSql, (err, result) => {
     if (err) {
       console.error("Error getting user notifications:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
-    return res.status(200).json(result);
+    return res.status(200).json({ success: true, notifications: result });
   });
 }
 module.exports.getMeNotificationsHandler = getMeNotificationsHandler;

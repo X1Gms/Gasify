@@ -20,7 +20,9 @@ function updateMeNotificationHandler(req, res) {
 
   // validate notification id
   if (!notificationId) {
-    return res.status(400).json({ message: "Missing field, expected: id" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Missing field, expected: id" });
   }
 
   // convert notification id to number
@@ -28,7 +30,9 @@ function updateMeNotificationHandler(req, res) {
 
   // validate notification id is a number
   if (isNaN(notificationIdNumber)) {
-    return res.status(400).json({ message: "Invalid notification id" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid notification id" });
   }
 
   // check if the notification exists and its read status
@@ -39,19 +43,24 @@ function updateMeNotificationHandler(req, res) {
   mysqlPool.query(checkNotificationSql, (err, results) => {
     if (err) {
       console.error("Error checking notification status:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
     if (results.length === 0) {
-      return res.status(404).json({ message: "Notification not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Notification not found" });
     }
 
     const notification = results[0];
     // if notification is already read
     if (notification.read_at !== null) {
-      return res
-        .status(200)
-        .json({ message: "Notification is already marked as read" });
+      return res.status(200).json({
+        success: true,
+        message: "Notification is already marked as read",
+      });
     }
 
     // if notification not already read, proceed to update
@@ -62,12 +71,14 @@ function updateMeNotificationHandler(req, res) {
     mysqlPool.query(updateNotificationSql, (err, result) => {
       if (err) {
         console.error("Error updating notification:", err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
       }
 
       return res
         .status(200)
-        .json({ message: "Notification updated successfully" });
+        .json({ success: true, message: "Notification updated successfully" });
     });
   });
 }

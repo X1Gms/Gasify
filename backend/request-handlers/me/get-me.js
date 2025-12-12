@@ -17,11 +17,15 @@ function getMeHandler(req, res) {
   mysqlPool.query(getUserSql, (err, result) => {
     if (err) {
       console.error("Error getting user:", err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
     if (result.length === 0) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     const dbUser = result[0];
@@ -34,6 +38,7 @@ function getMeHandler(req, res) {
     };
 
     return res.status(200).json({
+      success: true,
       message: "User retrieved successfully",
       user,
     });

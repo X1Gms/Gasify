@@ -18,12 +18,14 @@ function sendNeutralResponse(
 ) {
   if (isDevelopmentEnv) {
     return res.status(200).json({
+      success: true,
       debugMessage,
       ...extraDebugData,
     });
   }
 
   return res.status(200).json({
+    success: true,
     message: productionMessage,
   });
 }

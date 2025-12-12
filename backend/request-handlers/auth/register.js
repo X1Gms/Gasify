@@ -19,6 +19,7 @@ function registerHandler(req, res) {
   // validate request body
   if (!fullName || !email || !password || !passwordConfirmation) {
     return res.status(400).json({
+      success: false,
       message:
         "Missing fields, expected: fullName, email, password, passwordConfirmation",
     });
@@ -29,26 +30,32 @@ function registerHandler(req, res) {
 
   // validate full name
   if (fullName.length < 3) {
-    return res
-      .status(400)
-      .json({ message: "Full name must be at least 3 characters long" });
+    return res.status(400).json({
+      success: false,
+      message: "Full name must be at least 3 characters long",
+    });
   }
 
   // validate email format
   if (!emailRegex.test(email)) {
-    return res.status(400).json({ message: "Invalid email format" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid email format" });
   }
 
   // validate password format
   if (!passwordRegex.test(password)) {
     return res.status(400).json({
+      success: false,
       message: `Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.`,
     });
   }
 
   // validate password confirmation
   if (password !== passwordConfirmation) {
-    return res.status(400).json({ message: "Passwords do not match" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Passwords do not match" });
   }
 
   // check if user already exists
@@ -58,11 +65,17 @@ function registerHandler(req, res) {
   mysqlPool.query(getUserByEmailSql, (err, rows) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
     if (rows.length) {
-      return res.status(409).json({ message: "Email already exists" });
+      // prevent user enumeration by returning success but not creating user
+      return res.status(200).json({
+        success: true,
+        message: "User registered successfully. Please log in.",
+      });
     }
 
     const saltRounds = options.auth.saltRounds;
@@ -70,7 +83,9 @@ function registerHandler(req, res) {
     bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
       if (err) {
         console.error(err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
       }
 
       // insert user
@@ -81,19 +96,14 @@ function registerHandler(req, res) {
       mysqlPool.query(insertUserSql, (err, rows) => {
         if (err) {
           console.error(err);
-          return res.status(500).json({ message: "Internal server error" });
+          return res
+            .status(500)
+            .json({ success: false, message: "Internal server error" });
         }
 
-        const userId = rows.insertId;
-        const user = {
-          id: userId,
-          fullName,
-          email,
-        };
-
         return res.status(201).json({
+          success: true,
           message: "User registered successfully. Please log in.",
-          user,
         });
       });
     });

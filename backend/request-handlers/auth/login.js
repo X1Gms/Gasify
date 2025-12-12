@@ -19,6 +19,7 @@ function loginHandler(req, res) {
   // validate request body
   if (!email || !password) {
     return res.status(400).json({
+      success: false,
       message: "Missing fields, expected: email, password",
     });
   }
@@ -30,23 +31,31 @@ function loginHandler(req, res) {
   mysqlPool.query(getUserByEmailSql, (err, rows) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: "Internal server error" });
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
     }
 
     const user = rows[0];
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid credentials" });
     }
 
     // compare password
     bcrypt.compare(password, user.password_hash, (err, isMatch) => {
       if (err) {
         console.error(err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res
+          .status(500)
+          .json({ success: false, message: "Internal server error" });
       }
 
       if (!isMatch) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid credentials" });
       }
 
       const userPayload = {
@@ -59,6 +68,7 @@ function loginHandler(req, res) {
       });
 
       return res.json({
+        success: true,
         message: "User logged in successfully",
         token: token,
         user: userPayload,
