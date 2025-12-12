@@ -48,7 +48,7 @@ function forgotPasswordHandler(req, res) {
 
     // if no user, return neutral response
     if (!userId) {
-      return sendNeutralResponse(res, "User not found", productionMessage);
+      return sendNeutralResponse(res, true, "User not found", productionMessage);
     }
 
     // check if user already has a code
@@ -69,6 +69,7 @@ function forgotPasswordHandler(req, res) {
 
         return sendNeutralResponse(
           res,
+          true,
           "Email not sent again because user already has a valid password reset code",
           productionMessage,
           { code: existingCode }
@@ -224,6 +225,7 @@ function forgotPasswordHandler(req, res) {
 
                   return sendNeutralResponse(
                     res,
+                    true,
                     "New code generated and email sent",
                     productionMessage,
                     { code }

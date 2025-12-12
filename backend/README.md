@@ -382,7 +382,7 @@ Os utilitários são funções auxiliares reutilizáveis organizadas por propós
 
 #### Mensagens de Erro e Sucesso
 
-- **Formato JSON consistente**: Sempre `{ message: "..." }` ou `{ message: "...", data: {...} }`
+- **Formato JSON consistente**: Sempre `{ success: true/false, message: "..." }` ou `{ success: true, message: "...", data: {...} }`
 - **Mensagens em inglês**: Todas as mensagens da API estão em inglês
 - **Mensagens descritivas**: Claras sobre o que aconteceu ou o que está errado
 - **Sem detalhes técnicos**: Nunca expõem stack traces ou detalhes de implementação

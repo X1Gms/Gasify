@@ -61,7 +61,7 @@ function resetPasswordHandler(req, res) {
 
     // neutral response if user does not exist to prevent exposure of emails
     if (result.length === 0) {
-      return sendNeutralResponse(res, "Invalid data", productionMessage);
+      return sendNeutralResponse(res, false, "Invalid data", productionMessage);
     }
 
     const userId = result[0].id;
@@ -81,7 +81,7 @@ function resetPasswordHandler(req, res) {
 
       // neutral response for invalid or missing code
       if (result.length === 0) {
-        return sendNeutralResponse(res, "Invalid data", productionMessage);
+        return sendNeutralResponse(res, false, "Invalid data", productionMessage);
       }
 
       const resetCode = result[0];
@@ -91,7 +91,7 @@ function resetPasswordHandler(req, res) {
       const expiresAt = new Date(resetCode.expires_at);
 
       if (expiresAt < now || resetCode.used_at !== null) {
-        return sendNeutralResponse(res, "Invalid data", productionMessage);
+        return sendNeutralResponse(res, false, "Invalid data", productionMessage);
       }
 
       const saltRounds = Number(options.auth.saltRounds) || 10;
@@ -133,6 +133,7 @@ function resetPasswordHandler(req, res) {
             // final neutral response
             return sendNeutralResponse(
               res,
+              true,
               "Password successfully updated",
               productionMessage
             );
