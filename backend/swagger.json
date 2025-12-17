@@ -902,6 +902,80 @@
       }
     },
     "/me/devices/{id}": {
+      "get": {
+        "summary": "Get device details",
+        "description": "Retrieve device details, current sensor readings (cards), and historical data (charts).",
+        "tags": ["Me"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the device",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Data range for charts (hour, week, fortnight, month)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["hour", "week", "fortnight", "month"],
+              "default": "hour"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDeviceDetailsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid device ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Device not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch": {
         "summary": "Update a user device",
         "tags": ["Me"],
@@ -1092,6 +1166,74 @@
           "address",
           "postalCode"
         ]
+      },
+      "ChartPoint": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GetDeviceDetailsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "cards": {
+            "type": "object",
+            "properties": {
+              "gas": {
+                "type": ["number", "null"],
+                "description": "Latest gas reading (MQ2 - Methane/LPG/Smoke)"
+              },
+              "co": {
+                "type": ["number", "null"],
+                "description": "Latest CO/Smoke reading (MQ5 - CO)"
+              },
+              "temperature": {
+                "type": ["number", "null"]
+              },
+              "humidity": {
+                "type": ["number", "null"]
+              }
+            }
+          },
+          "charts": {
+            "type": "object",
+            "properties": {
+              "gas": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ChartPoint"
+                }
+              },
+              "co": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ChartPoint"
+                }
+              },
+              "temperature": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ChartPoint"
+                }
+              },
+              "humidity": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ChartPoint"
+                }
+              }
+            }
+          }
+        }
       },
       "UpdateDeviceRequestBody": {
         "type": "object",

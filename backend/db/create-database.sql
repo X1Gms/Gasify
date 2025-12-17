@@ -166,7 +166,7 @@ CREATE INDEX `idx_mcu_detection_readings`
 ON `mcu_detection` (`readings_id`);
 
 -- ==================================
--- INSERT USERS (password = 'aBc12345678!')
+-- INSERT EXISTING USERS
 -- ==================================
 SET @pwd := '$2b$12$6g.ScdVpJSzGeICAfHfxAu9ulKX9W1mSD4sV4L0nUB/wQXS9gzEsC';
 
@@ -177,31 +177,49 @@ INSERT INTO user (full_name, email, password_hash) VALUES
 ('Dana Lee', 'dana.lee@example.com', @pwd);
 
 -- ==================================
+-- INSERT ADDITIONAL USERS
+-- ==================================
+INSERT INTO user (full_name, email, password_hash) VALUES
+('Evan Thompson', 'evan.thompson@example.com', @pwd),
+('Fiona Carter', 'fiona.carter@example.com', @pwd),
+('George King', 'george.king@example.com', @pwd),
+('Hannah Scott', 'hannah.scott@example.com', @pwd),
+('Ian Wright', 'ian.wright@example.com', @pwd),
+('Julia Adams', 'julia.adams@example.com', @pwd);
+
+-- ==================================
 -- INSERT COUNTRIES
 -- ==================================
 INSERT INTO country (name, iso_code, emergency_number) VALUES
 ('Portugal', 'PT', '112'),
 ('Spain', 'ES', '112'),
 ('France', 'FR', '112'),
-('United States', 'US', '911');
+('United States', 'US', '911'),
+('Germany', 'DE', '112'),
+('Italy', 'IT', '112'),
+('Netherlands', 'NL', '112');
 
 -- ==================================
 -- INSERT DEVICES
 -- ==================================
-INSERT INTO device
-(user_id, country_id, name, serial_number, address, postal_code, located_at)
-VALUES
-(1, 1, 'Kitchen Sensor', 'GSF-KIT-001', 'Rua das Flores 123', '4000-123', 'Kitchen'),
-(1, 1, 'Garage Sensor', 'GSF-GAR-002', 'Rua das Flores 123', '4000-123', 'Garage'),
-(2, 2, 'Boiler Room Sensor', 'GSF-BLR-003', 'Calle Mayor 45', '28013', 'Basement'),
-(4, 4, 'Apartment Sensor', 'GSF-APT-004', '742 Evergreen Terrace', '62704', 'Living Room');
+INSERT INTO device (user_id, country_id, name, serial_number, address, postal_code) VALUES
+(1, 1, 'Kitchen Sensor', 'GSF-KIT-001', 'Rua das Flores 123', '4000-123'),
+(1, 1, 'Garage Sensor', 'GSF-GAR-002', 'Rua das Flores 123', '4000-123'),
+(2, 2, 'Boiler Room Sensor', 'GSF-BLR-003', 'Calle Mayor 45', '28013'),
+(4, 4, 'Apartment Sensor', 'GSF-APT-004', '742 Evergreen Terrace', '62704'),
+(3, 3, 'Office Sensor', 'GSF-OFC-005', '10 Rue de la Paix', '75002'),
+(5, 5, 'Living Room Sensor', 'GSF-LIV-006', '12 Main Street', '10001'),
+(6, 6, 'Bedroom Sensor', 'GSF-BDR-007', '20 Berliner Strasse', '10115'),
+(7, 7, 'Kitchen Sensor', 'GSF-KIT-008', '15 Via Roma', '00184');
 
 -- ==================================
 -- INSERT NOTIFICATION TYPES
 -- ==================================
 INSERT INTO notification_type (name) VALUES
 ('Important'),
-('Regular');
+('Regular'),
+('Alert'),
+('Maintenance');
 
 -- ==================================
 -- INSERT NOTIFICATIONS
@@ -210,7 +228,12 @@ INSERT INTO notification (user_id, type_id, title, body, read_at) VALUES
 (1, 1, 'Welcome to Gasify', 'Your account has been created successfully.', NOW() - INTERVAL 1 DAY),
 (1, 2, 'Weekly Tips', 'Remember to check your gas usage weekly.', NULL),
 (2, 1, 'Account Verification', 'Please verify your email to activate your account.', NULL),
-(4, 2, 'Regular Update', 'This is a regular notification about your account.', NOW() - INTERVAL 2 HOUR);
+(4, 2, 'Regular Update', 'This is a regular notification about your account.', NOW() - INTERVAL 2 HOUR),
+(3, 1, 'Sensor Alert', 'High CO levels detected in office sensor.', NULL),
+(3, 2, 'Maintenance Reminder', 'Time to check your office sensor.', NOW() - INTERVAL 1 HOUR),
+(5, 1, 'Gas Alert', 'LPG leak detected in living room.', NOW() - INTERVAL 30 MINUTE),
+(6, 2, 'Routine Check', 'Bedroom sensor calibration needed.', NULL),
+(7, 1, 'Smoke Alert', 'Smoke detected in kitchen sensor.', NULL);
 
 -- ==================================
 -- INSERT PASSWORD RESET CODES
@@ -219,17 +242,25 @@ INSERT INTO password_reset_code (user_id, code, expires_at, used_at) VALUES
 (1, 'A1B2C3', NOW() - INTERVAL 5 MINUTE, NOW() - INTERVAL 10 MINUTE),
 (1, 'D4E5F6', NOW() + INTERVAL 10 MINUTE, NULL),
 (2, 'G7H8I9', NOW() + INTERVAL 5 MINUTE, NULL),
-(4, 'J0K1L2', NOW() - INTERVAL 10 MINUTE, NOW() - INTERVAL 15 MINUTE);
+(4, 'J0K1L2', NOW() - INTERVAL 10 MINUTE, NOW() - INTERVAL 15 MINUTE),
+(3, 'M3N4O5', NOW() + INTERVAL 15 MINUTE, NULL),
+(5, 'P6Q7R8', NOW() + INTERVAL 20 MINUTE, NULL),
+(6, 'S9T0U1', NOW() - INTERVAL 5 MINUTE, NOW() - INTERVAL 2 MINUTE),
+(7, 'V2W3X4', NOW() + INTERVAL 30 MINUTE, NULL);
 
 -- ==================================
 -- INSERT READINGS
 -- ==================================
-INSERT INTO readings (device_id, gas_type, humidity, temperature, mq2, mq5) VALUES
-(1, 'LPG', 45.20, 22.80, 120, 95),
-(1, 'LPG', 48.10, 23.40, 380, 310),
-(2, 'Methane', 52.00, 21.10, 620, 580),
-(3, 'CO', 40.00, 19.50, 90, 70),
-(4, 'Smoke', 60.30, 25.90, 710, 690);
+INSERT INTO readings (device_id, gas_type, humidity, temperature, mq2, mq5, created_at) VALUES
+(1, 'LPG', 45.20, 22.80, 120, 95, NOW() - INTERVAL 2 HOUR),
+(1, 'LPG', 48.10, 23.40, 380, 310, NOW() - INTERVAL 50 MINUTE),
+(2, 'Methane', 52.00, 21.10, 620, 580, NOW() - INTERVAL 3 HOUR),
+(3, 'CO', 40.00, 19.50, 90, 70, NOW() - INTERVAL 5 DAY),
+(4, 'Smoke', 60.30, 25.90, 710, 690, NOW() - INTERVAL 15 MINUTE),
+(5, 'LPG', 47.50, 22.00, 200, 180, NOW() - INTERVAL 10 MINUTE),
+(6, 'Methane', 50.10, 21.50, 600, 570, NOW() - INTERVAL 7 DAY),
+(7, 'CO', 38.70, 20.30, 80, 75, NOW() - INTERVAL 20 MINUTE),
+(8, 'Smoke', 62.40, 26.10, 720, 700, NOW() - INTERVAL 1 HOUR);
 
 -- ==================================
 -- INSERT MCU DETECTIONS
@@ -237,7 +268,10 @@ INSERT INTO readings (device_id, gas_type, humidity, temperature, mq2, mq5) VALU
 INSERT INTO mcu_detection (readings_id, canceled) VALUES
 (2, FALSE),
 (3, FALSE),
-(5, TRUE);
+(5, TRUE),
+(6, FALSE),
+(7, TRUE),
+(8, FALSE);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

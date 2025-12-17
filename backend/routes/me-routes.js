@@ -16,6 +16,7 @@ const {
 const {
   getMyDevicesHandler,
 } = require("../request-handlers/me/get-my-devices");
+const { getMyDeviceHandler } = require("../request-handlers/me/get-device");
 const { createDeviceHandler } = require("../request-handlers/me/create-device");
 const {
   updateMeDeviceHandler,
@@ -30,6 +31,7 @@ router.delete("/", requireAuth, deleteMeHandler);
 router.get("/notifications", requireAuth, getMeNotificationsHandler);
 router.patch("/notifications/:id", requireAuth, updateMeNotificationHandler);
 router.get("/devices", requireAuth, getMyDevicesHandler);
+router.get("/devices/:id", requireAuth, getMyDeviceHandler);
 router.post("/devices", requireAuth, createDeviceHandler);
 router.patch("/devices/:id", requireAuth, updateMeDeviceHandler);
 
