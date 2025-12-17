@@ -748,6 +748,34 @@
         }
       }
     },
+    "/countries": {
+      "get": {
+        "summary": "Get all countries",
+        "tags": ["Countries"],
+        "responses": {
+          "200": {
+            "description": "Countries retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCountriesResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/me/devices": {
       "get": {
         "summary": "Get current user devices",
@@ -789,6 +817,88 @@
             }
           }
         }
+      },
+      "post": {
+        "summary": "Create a new device",
+        "tags": ["Me"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDeviceRequestBody"
+              },
+              "examples": {
+                "createDevice": {
+                  "value": {
+                    "name": "My Device",
+                    "serialNumber": "SN123456",
+                    "countryId": 1,
+                    "address": "123 Main St",
+                    "postalCode": "1000-001"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Device created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Country not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Device already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -804,6 +914,62 @@
             "type": "string"
           }
         }
+      },
+      "Country": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "name", "code"]
+      },
+      "GetCountriesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Country"
+            }
+          }
+        }
+      },
+      "CreateDeviceRequestBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "serialNumber": {
+            "type": "string"
+          },
+          "countryId": {
+            "type": "integer"
+          },
+          "address": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "serialNumber",
+          "countryId",
+          "address",
+          "postalCode"
+        ]
       },
       "Device": {
         "type": "object",

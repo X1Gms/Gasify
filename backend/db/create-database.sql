@@ -24,25 +24,45 @@ CREATE TABLE `user` (
 CREATE UNIQUE INDEX `ux_user_email` ON `user` (`email`);
 
 -- ==================================
+-- COUNTRY TABLE
+-- ==================================
+CREATE TABLE `country` (
+  `id` SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `iso_code` CHAR(2) NOT NULL,
+  `emergency_number` VARCHAR(10) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+CREATE UNIQUE INDEX `ux_country_name` ON `country` (`name`);
+CREATE UNIQUE INDEX `ux_country_iso` ON `country` (`iso_code`);
+
+-- ==================================
 -- DEVICE TABLE
 -- ==================================
 CREATE TABLE `device` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT UNSIGNED NOT NULL,
+  `country_id` SMALLINT UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `serial_number` VARCHAR(255) NOT NULL,
-  `located_at` VARCHAR(255),
+  `address` VARCHAR(255) NOT NULL,
+  `postal_code` VARCHAR(20) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_device_user`
     FOREIGN KEY (`user_id`)
     REFERENCES `user` (`id`)
-    ON DELETE CASCADE
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_device_country`
+    FOREIGN KEY (`country_id`)
+    REFERENCES `country` (`id`)
 ) ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX `ux_device_serial` ON `device` (`serial_number`);
 CREATE INDEX `idx_device_user` ON `device` (`user_id`);
+CREATE INDEX `idx_device_country` ON `device` (`country_id`);
 
 -- ==================================
 -- NOTIFICATION TYPE TABLE
@@ -157,13 +177,24 @@ INSERT INTO user (full_name, email, password_hash) VALUES
 ('Dana Lee', 'dana.lee@example.com', @pwd);
 
 -- ==================================
+-- INSERT COUNTRIES
+-- ==================================
+INSERT INTO country (name, iso_code, emergency_number) VALUES
+('Portugal', 'PT', '112'),
+('Spain', 'ES', '112'),
+('France', 'FR', '112'),
+('United States', 'US', '911');
+
+-- ==================================
 -- INSERT DEVICES
 -- ==================================
-INSERT INTO device (user_id, name, serial_number, located_at) VALUES
-(1, 'Kitchen Sensor', 'GSF-KIT-001', 'Kitchen'),
-(1, 'Garage Sensor', 'GSF-GAR-002', 'Garage'),
-(2, 'Boiler Room Sensor', 'GSF-BLR-003', 'Basement'),
-(4, 'Apartment Sensor', 'GSF-APT-004', 'Living Room');
+INSERT INTO device
+(user_id, country_id, name, serial_number, address, postal_code, located_at)
+VALUES
+(1, 1, 'Kitchen Sensor', 'GSF-KIT-001', 'Rua das Flores 123', '4000-123', 'Kitchen'),
+(1, 1, 'Garage Sensor', 'GSF-GAR-002', 'Rua das Flores 123', '4000-123', 'Garage'),
+(2, 2, 'Boiler Room Sensor', 'GSF-BLR-003', 'Calle Mayor 45', '28013', 'Basement'),
+(4, 4, 'Apartment Sensor', 'GSF-APT-004', '742 Evergreen Terrace', '62704', 'Living Room');
 
 -- ==================================
 -- INSERT NOTIFICATION TYPES

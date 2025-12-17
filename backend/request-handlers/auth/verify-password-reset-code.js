@@ -40,12 +40,10 @@ function verifyPasswordResetCodeHandler(req, res) {
 
     if (!userId) {
       // neutral response to prevent user enumeration
-      return res
-        .status(200)
-        .json({
-          success: false,
-          message: "Invalid or expired password reset code",
-        });
+      return res.status(200).json({
+        success: false,
+        message: "Invalid or expired password reset code",
+      });
     }
 
     // check if code is valid
@@ -62,12 +60,10 @@ function verifyPasswordResetCodeHandler(req, res) {
       }
 
       if (result.length === 0) {
-        return res
-          .status(200)
-          .json({
-            success: false,
-            message: "Invalid or expired password reset code",
-          });
+        return res.status(200).json({
+          success: false,
+          message: "Invalid or expired password reset code",
+        });
       }
 
       return res

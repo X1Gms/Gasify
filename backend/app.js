@@ -6,6 +6,7 @@ const swaggerDocs = require("./swagger.json");
 
 const authRoutes = require("./routes/auth-routes");
 const meRoutes = require("./routes/me-routes");
+const countriesRoutes = require("./routes/countries-routes");
 
 const app = express();
 const PORT = options.server.port || 8081;
@@ -20,6 +21,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // use routes
 app.use("/auth", authRoutes);
 app.use("/me", meRoutes);
+app.use("/countries", countriesRoutes);
 
 // start server
 app.listen(PORT, () => {
