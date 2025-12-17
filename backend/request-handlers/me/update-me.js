@@ -8,7 +8,6 @@ const { mysqlPool } = require("../../db/mysql-pool");
 
 /**
  * Handles the update of user
- * todo: check if we just need to update one field at a time or this is good
  *
  * @param {express.Request} req
  * @param {express.Response} res
@@ -16,41 +15,39 @@ const { mysqlPool } = require("../../db/mysql-pool");
 function updateMeHandler(req, res) {
   const { id: userId } = req.user;
 
-  // todo: check if this is enough or if we still need more fields
   // destructuring request body
   let { fullName, email, password, passwordConfirmation } = req.body;
 
-  // validate request body
-  if (!fullName || !email) {
+  // check if at least one field is provided
+  if (!fullName && !email && !password) {
     return res.status(400).json({
       success: false,
-      message: "Missing fields, expected: fullName, email",
+      message: "At least one field is expected: fullName, email, password",
     });
   }
 
-  // trim fullName
-  fullName = fullName.trim();
-
-  // validate fullName
-  if (fullName.length < 3) {
-    return res.status(400).json({
-      success: false,
-      message: "Full name must be at least 3 characters long",
-    });
+  // validate fullName if provided
+  if (fullName) {
+    fullName = fullName.trim();
+    if (fullName.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: "Full name must be at least 3 characters long",
+      });
+    }
   }
 
-  // check if email is valid using the util function
-  if (!emailRegex.test(email)) {
+  // validate email if provided
+  if (email && !emailRegex.test(email)) {
     return res
       .status(400)
       .json({ success: false, message: "Invalid email format" });
   }
 
-  // check if password fields are provided
-  const isPasswordUpdate = password || passwordConfirmation;
-  if (isPasswordUpdate) {
-    // if one password field is provided, both must be provided
-    if (!password || !passwordConfirmation) {
+  // validate password if provided
+  if (password) {
+    // if password is provided, passwordConfirmation must also be provided
+    if (!passwordConfirmation) {
       return res.status(400).json({
         success: false,
         message: "Both password and passwordConfirmation are required",
@@ -75,13 +72,13 @@ function updateMeHandler(req, res) {
   }
 
   // prepare fields to update
-  const updateFields = {
-    full_name: fullName, // maps API fullName to db full_name
-    email,
-  };
+  const updateFields = {};
 
-  // if password update is requested, hash it first then update
-  if (isPasswordUpdate) {
+  if (fullName) updateFields.full_name = fullName;
+  if (email) updateFields.email = email;
+
+  // if password provided, hash it first then proceed
+  if (password) {
     const saltRounds = options.auth.saltRounds;
     bcrypt.hash(password, saltRounds, (hashErr, hashedPassword) => {
       if (hashErr) {
@@ -96,7 +93,7 @@ function updateMeHandler(req, res) {
       executeUpdate(updateFields, userId, res);
     });
   } else {
-    // update without password
+    // proceed without password
     executeUpdate(updateFields, userId, res);
   }
 }
@@ -122,6 +119,12 @@ function executeUpdate(updateFields, userId, res) {
   mysqlPool.query(updateUserSql, (err, rows) => {
     if (err) {
       console.error("Error updating user:", err);
+      // check if error is due to duplicate email
+      if (err.code === "ER_DUP_ENTRY") {
+        return res
+          .status(409)
+          .json({ success: false, message: "Email already in use" });
+      }
       return res
         .status(500)
         .json({ success: false, message: "Internal server error" });

@@ -17,6 +17,9 @@ const {
   getMyDevicesHandler,
 } = require("../request-handlers/me/get-my-devices");
 const { createDeviceHandler } = require("../request-handlers/me/create-device");
+const {
+  updateMeDeviceHandler,
+} = require("../request-handlers/me/update-my-device");
 
 const router = Router();
 
@@ -28,5 +31,6 @@ router.get("/notifications", requireAuth, getMeNotificationsHandler);
 router.patch("/notifications/:id", requireAuth, updateMeNotificationHandler);
 router.get("/devices", requireAuth, getMyDevicesHandler);
 router.post("/devices", requireAuth, createDeviceHandler);
+router.patch("/devices/:id", requireAuth, updateMeDeviceHandler);
 
 module.exports = router;

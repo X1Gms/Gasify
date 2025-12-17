@@ -900,6 +900,128 @@
           }
         }
       }
+    },
+    "/me/devices/{id}": {
+      "patch": {
+        "summary": "Update a user device",
+        "tags": ["Me"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the device to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Fields to update. At least one must be provided.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDeviceRequestBody"
+              },
+              "examples": {
+                "updateFull": {
+                  "summary": "Update all fields",
+                  "value": {
+                    "name": "Kitchen Sensor V2",
+                    "countryId": 2,
+                    "address": "Calle Mayor 45",
+                    "postalCode": "28013"
+                  }
+                },
+                "updatePartial": {
+                  "summary": "Update only name",
+                  "value": {
+                    "name": "New Name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Device updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request (missing fields, validation error)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                },
+                "examples": {
+                  "missingFields": {
+                    "summary": "Missing fields",
+                    "value": {
+                      "success": false,
+                      "message": "At least one field is expected: name, countryId, address, postalCode"
+                    }
+                  },
+                  "validationError": {
+                    "summary": "Validation Error",
+                    "value": {
+                      "success": false,
+                      "message": "Name must be at least 3 characters long"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Device or Country not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                },
+                "examples": {
+                  "deviceNotFound": {
+                    "value": {
+                      "success": false,
+                      "message": "Device not found"
+                    }
+                  },
+                  "countryNotFound": {
+                    "value": {
+                      "success": false,
+                      "message": "Country not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -970,6 +1092,28 @@
           "address",
           "postalCode"
         ]
+      },
+      "UpdateDeviceRequestBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 3
+          },
+          "countryId": {
+            "type": "integer"
+          },
+          "address": {
+            "type": "string",
+            "minLength": 3
+          },
+          "postalCode": {
+            "type": "string",
+            "minLength": 3
+          }
+        },
+        "minProperties": 1,
+        "description": "At least one property must be provided"
       },
       "Device": {
         "type": "object",
