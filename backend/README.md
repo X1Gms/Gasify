@@ -35,15 +35,16 @@ backend/
 │   │   ├── register.js
 │   │   ├── reset-password.js
 │   │   └── verify-password-reset-code.js
-│   └── me/                    # Handlers de gestão de utilizador
-│       ├── delete-me.js
-│       ├── get-me.js
-│       ├── get-me-notifications.js
-│       ├── update-me.js
-│       └── update-me-notification.js
+│   └── users/                 # Domain users
+│       └── me/                # Handlers de gestão de utilizador
+│           ├── delete-me.js
+│           ├── get-me.js
+│           ├── get-me-notifications.js
+│           ├── update-me.js
+│           └── update-me-notification.js
 ├── routes/                    # Definição de rotas
 │   ├── auth-routes.js
-│   └── me-routes.js
+│   └── user-routes.js
 ├── utils/                     # Utilitários
 │   ├── email/                 # Utilitários de email
 │   │   ├── email-helpers.js
@@ -323,7 +324,7 @@ O sistema implementa tratamento consistente de erros:
 Os handlers estão organizados por **domínio funcional** em vez de por tipo de operação:
 
 - **`request-handlers/auth/`**: Toda a lógica relacionada com autenticação
-- **`request-handlers/me/`**: Toda a lógica relacionada com gestão do utilizador autenticado
+- **`request-handlers/users/me/`**: Toda a lógica relacionada com gestão do utilizador autenticado
 
 **Vantagens**:
 
