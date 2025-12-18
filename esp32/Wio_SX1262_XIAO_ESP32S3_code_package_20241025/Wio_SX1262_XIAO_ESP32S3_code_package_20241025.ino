@@ -3,15 +3,46 @@
 #include <Wire.h>
 #include "DHT.h"
 #include "GasDetector.h"
+#define debounceDelay 1000
+#define BUZZER_PIN D7
+#define BUTTON_PIN D6
 #define DHTTYPE DHT22  // DHT 22
 #define DHT_PIN D2
 #define MQ2_D_PIN D0
 #define MQ5_D_PIN D1
 #define MQ2_A_PIN A3
 #define MQ5_A_PIN A4
+unsigned long alarmStartMillis = 0;
+#define ALARM_TIMEOUT 30000UL  // 30 seconds
+// States
+#define IDLE 0       // 00 -> no emergency
+#define PENDING 1    // 01 -> buzzer active, waiting 30s
+#define CANCELED 2   // 10 -> canceled
+#define CONFIRMED 3  // 11 -> not canceled
+volatile int status = IDLE;
 
 DHT dht(DHT_PIN, DHTTYPE);
+int16_t state = RADIOLIB_ERR_NONE;
 
+/*
+*/
+// volatile bool buttonState = false;
+// volatile unsigned long lastInterrupt = 0;
+
+// void IRAM_ATTR handleButtonState() {
+//   unsigned long currentTime = millis();
+//   if (status == PENDING) {
+//     status = CANCELED;
+//     digitalWrite(BUZZER_PIN, LOW);
+//     lastInterrupt = currentTime;
+//   } else if (status == CONFIRMED) {
+//     status = IDLE;
+//     digitalWrite(BUZZER_PIN, LOW);
+//     lastInterrupt = currentTime;
+//   }
+// }
+/*
+*/
 // regional choices: EU868, US915, AU915, AS923, IN865, KR920, CN780, CN500
 const LoRaWANBand_t Region = EU868;
 const uint8_t subBand = 0;  // For US915 and AU915
@@ -58,7 +89,7 @@ void setup() {
   deviceInfoLoad();
   Serial.println(F("\nSetup... "));
   Serial.println(F("Initialise the radio"));
-  int16_t state = radio.begin();
+  state = radio.begin();
   debug(state != RADIOLIB_ERR_NONE, F("Initialise radio failed"), state, true);
 
   // SX1262 rf switch order: setRfSwitchPins(rxEn, txEn);
@@ -90,16 +121,47 @@ void setup() {
   dht.begin();
   pinMode(MQ2_D_PIN, INPUT);
   pinMode(MQ5_D_PIN, INPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLDOWN);
+  // attachInterrupt(BUTTON_PIN, handleButtonState, CHANGE);
+  digitalWrite(BUZZER_PIN, LOW);
 }
 
+
 void loop() {
+  Serial.println(status);
   uplinkPayloadLen = 0;
   memset(uplinkPayload, 0, sizeof(uplinkPayload));
   int MQ2AV = analogRead(MQ2_A_PIN);
   int MQ5AV = analogRead(MQ5_A_PIN);
   int dv2 = !digitalRead(MQ2_D_PIN);
   int dv5 = !digitalRead(MQ5_D_PIN);
-  int result = detectGas(dv2,dv5, MQ2AV, MQ5AV);
+  int result = detectGas(dv2, dv5, MQ2AV, MQ5AV);
+  bool btnState = (bool)digitalRead(BUTTON_PIN);
+  static bool _ = -1;
+  if ((result > 0) && (status == IDLE)) {
+    status = PENDING;
+    alarmStartMillis = millis();
+    _ = result;
+  }
+  if (status == PENDING && alarmStartMillis != 0) {
+    if (millis() - alarmStartMillis >= ALARM_TIMEOUT) {
+      status = CONFIRMED;
+      if (result < 0) {
+        if (!(status == IDLE)) {
+          result = _;
+        }
+      }
+    }
+  }
+  if (status == PENDING) {
+    digitalWrite(BUZZER_PIN, HIGH);
+  } else if (status == CONFIRMED) {
+    digitalWrite(BUZZER_PIN, HIGH);
+    if (btnState) {
+      status = IDLE;
+    }
+  }
   // int Temperature = dht.readTemperature();
   // int Hum = dht.readHumidity();
 
@@ -123,15 +185,15 @@ void loop() {
   uplinkPayloadLen = snprintf(
     (char *)uplinkPayload,
     sizeof(uplinkPayload),
-    "%d;%d;%d;%d;%d;%04X%08X",
+    "%d;%d;%d;%d;%d;%04X%08X;%d",
     result,
     MQ2AV,
     MQ5AV,
     Temperature,
     Hum,
     (uint16_t)(efuseMac >> 32),  // upper 16 bits
-    (uint32_t)efuseMac           // lower 32 bits
-  );
+    (uint32_t)efuseMac,          // lower 32 bits,
+    status);
 
 
   Serial.print("Uplink payload: ");
@@ -158,63 +220,8 @@ void loop() {
   }
 
   delay(1000);
+  if (status == CANCELED) status = IDLE;
 }
-
-
-
-// void loop() {
-//   float temp_hum_val[2] = { 0 };
-//   if (!dht.readTempAndHumidity(temp_hum_val)) {
-//     uplinkPayloadLen = 0;
-//     memset(uplinkPayload, sizeof(uplinkPayload), 0);
-
-//     // Convert temperature and humidity to bytes with decimal precision
-//     uint16_t tempDecimal = (temp_hum_val[1] * 100);
-//     uint16_t humDecimal = (temp_hum_val[0] * 100);
-//     uplinkPayload[uplinkPayloadLen++] = (tempDecimal >> 8);
-//     uplinkPayload[uplinkPayloadLen++] = tempDecimal & 0xFF;
-//     uplinkPayload[uplinkPayloadLen++] = (humDecimal >> 8);
-//     uplinkPayload[uplinkPayloadLen++] = humDecimal & 0xFF;
-
-//     Serial.print("Temperature: ");
-//     Serial.print(temp_hum_val[1]);
-//     Serial.print(" *C, Humidity: ");
-//     Serial.println(temp_hum_val[0]);
-//     Serial.print("Uplink payload length: ");
-//     Serial.println(uplinkPayloadLen);
-//     // Output the uplink payload for debugging
-//     Serial.print("Uplink payload: ");
-//     for (int i = 0; i < uplinkPayloadLen; i++) {
-//       Serial.print(uplinkPayload[i], HEX);
-//       Serial.print(" ");
-//     }
-//     Serial.println();
-
-//     int16_t state = node.sendReceive(uplinkPayload, uplinkPayloadLen, LORAWAN_UPLINK_USER_PORT);
-//     if (state != RADIOLIB_LORAWAN_NO_DOWNLINK && state != RADIOLIB_ERR_NONE) {
-//       Serial.println("Error in sendReceive:");
-//       Serial.println(state);
-//     } else {
-//       Serial.println("Sending uplink successful!");
-//     }
-//   } else {
-//     Serial.println("Failed to get temprature and humidity value.");
-//     uplinkPayloadLen = 0;
-//     memset(uplinkPayload, sizeof(uplinkPayload), 0);
-//   }
-
-//   uint32_t currentMillis = millis();
-//   if (currentMillis - previousMillis >= LORAWAN_UPLINK_PERIOD) {
-//     previousMillis = currentMillis;
-//     if (uplinkPayloadLen) {
-//       Serial.println(F("Sending uplink"));
-//       int16_t state = node.sendReceive(uplinkPayload, uplinkPayloadLen, LORAWAN_UPLINK_USER_PORT);
-//       debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), F("Error in sendReceive"), state, false);
-//       uplinkPayloadLen = 0;
-//     }
-//   }
-//   delay(1000);
-// }
 
 void deviceInfoLoad() {
   uint16_t checkSum = 0, checkSum_ = 0;
