@@ -16,11 +16,14 @@ const {
 const {
   getMyDevicesHandler,
 } = require("../request-handlers/me/get-my-devices");
-const { getMyDeviceHandler } = require("../request-handlers/me/get-device");
+const { getMyDeviceHandler } = require("../request-handlers/me/get-my-device");
 const { createDeviceHandler } = require("../request-handlers/me/create-device");
 const {
   updateMeDeviceHandler,
 } = require("../request-handlers/me/update-my-device");
+const {
+  deleteMyDeviceHandler,
+} = require("../request-handlers/me/delete-my-device");
 
 const router = Router();
 
@@ -34,5 +37,6 @@ router.get("/devices", requireAuth, getMyDevicesHandler);
 router.get("/devices/:id", requireAuth, getMyDeviceHandler);
 router.post("/devices", requireAuth, createDeviceHandler);
 router.patch("/devices/:id", requireAuth, updateMeDeviceHandler);
+router.delete("/devices/:id", requireAuth, deleteMyDeviceHandler);
 
 module.exports = router;
