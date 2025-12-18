@@ -13,6 +13,7 @@
 #define MQ2_A_PIN A3
 #define MQ5_A_PIN A4
 unsigned long alarmStartMillis = 0;
+bool needsCancel = false;
 #define ALARM_TIMEOUT 30000UL  // 30 seconds
 // States
 #define IDLE 0       // 00 -> no emergency
@@ -122,13 +123,16 @@ void setup() {
   pinMode(MQ2_D_PIN, INPUT);
   pinMode(MQ5_D_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLDOWN);
+  pinMode(BUTTON_PIN, INPUT);
   // attachInterrupt(BUTTON_PIN, handleButtonState, CHANGE);
   digitalWrite(BUZZER_PIN, LOW);
 }
 
 
 void loop() {
+  if (status == CANCELED) {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
   Serial.println(status);
   uplinkPayloadLen = 0;
   memset(uplinkPayload, 0, sizeof(uplinkPayload));
@@ -139,6 +143,10 @@ void loop() {
   int result = detectGas(dv2, dv5, MQ2AV, MQ5AV);
   bool btnState = (bool)digitalRead(BUTTON_PIN);
   static bool _ = -1;
+  if ((status == PENDING) && btnState) {
+    status = CANCELED;
+    needsCancel = true;
+  }
   if ((result > 0) && (status == IDLE)) {
     status = PENDING;
     alarmStartMillis = millis();
@@ -211,6 +219,12 @@ void loop() {
       uplinkPayloadLen,
       LORAWAN_UPLINK_USER_PORT);
 
+    if (state == = RADIOLIB_ERR_NONE) {
+      if (state == CANCELED && needsCancel) {
+        needsCancel = false;
+        state = IDLE;
+      }
+    }
     if (state != RADIOLIB_LORAWAN_NO_DOWNLINK && state != RADIOLIB_ERR_NONE) {
       Serial.println("Error in sendReceive:");
       Serial.println(state);
