@@ -1,7 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2");
 
-const { mysqlPool } = require("../../db/mysql-pool");
+const { mysqlPool } = require("../../../db/mysql-pool");
 
 /**
  * Handles the creation of a new device for the authenticated user

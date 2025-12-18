@@ -2,7 +2,7 @@ const express = require("express");
 const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 
-const { mysqlPool } = require("../../db/mysql-pool");
+const { mysqlPool } = require("../../../db/mysql-pool");
 
 /**
  * Handles user deletion requests, requiring password confirmation.

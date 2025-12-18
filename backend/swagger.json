@@ -322,10 +322,10 @@
         }
       }
     },
-    "/me": {
+    "/users/me": {
       "get": {
         "summary": "Get current user",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -377,7 +377,7 @@
       "patch": {
         "summary": "Update current user",
         "description": "Update user profile information. Password fields are optional - if provided, both password and passwordConfirmation must be included and meet security requirements.",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -498,7 +498,7 @@
       },
       "delete": {
         "summary": "Delete current user",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -565,10 +565,10 @@
         }
       }
     },
-    "/me/notifications": {
+    "/users/me/notifications": {
       "get": {
         "summary": "Get current user notifications",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -618,11 +618,11 @@
         }
       }
     },
-    "/me/notifications/{id}": {
+    "/users/me/notifications/{id}": {
       "patch": {
         "summary": "Update a current user notification",
         "description": "At the moment, this is only used to mark a notification as read, but it can be used to update other fields in the future because it is scalable.",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -776,10 +776,10 @@
         }
       }
     },
-    "/me/devices": {
+    "/users/me/devices": {
       "get": {
         "summary": "Get current user devices",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -820,7 +820,7 @@
       },
       "post": {
         "summary": "Create a new device",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -901,11 +901,11 @@
         }
       }
     },
-    "/me/devices/{id}": {
+    "/users/me/devices/{id}": {
       "get": {
         "summary": "Get device details",
         "description": "Retrieve device details, current sensor readings (cards), and historical data (charts).",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -978,7 +978,7 @@
       },
       "patch": {
         "summary": "Update a user device",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []
@@ -1098,7 +1098,7 @@
       },
       "delete": {
         "summary": "Delete a user device",
-        "tags": ["Me"],
+        "tags": ["Users"],
         "security": [
           {
             "bearerAuth": []

@@ -2,9 +2,9 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const mysql = require("mysql2");
 
-const { emailRegex, passwordRegex } = require("../../utils/regexes");
-const options = require("../../config/options.json");
-const { mysqlPool } = require("../../db/mysql-pool");
+const { emailRegex, passwordRegex } = require("../../../utils/regexes");
+const options = require("../../../config/options.json");
+const { mysqlPool } = require("../../../db/mysql-pool");
 
 /**
  * Handles the update of user

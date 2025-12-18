@@ -5,7 +5,7 @@ const options = require("./config/options.json");
 const swaggerDocs = require("./swagger.json");
 
 const authRoutes = require("./routes/auth-routes");
-const meRoutes = require("./routes/me-routes");
+const userRoutes = require("./routes/user-routes");
 const countriesRoutes = require("./routes/countries-routes");
 
 const app = express();
@@ -20,7 +20,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // use routes
 app.use("/auth", authRoutes);
-app.use("/me", meRoutes);
+app.use("/users", userRoutes);
 app.use("/countries", countriesRoutes);
 
 // start server
