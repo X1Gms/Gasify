@@ -1,0 +1,21 @@
+{
+  "server": {
+    "PORT": ,
+    "mqtt": {
+      "PORT": 
+    }
+  },
+  "ttn": {
+    "apikey": "",
+    "username": "",
+    "url": "",
+    "connectTimeout": ,
+    "clean": 
+  },
+  "mysql": {
+    "host": "",
+    "database": "",
+    "user": "",
+    "password": ""
+  }
+}
