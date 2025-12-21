@@ -126,9 +126,9 @@ CREATE INDEX `idx_recovery_user`
 ON `password_reset_code` (`user_id`);
 
 -- ==================================
--- READINGS TABLE
+-- READING TABLE
 -- ==================================
-CREATE TABLE `readings` (
+CREATE TABLE `reading` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `device_id` BIGINT UNSIGNED NOT NULL,
   `gas_type` ENUM('LPG','Methane','CO','Smoke') NOT NULL,
@@ -138,32 +138,32 @@ CREATE TABLE `readings` (
   `mq5` SMALLINT,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_readings_device`
+  CONSTRAINT `fk_reading_device`
     FOREIGN KEY (`device_id`)
     REFERENCES `device` (`id`)
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE INDEX `idx_readings_device`
-ON `readings` (`device_id`);
+CREATE INDEX `idx_reading_device`
+ON `reading` (`device_id`);
 
 -- ==================================
 -- MCU DETECTION TABLE
 -- ==================================
 CREATE TABLE `mcu_detection` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `readings_id` BIGINT UNSIGNED NOT NULL,
+  `reading_id` BIGINT UNSIGNED NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `canceled` BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_mcu_detection_readings`
-    FOREIGN KEY (`readings_id`)
-    REFERENCES `readings` (`id`)
+  CONSTRAINT `fk_mcu_detection_reading`
+    FOREIGN KEY (`reading_id`)
+    REFERENCES `reading` (`id`)
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-CREATE INDEX `idx_mcu_detection_readings`
-ON `mcu_detection` (`readings_id`);
+CREATE INDEX `idx_mcu_detection_reading`
+ON `mcu_detection` (`reading_id`);
 
 -- ==================================
 -- INSERT EXISTING USERS
@@ -251,7 +251,7 @@ INSERT INTO password_reset_code (user_id, code, expires_at, used_at) VALUES
 -- ==================================
 -- INSERT READINGS
 -- ==================================
-INSERT INTO readings (device_id, gas_type, humidity, temperature, mq2, mq5, created_at) VALUES
+INSERT INTO reading (device_id, gas_type, humidity, temperature, mq2, mq5, created_at) VALUES
 (1, 'LPG', 45.20, 22.80, 120, 95, NOW() - INTERVAL 2 HOUR),
 (1, 'LPG', 48.10, 23.40, 380, 310, NOW() - INTERVAL 50 MINUTE),
 (2, 'Methane', 52.00, 21.10, 620, 580, NOW() - INTERVAL 3 HOUR),
@@ -265,7 +265,7 @@ INSERT INTO readings (device_id, gas_type, humidity, temperature, mq2, mq5, crea
 -- ==================================
 -- INSERT MCU DETECTIONS
 -- ==================================
-INSERT INTO mcu_detection (readings_id, canceled) VALUES
+INSERT INTO mcu_detection (reading_id, canceled) VALUES
 (2, FALSE),
 (3, FALSE),
 (5, TRUE),

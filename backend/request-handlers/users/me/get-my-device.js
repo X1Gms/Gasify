@@ -24,7 +24,7 @@ function getMyDeviceHandler(req, res) {
 
   // check ownership
   const checkOwnershipSql = mysql.format(
-    "SELECT id FROM device WHERE id = ? AND user_id = ?",
+    `SELECT d.id, EXISTS(SELECT 1 FROM reading r JOIN mcu_detection md ON md.reading_id = r.id WHERE r.device_id = d.id AND md.canceled = 0) as has_active_alert FROM device d WHERE d.id = ? AND d.user_id = ?`,
     [deviceId, userId]
   );
   mysqlPool.query(checkOwnershipSql, (err, results) => {
@@ -45,7 +45,7 @@ function getMyDeviceHandler(req, res) {
 
     // get latest readings
     const getLateastReadingSql = mysql.format(
-      "SELECT * FROM readings WHERE device_id = ? ORDER BY created_at DESC LIMIT 1",
+      "SELECT * FROM reading WHERE device_id = ? ORDER BY created_at DESC LIMIT 1",
       [deviceId]
     );
     mysqlPool.query(getLateastReadingSql, (err, latestReadingRows) => {
@@ -59,7 +59,7 @@ function getMyDeviceHandler(req, res) {
       // get history readings
       const rangeCondition = getRangeCondition(range);
       const getHistoryReadingsSql = mysql.format(
-        `SELECT * FROM readings WHERE device_id = ? AND created_at >= NOW() - INTERVAL ${rangeCondition} ORDER BY created_at ASC`,
+        `SELECT * FROM reading WHERE device_id = ? AND created_at >= NOW() - INTERVAL ${rangeCondition} ORDER BY created_at ASC`,
         [deviceId]
       );
       mysqlPool.query(getHistoryReadingsSql, (err, historyRows) => {
@@ -73,6 +73,7 @@ function getMyDeviceHandler(req, res) {
         const response = formatResponse(latestReadingRows[0], historyRows);
         return res.json({
           success: true,
+          has_active_alert: !!results[0].has_active_alert, // ensure boolean
           ...response,
         });
       });

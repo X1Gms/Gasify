@@ -14,7 +14,7 @@ function getMyDevicesHandler(req, res) {
 
   // get user devices
   const getUserDevicesSql = mysql.format(
-    `SELECT * FROM device WHERE user_id = ?`,
+    `SELECT d.*, EXISTS(SELECT 1 FROM reading r JOIN mcu_detection md ON md.reading_id = r.id WHERE r.device_id = d.id AND md.canceled = 0) as has_active_alert FROM device d WHERE d.user_id = ?`,
     [userId]
   );
   mysqlPool.query(getUserDevicesSql, (err, result) => {
@@ -25,7 +25,12 @@ function getMyDevicesHandler(req, res) {
         .json({ success: false, message: "Internal server error" });
     }
 
-    return res.status(200).json({ success: true, devices: result });
+    const devices = result.map((device) => ({
+      ...device,
+      has_active_alert: !!device.has_active_alert,
+    }));
+
+    return res.status(200).json({ success: true, devices });
   });
 }
 module.exports.getMyDevicesHandler = getMyDevicesHandler;
