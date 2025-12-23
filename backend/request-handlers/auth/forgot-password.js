@@ -6,7 +6,7 @@ const { generateRandomCode } = require("../../utils/random-code");
 const config = require("../../config/options.json");
 const { sendEmail } = require("../../utils/email/send-email");
 const { sendNeutralResponse } = require("../../utils/send-neutral-response");
-const { emailStyles } = require("../../utils/email/email-helpers");
+const { emailStyles, logoUrl } = require("../../utils/email/email-helpers");
 
 /**
  * Handles user forgot password requests.
@@ -48,7 +48,12 @@ function forgotPasswordHandler(req, res) {
 
     // if no user, return neutral response
     if (!userId) {
-      return sendNeutralResponse(res, true, "User not found", productionMessage);
+      return sendNeutralResponse(
+        res,
+        true,
+        "User not found",
+        productionMessage
+      );
     }
 
     // check if user already has a code
@@ -147,64 +152,147 @@ function forgotPasswordHandler(req, res) {
               Gasify
               `;
 
-              // todo: add styles
               const emailHtml = `
-              <div style="width: 100%; background-color: ${emailStyles.background}; padding: 40px 0; font-family: Arial, sans-serif;">
-                <div style="
-                    max-width: 480px;
-                    margin: auto;
-                    background-color: ${emailStyles.card};
-                    border: 1px solid ${emailStyles.border};
-                    border-radius: 12px;
-                    padding: 32px;
-                    box-shadow: ${emailStyles.boxShadow};
-                    color: ${emailStyles.foreground};
-                  "
-                >
-                  <h2 style="color: ${emailStyles.primary}; margin-top: 0; margin-bottom: 24px; font-size: 24px; font-weight: 600;">
-                    Password Reset Code
-                  </h2>
+              <table
+                width="100%"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
+                bgcolor="${emailStyles.background}"
+                style="background-color:${emailStyles.background}; font-family:Arial, sans-serif;"
+              >
+                <tr>
+                  <td align="center" style="padding:40px 0;">
+                    <table
+                      width="480"
+                      cellpadding="0"
+                      cellspacing="0"
+                      border="0"
+                      align="center"
+                      style="width:480px; max-width:480px;"
+                    >
+                      <tr>
+                        <td>
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <td
+                                bgcolor="${emailStyles.card}"
+                                style="
+                                  padding:32px;
+                                  background-color:${emailStyles.card};
+                                  border:1px solid ${emailStyles.border};
+                                  border-radius:12px;
+                                  color:${emailStyles.foreground};
+                                  font-family:Arial, sans-serif;
+                                "
+                              >
 
-                  <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">
-                    Hello, ${fullName},
-                  </p>
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                  <tr>
+                                    <td align="center" style="padding-bottom:32px;">
+                                      <img
+                                        src="${logoUrl}"
+                                        alt="Gasify"
+                                        width="78"
+                                        style="
+                                          display:block;
+                                          border:0;
+                                          outline:none;
+                                          text-decoration:none;
+                                          max-width:78px;
+                                          border-radius:50%;
+                                          height:auto;
+                                        "
+                                      />
+                                    </td>
+                                  </tr>
+                                </table>
 
-                  <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.5;">
-                    We received a request to reset the password associated with your Gasify account.
-                  </p>
+                                <h2
+                                  style="
+                                    margin:0 0 24px 0;
+                                    font-size:24px;
+                                    font-weight:600;
+                                    color:${emailStyles.primary};
+                                  "
+                                >
+                                  Password Reset Code
+                                </h2>
 
-                  <p style="margin: 0 0 12px 0; font-size: 14px; line-height: 1.5;">
-                    Your password reset code is:
-                  </p>
+                                <p style="margin:0 0 16px 0; font-size:14px; line-height:1.5;">
+                                  Hello, ${fullName},
+                                </p>
 
-                  <div style="
-                      text-align: center;
-                      padding: 20px;
-                      font-size: 28px;
-                      font-weight: bold;
-                      color: ${emailStyles.primary};
-                      background-color: ${emailStyles.muted};
-                      border: 1px solid ${emailStyles.primary};
-                      border-radius: 8px;
-                      margin-bottom: 24px;
-                    "
-                  >
-                    ${code}
-                  </div>
+                                <p style="margin:0 0 16px 0; font-size:14px; line-height:1.5;">
+                                  We received a request to reset the password associated with your Gasify account.
+                                </p>
 
-                  <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.5;">
-                    This code is valid for <strong style="color: ${emailStyles.primary};">${codeExpirationTimeInMinutes} minutes</strong>.  
-                    If you did not request a password reset, you can safely ignore this message.
-                  </p>
+                                <p style="margin:0 0 12px 0; font-size:14px; line-height:1.5;">
+                                  Your password reset code is:
+                                </p>
 
-                  <hr style="border: none; border-top: 1px solid ${emailStyles.border}; margin: 28px 0;" />
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+                                  <tr>
+                                    <td
+                                      align="center"
+                                      bgcolor="${emailStyles.muted}"
+                                      style="
+                                        padding:20px;
+                                        font-size:28px;
+                                        font-weight:bold;
+                                        color:${emailStyles.primary};
+                                        border:1px solid ${emailStyles.primary};
+                                        border-radius:8px;
+                                      "
+                                    >
+                                      ${code}
+                                    </td>
+                                  </tr>
+                                </table>
 
-                  <p style="margin: 0; font-size: 13px; line-height: 1.5; color: ${emailStyles.mutedForeground};">
-                    Thank you,<br />
-                    <strong style="color: ${emailStyles.foreground};">Gasify</strong>
-                  </p>
-                </div>
-              </div>
+                                <p style="margin:0 0 20px 0; font-size:14px; line-height:1.5;">
+                                  This code is valid for
+                                  <strong style="
+                                      display:inline-block;
+                                      color:${emailStyles.primary};
+                                    "
+                                  >
+                                    ${codeExpirationTimeInMinutes} minutes
+                                  </strong>.
+                                  If you did not request a password reset, you can safely ignore this message.
+                                </p>
+
+                                <hr
+                                  style="
+                                    border:none;
+                                    border-top:1px solid ${emailStyles.border};
+                                    margin:28px 0;
+                                  "
+                                />
+
+                                <p
+                                  style="
+                                    margin:0;
+                                    font-size:13px;
+                                    line-height:1.5;
+                                    color:${emailStyles.mutedForeground};
+                                  "
+                                >
+                                  Thank you,<br />
+                                  <strong style="color:${emailStyles.foreground};">Gasify</strong>
+                                </p>
+
+                              </td>
+                            </tr>
+                          </table>
+
+                        </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              </table>
               `;
 
               // send email

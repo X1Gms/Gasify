@@ -7,6 +7,8 @@ const emailStyles = {
   muted: "#fbf3ed", // muted color
   mutedForeground: "#998D8D", // muted text color
   border: "#cccccc", // borders
-  boxShadow: "0 0 8px 0 rgb(0 0 0 / 25%)", // card shadow
 };
 module.exports.emailStyles = emailStyles;
+
+const logoUrl = "https://i.ibb.co/tp8WMWnM/Gasify.png";
+module.exports.logoUrl = logoUrl;
