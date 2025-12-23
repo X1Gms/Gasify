@@ -186,20 +186,19 @@ function forgotPasswordHandler(req, res) {
                                   font-family:Arial, sans-serif;
                                 "
                               >
-
                                 <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                   <tr>
                                     <td align="center" style="padding-bottom:32px;">
                                       <img
                                         src="${logoUrl}"
                                         alt="Gasify"
-                                        width="78"
+                                        width="${emailStyles.logoHeight}"
                                         style="
                                           display:block;
                                           border:0;
                                           outline:none;
                                           text-decoration:none;
-                                          max-width:78px;
+                                          max-width:${emailStyles.logoHeight}px;
                                           border-radius:50%;
                                           height:auto;
                                         "
@@ -281,15 +280,12 @@ function forgotPasswordHandler(req, res) {
                                   Thank you,<br />
                                   <strong style="color:${emailStyles.foreground};">Gasify</strong>
                                 </p>
-
                               </td>
                             </tr>
                           </table>
-
                         </td>
                       </tr>
                     </table>
-
                   </td>
                 </tr>
               </table>
