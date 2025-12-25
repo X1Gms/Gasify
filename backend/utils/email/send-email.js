@@ -34,8 +34,8 @@ function sendEmail({ to, subject, text, html }, callback) {
         return callback(error);
       }
 
+      console.log("Email sent to:", to);
       if (isDevelopmentEnv) {
-        console.log("Email sent to:", to);
         console.log("Test message URL:", nodemailer.getTestMessageUrl(info));
       }
 
