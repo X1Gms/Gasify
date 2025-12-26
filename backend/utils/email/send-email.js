@@ -7,11 +7,11 @@ const { isDevelopmentEnv } = require("../dev-environment");
  * Sends an email.
  *
  * @param {Object} options
- * @param {string} options.to - Recipient email address.
- * @param {string} options.subject - Email subject.
- * @param {string} options.text - Plain text body.
- * @param {string} options.html - Optional HTML body.
- * @param {function()} callback - Callback function to be called when the email is sent.
+ * @param {string} options.to Recipient email address.
+ * @param {string} options.subject Email subject.
+ * @param {string} options.text Plain text body.
+ * @param {string} options.html Optional HTML body.
+ * @param {function()} callback Callback function to be called when the email is sent.
  */
 function sendEmail({ to, subject, text, html }, callback) {
   getTransporter((err, transporter) => {

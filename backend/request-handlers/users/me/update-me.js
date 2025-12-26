@@ -101,9 +101,10 @@ module.exports.updateMeHandler = updateMeHandler;
 
 /**
  * Helper function to execute the update query
- * @param {Object} updateFields - Object containing fields to update
- * @param {string|number} userId - The ID of the user to update
- * @param {express.Response} res - Express response object
+ *
+ * @param {Object} updateFields Object containing fields to update
+ * @param {string|number} userId The ID of the user to update
+ * @param {express.Response} res Express response object
  */
 function executeUpdate(updateFields, userId, res) {
   // build dynamic SQL query
