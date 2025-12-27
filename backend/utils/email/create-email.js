@@ -20,7 +20,11 @@ function createEmail(templateName, data) {
   const template = templates[templateName];
 
   if (!template) {
-    throw new Error(`Template ${templateName} not found`);
+    // get available templates
+    const availableTemplates = Object.keys(templates).join(", ");
+    throw new Error(
+      `Template ${templateName} not found. Available templates: ${availableTemplates}`
+    );
   }
 
   return template(data);
