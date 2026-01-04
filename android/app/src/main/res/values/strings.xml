@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Gasify Project</string>
+    <string name="welcome">Bem-Vindo</string>
+    <string name="keep_environment_safe">Mantenha o seu ambiente seguro</string>
+    <string name="fullName">Nome Completo</string>
+    <string name="send">Enviar</string>
+    <string name="authenticate">Autenticar</string>
+    <string name="six_digit">Insira o código de 6 dígitos que recebeu no seu e-mail</string>
+    <string name="insertCode">Inserir Código</string>
+    <string name="changePass">Mudar Palavra-Passe</string>
+    <string name="changePassDesc">Altere a sua palavra-passe para uma que seja fácil de lembrar</string>
+    <string name="code">Código</string>
+    <string name="email">E-mail</string>
+    <string name="password">Palavra-Passe</string>
+    <string name="conPassword">Confirmar Palavra-Passe</string>
+    <string name="remember_me">Lembrar-me</string>
+    <string name="rememberNow">Lembrei da Palavra-Passe</string>
+    <string name="forgot_password">Esqueceu da palavra-passe?</string>
+    <string name="login">Iniciar Sessão</string>
+    <string name="recPass">Recuperar Palavra-Passe</string>
+    <string name="insertEmail">Insira o seu e-mail para receber um código para recuperar a sua conta</string>
+    <string name="no_account">Não tem conta?</string>
+    <string name="yes_account">Tem conta regista?</string>
+    <string name="regist_yourself">Registe</string>
+    <string name="termsNConditions">Ao marcar a caixa, permitirá ter acesso a estas informações</string>
+    <string name="edit">Editar Perfil</string>
+    <string name="delete">Eliminar Conta</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

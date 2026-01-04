@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#FF00051A</color>
+    <color name="background_30">#4D676767</color>
+    <color name="foreground">#FFFFFFFF</color>
+    <color name="primary">#FFB86C1C</color>
+    <color name="primary_foreground">#FFFFFFFF</color>
+    <color name="muted">#FFFFA75B</color>
+    <color name="muted_foreground">#FF998D8D</color>
+    <color name="card">#FF01061D</color>
+    <color name="card_foreground">#FF998D8D</color>
+    <color name="disabled">#FF0D111F</color>
+    <color name="disabled_foreground">#FF474756</color>
+    <color name="destroy">#FFB82B2E</color>
+    <color name="success">#FF24BC3B</color>
+    <color name="card_destroy">#FF3F0B0C</color>
+    <color name="card_destroy_foreground">#FFB5595B</color>
+    <color name="shadow_color">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
+</resources>
