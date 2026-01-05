@@ -52,15 +52,6 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvDeviceId"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Device #01"
-                android:textColor="@color/card_foreground"
-                android:textSize="13sp"
-                android:layout_marginTop="2dp" />
-
-            <TextView
                 android:id="@+id/tvDeviceSerial"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

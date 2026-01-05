@@ -1,6 +1,5 @@
 package com.example.gasify_project.view;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -126,7 +125,7 @@ public class DeviceSpecFragment extends Fragment {
 
     private void loadDeviceData() {
         tvDeviceTitle.setText("Device #01");
-        tvDeviceSubtitle.setText("Device #01 · Série: EAFC26EF");
+        tvDeviceSubtitle.setText("Número Série: EAFC26EF");
         tvGasPresence.setText("Baixa");
         tvCarbonMonoxide.setText("Baixa");
         tvTemperature.setText("16°C");
@@ -161,6 +160,15 @@ public class DeviceSpecFragment extends Fragment {
         cardView.setRadius(40);
         cardView.setCardElevation(8);
         cardView.setCardBackgroundColor(getResources().getColor(R.color.card, null));
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            cardView.setOutlineSpotShadowColor(
+                    getResources().getColor(R.color.shadow_color, null)
+            );
+            cardView.setOutlineAmbientShadowColor(
+                    getResources().getColor(R.color.shadow_color, null)
+            );
+        }
 
         LinearLayout container = new LinearLayout(requireContext());
         container.setOrientation(LinearLayout.VERTICAL);

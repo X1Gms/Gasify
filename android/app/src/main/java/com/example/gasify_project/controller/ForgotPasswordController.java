@@ -4,7 +4,10 @@ import android.util.Log;
 import android.util.Patterns;
 
 import com.example.gasify_project.api.ApiClient;
+import com.example.gasify_project.model.ForgotPasswordRequest;
+import com.example.gasify_project.model.ResetPasswordRequest;
 import com.example.gasify_project.model.SimpleResponse;
+import com.example.gasify_project.model.VerifyCodeRequest;
 import com.google.gson.Gson;
 
 import okhttp3.ResponseBody;
@@ -49,7 +52,7 @@ public class ForgotPasswordController {
         this.userEmail = email;
 
         // Criar request
-        ApiClient.ForgotPasswordRequest request = new ApiClient.ForgotPasswordRequest(email);
+        ForgotPasswordRequest request = new ForgotPasswordRequest(email);
 
         // DEBUG
         Log.d("ForgotPasswordController", "Solicitando código para: " + email);
@@ -107,7 +110,7 @@ public class ForgotPasswordController {
 
         if (listener != null) listener.onRequestStarted();
 
-        ApiClient.VerifyCodeRequest request = new ApiClient.VerifyCodeRequest(userEmail, code);
+        VerifyCodeRequest request = new VerifyCodeRequest(userEmail, code);
         Log.d("ForgotPasswordController", "Verificando código: " + code + " para: " + userEmail);
 
         ApiClient.getService().verifyResetCode(request).enqueue(new Callback<SimpleResponse>() {
@@ -185,7 +188,7 @@ public class ForgotPasswordController {
         if (listener != null) listener.onRequestStarted();
 
         // Criar request
-        ApiClient.ResetPasswordRequest request = new ApiClient.ResetPasswordRequest(
+        ResetPasswordRequest request = new ResetPasswordRequest(
                 userEmail, code, password, confirmPassword
         );
 

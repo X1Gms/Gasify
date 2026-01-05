@@ -208,6 +208,7 @@
             <LinearLayout
                 android:outlineSpotShadowColor="@color/shadow_color"
                 android:layout_width="match_parent"
+                android:minHeight="600dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:background="@drawable/sketch_devices"
