@@ -3,6 +3,7 @@ const mysql = require("mysql2");
 
 const { mysqlPool } = require("../../../db/mysql-pool");
 
+// TODO: Add the cards info to the response
 /**
  * Handles the retrieval of device details including sensor readings and charts
  *
@@ -24,7 +25,7 @@ function getMyDeviceHandler(req, res) {
 
   // check ownership
   const checkOwnershipSql = mysql.format(
-    `SELECT d.id, EXISTS(SELECT 1 FROM reading r JOIN mcu_detection md ON md.reading_id = r.id WHERE r.device_id = d.id AND md.canceled = 0) as has_active_alert FROM device d WHERE d.id = ? AND d.user_id = ?`,
+    `SELECT d.id, d.name, d.serial_number, EXISTS(SELECT 1 FROM reading r JOIN mcu_detection md ON md.reading_id = r.id WHERE r.device_id = d.id AND md.canceled = 0) as has_active_alert FROM device d WHERE d.id = ? AND d.user_id = ?`,
     [deviceId, userId]
   );
   mysqlPool.query(checkOwnershipSql, (err, results) => {
@@ -42,6 +43,8 @@ function getMyDeviceHandler(req, res) {
         message: "Device not found",
       });
     }
+
+    const device = results[0];
 
     // get latest readings
     const getLateastReadingSql = mysql.format(
@@ -73,7 +76,9 @@ function getMyDeviceHandler(req, res) {
         const response = formatResponse(latestReadingRows[0], historyRows);
         return res.json({
           success: true,
-          has_active_alert: !!results[0].has_active_alert, // ensure boolean
+          name: device.name,
+          serial_number: device.serial_number,
+          has_active_alert: !!device.has_active_alert, // ensure boolean
           ...response,
         });
       });

@@ -1247,6 +1247,15 @@
           "success": {
             "type": "boolean"
           },
+          "name": {
+            "type": "string"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "has_active_alert": {
+            "type": "boolean"
+          },
           "cards": {
             "type": "object",
             "properties": {
@@ -1360,6 +1369,23 @@
         "properties": {
           "success": {
             "type": "boolean"
+          },
+          "cards": {
+            "type": "object",
+            "properties": {
+              "total_devices": {
+                "type": "integer"
+              },
+              "active_alerts": {
+                "type": "integer"
+              },
+              "avg_gas": {
+                "type": "number"
+              },
+              "avg_co": {
+                "type": "number"
+              }
+            }
           },
           "devices": {
             "type": "array",
