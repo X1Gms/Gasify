@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardDevice"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/card"
+    android:outlineSpotShadowColor="@color/shadow_color">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Device Icon -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/deviceIconCard"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/primary">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_device"
+                app:tint="@color/primary_foreground" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Device Info -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/tvDeviceName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Device #01"
+                android:textColor="@color/foreground"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDeviceId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Device #01"
+                android:textColor="@color/card_foreground"
+                android:textSize="13sp"
+                android:layout_marginTop="2dp" />
+
+            <TextView
+                android:id="@+id/tvDeviceSerial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Número de Série: EAFC26EF"
+                android:textColor="@color/card_foreground"
+                android:textSize="12sp"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Menu Button -->
+        <ImageView
+            android:id="@+id/btnMenu"
+            android:layout_width="30dp"
+            android:layout_height="20dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_more_horiz"
+            app:tint="@color/primary"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <!-- Alarm Button (only visible for emergency devices) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelAlarm"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Cancelar Alarme"
+            android:textSize="12sp"
+            android:textAllCaps="false"
+            android:visibility="gone"
+            app:backgroundTint="@color/destroy"
+            app:cornerRadius="8dp"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.GasifyProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary color -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary</item>
+        <item name="colorOnPrimary">@color/primary_foreground</item>
+
+        <!-- Secondary color -->
+        <item name="colorSecondary">@color/muted</item>
+        <item name="colorSecondaryVariant">@color/muted</item>
+        <item name="colorOnSecondary">@color/foreground</item>
+
+        <!-- Background color -->
+        <item name="android:windowBackground">@color/background</item> <!-- FIXED -->
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- Material Components -->
+        <item name="materialButtonStyle">@style/Widget.GasifyProject.Button</item>
+        <item name="textInputStyle">@style/Widget.GasifyProject.TextInputLayout</item>
+
+        <!-- Text colors -->
+        <item name="android:textColor">@color/foreground</item>
+        <item name="android:textColorHint">@color/card_foreground</item> <!-- FIXED -->
+    </style>
+
+    <!-- Custom button style -->
+    <style name="Widget.GasifyProject.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">@drawable/primary_button_background</item>
+        <item name="android:textColor">@color/primary_foreground</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">28dp</item>
+    </style>
+
+    <!-- Custom TextInputLayout style -->
+    <style name="Widget.GasifyProject.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/transparent</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="boxBackgroundMode">none</item>
+        <item name="boxBackgroundColor">@color/transparent</item>
+        <item name="hintTextColor">@color/foreground</item> <!-- Hint color here -->
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.GasifyProject.TextInput</item>
+    </style>
+
+    <!-- Custom TextInputEditText style -->
+    <style name="Widget.GasifyProject.TextInputEditText" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="android:background">@null</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textColor">@color/foreground</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColorHint">@color/foreground</item> <!-- Hint color here too -->
+    </style>
+
+    <!-- Shape appearance for TextInput to have more border radius -->
+    <style name="ShapeAppearance.GasifyProject.TextInput" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+</resources>
