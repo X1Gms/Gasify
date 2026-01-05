@@ -1,0 +1,137 @@
+/* =========================
+   LIGHT THEME (DEFAULT)
+========================= */
+:root {
+
+    /* ===== BRAND ===== */
+    --primary: #D7884F;
+    --primary-dark: #B96D3F;
+
+    /* ===== BACKGROUNDS ===== */
+    --bg-main: #ffffff;
+    --bg-soft: #f7f1ec;
+    --bg-accent: #EDD3AE;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --bg-input-focus: #f9e8dd;
+
+    /* ===== AUTH / BUBBLES ===== */
+    --bubble-bg: #f7f1ec;
+    --bubble-border: rgba(215, 136, 79, 0.35);
+    --bubble-shadow: rgba(0, 0, 0, 0.15);
+
+    /* ===== HOVERS ===== */
+    --bg-hover-soft: rgba(215, 136, 79, 0.18);
+    --bg-hover-strong: rgba(215, 136, 79, 0.20);
+
+    /* ===== TEXT ===== */
+    --text-main: #000000;
+    --text-soft: #555;
+    --text-muted: #777;
+    --text-muted-2: #666;
+    --text-placeholder: rgba(0, 0, 0, 0.45);
+
+    /* ===== BORDERS ===== */
+    --border-main: rgba(0, 0, 0, 0.12);
+    --border-soft: rgba(0, 0, 0, 0.10);
+    --border-accent: rgba(215, 136, 79, 0.35);
+    --input-border: var(--primary);
+
+    /* ===== SHADOWS ===== */
+    --shadow-soft: rgba(0, 0, 0, 0.08);
+    --shadow-main: rgba(0, 0, 0, 0.15);
+    --shadow-strong: rgba(0, 0, 0, 0.25);
+
+    /* ===== STATUS ===== */
+    --danger: #d64545;
+    --danger-dark: #b73838;
+    --danger-bg: rgba(255, 80, 80, 0.15);
+    --danger-border: rgba(255, 80, 80, 0.45);
+    --danger-soft: #ffe5e5;
+
+    --success-bg: rgba(100, 200, 100, 0.18);
+    --success-border: rgba(100, 200, 100, 0.45);
+    --success-text: #1b5e20;
+
+    /* ===== OVERLAY ===== */
+    --overlay-bg: rgba(0, 0, 0, 0.35);
+
+    /* ===== ALIASES (LEGACY SUPPORT) ===== */
+    --input-bg: var(--bg-input);
+    --glass-border: var(--border-main);
+    --shadow: var(--shadow-main);
+}
+
+/* =========================
+   DARK THEME (BLUE CORE)
+========================= */
+[data-theme="dark"] {
+
+    /* ===== BRAND ===== */
+    --primary: #E09A63;
+    --primary-dark: #C8824E;
+
+    /* ===== BACKGROUNDS ===== */
+    --bg-main: #00051A;        /* azul quase preto */
+    --bg-soft: #070C24;        /* surface base */
+    --bg-accent: #0E1638;     /* áreas destacadas */
+    --bg-card: #050A22;       /* cards / modais */
+    --bg-input: #070E2E;      /* inputs */
+    --bg-input-focus: #0E1638;
+
+    /* ===== AUTH / BUBBLES ===== */
+    --bubble-bg: #070C24;
+    --bubble-border: rgba(224, 154, 99, 0.35);
+    --bubble-shadow: rgba(0, 0, 0, 0.75);
+
+    /* ===== HOVERS ===== */
+    --bg-hover-soft: rgba(224, 154, 99, 0.12);
+    --bg-hover-strong: rgba(224, 154, 99, 0.22);
+
+    /* ===== TEXT ===== */
+    --text-main: #F4F6FF;
+    --text-soft: #C9D1FF;
+    --text-muted: #9AA4D6;
+    --text-muted-2: #7F89B8;
+    --text-placeholder: rgba(201, 209, 255, 0.45);
+
+    /* ===== BORDERS ===== */
+    --border-main: rgba(160, 170, 255, 0.14);
+    --border-soft: rgba(160, 170, 255, 0.08);
+    --border-accent: rgba(224, 154, 99, 0.45);
+    --input-border: var(--primary);
+
+    /* ===== SHADOWS ===== */
+    --shadow-soft: rgba(0, 0, 0, 0.45);
+    --shadow-main: rgba(0, 0, 0, 0.65);
+    --shadow-strong: rgba(0, 0, 0, 0.85);
+
+    /* ===== STATUS ===== */
+    --danger: #FF6B6B;
+    --danger-dark: #E25555;
+    --danger-bg: rgba(255, 90, 90, 0.18);
+    --danger-border: rgba(255, 90, 90, 0.45);
+    --danger-soft: rgba(255, 107, 107, 0.15);
+
+    --success-bg: rgba(90, 200, 120, 0.20);
+    --success-border: rgba(90, 200, 120, 0.45);
+    --success-text: #9BE7B0;
+
+    /* ===== OVERLAY ===== */
+    --overlay-bg: rgba(0, 0, 0, 0.70);
+
+    /* ===== ALIASES (LEGACY SUPPORT) ===== */
+    --input-bg: var(--bg-input);
+    --glass-border: var(--border-main);
+    --shadow: var(--shadow-main);
+}
+
+/* imagem default (light) */
+#auth-img {
+    content: url("../img/authimage.png");
+}
+
+/* imagem dark */
+[data-theme="dark"] #auth-img {
+    content: url("../img/authimage2.png");
+}

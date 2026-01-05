@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil – RSSF / PWDAM</title>
+    <script>
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+
+    <link rel="stylesheet" href="css/color.css">
+
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- HEADER -->
+    <link rel="stylesheet" href="css/header.css">
+
+    <!-- CSS da página -->
+    <link rel="stylesheet" href="css/profile.css">
+
+    <script src="js/eye.js" defer></script>
+<script src="js/sessions.js"></script>
+    <!-- Include header -->
+    <script src="js/include.js" defer></script>
+</head>
+
+<body>
+
+    <div data-include-header></div>
+
+    <main class="profile-content">
+
+        <h1 class="page-title">Perfil</h1>
+
+        <div class="profile-card">
+
+            <label>Nome Completo</label>
+            <input type="text" id="name" placeholder="O seu nome">
+
+            <label>E-mail</label>
+            <input type="email" id="email" placeholder="email@example.com">
+
+            <label>Palavra-Passe</label>
+            <input type="password" id="password" placeholder="••••••••">
+
+            <label>Confirmar Palavra-Passe</label>
+            <input type="password" id="password2" placeholder="••••••••">
+
+            <div class="btn-row">
+                <button class="edit-btn">Editar Perfil</button>
+                <button class="delete-btn">Eliminar Conta</button>
+            </div>
+
+        </div>
+
+        <!-- OVERLAY -->
+        <div class="modal-overlay" id="deleteOverlay">
+
+            <!-- MODAL -->
+            <div class="modal">
+
+                <button class="modal-close" id="closeDeleteModal">✖</button>
+
+                <h2>Eliminar Conta</h2>
+
+                <p class="modal-text">
+                    Pretende eliminar a sua conta? Esta ação é irreversível e apagará todos os dados associados.
+                    <br><br>
+                    Para continuar, confirme usando a sua palavra-passe.
+                </p>
+
+                <!-- Password -->
+                <div class="password-wrapper">
+                    <input type="password" id="deletePassword" placeholder="Palavra-passe">
+                    <span class="toggle-pass" onclick="togglePassword('deletePassword', this)">
+                        <svg class="eye-closed" viewBox="0 0 24 24">
+                            <path
+                                d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5ZM12 16A4 4 0 1 1 12 8A4 4 0 0 1 12 16Z" />
+                        </svg>
+                        <svg class="eye-open" viewBox="0 0 24 24">
+                            <path
+                                d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5Z" />
+                            <path d="M4 4L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </span>
+                </div>
+
+
+                <!-- BOTÕES -->
+                <div class="modal-actions">
+                    <button class="confirm-btn-modal">Confirmar</button>
+                    <button class="cancel-btn-modal" id="cancelDelete">Cancelar</button>
+                </div>
+
+            </div>
+        </div>
+
+
+    </main>
+
+    <script>
+        const deleteBtn = document.querySelector(".delete-btn");
+        const overlay = document.getElementById("deleteOverlay");
+        const closeBtn = document.getElementById("closeDeleteModal");
+        const cancelBtn = document.getElementById("cancelDelete");
+
+        deleteBtn.onclick = () => {
+            overlay.classList.add("show");
+        };
+
+        closeBtn.onclick = cancelBtn.onclick = () => {
+            overlay.classList.remove("show");
+        };
+
+        // Fechar ao clicar fora
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove("show");
+            }
+        });
+
+        // Toggle password (simples)
+        function togglePassword(id, el) {
+            const input = document.getElementById(id);
+            input.type = input.type === "password" ? "text" : "password";
+        }
+    </script>
+
+
+</body>
+
+</html>

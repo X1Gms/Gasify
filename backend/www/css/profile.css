@@ -1,0 +1,288 @@
+/* ======================
+   PROFILE PAGE
+====================== */
+.profile-content {
+    padding: 140px 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.page-title {
+    font-size: 32px;
+    color: var(--primary-dark);
+    margin-bottom: 20px;
+}
+
+/* ======================
+   PROFILE CARD
+====================== */
+.profile-card {
+    background: var(--bg-card);
+    padding: 30px 25px;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 15px var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.profile-card label {
+    font-weight: bold;
+    color: var(--text-soft);
+}
+
+/* ======================
+   INPUTS (IGUAIS AO AUTH)
+====================== */
+.profile-card input,
+.modal input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    font-size: 15px;
+    border-radius: 12px;
+    border: 2px solid var(--input-border);
+    background: var(--bg-input);
+    color: var(--text-main);
+}
+
+.profile-card input:focus,
+.modal input:focus {
+    background: var(--bg-input-focus);
+    outline: none;
+}
+
+/* ======================
+   PASSWORD WRAPPER
+====================== */
+.password-wrapper {
+    position: relative;
+    margin: 8px 0;
+}
+
+.password-wrapper input {
+    padding-right: 45px;
+}
+
+/* Eye toggle */
+.toggle-pass {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-pass svg {
+    width: 24px;
+    height: 24px;
+}
+
+.toggle-pass svg * {
+    fill: var(--primary) !important;
+    stroke: var(--primary) !important;
+}
+
+.eye-open {
+    display: none;
+}
+
+.eye-closed {
+    display: block;
+}
+
+/* ======================
+   BOTÕES PERFIL
+====================== */
+.btn-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+/* Editar */
+.edit-btn {
+    background: var(--primary);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 4px 12px var(--shadow-main);
+}
+
+.edit-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* Eliminar */
+.delete-btn {
+    background: var(--danger);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 4px 12px var(--shadow-main);
+}
+
+.delete-btn:hover {
+    background: var(--danger-dark);
+    transform: translateY(-2px);
+}
+
+/* ======================
+   MODAL OVERLAY
+====================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+/* ======================
+   MODAL
+====================== */
+.modal {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 30px 26px;
+    height: 100%;
+    max-height: 450px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 30px var(--shadow-strong);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Título */
+.modal h2 {
+    margin: 0 0 10px;
+    text-align: center;
+    color: var(--text-main);
+    font-size: 26px;
+    margin-top: 50px;
+}
+
+/* Texto */
+.modal-text {
+    text-align: center;
+    font-size: 15px;
+    color: var(--text-soft);
+    margin-bottom: 20px;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+/* Fechar */
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+/* ======================
+   MODAL ACTIONS
+====================== */
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+/* Confirmar – vermelho */
+.confirm-btn-modal {
+    background: var(--danger);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.confirm-btn-modal:hover {
+    background: var(--danger-dark);
+    transform: translateY(-2px);
+}
+
+/* Cancelar – primário */
+.cancel-btn-modal {
+    background: var(--primary);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.cancel-btn-modal:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* ======================
+   INPUTS – SOMBRA NEUTRA
+====================== */
+.profile-card input,
+.modal input {
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    border-radius: 12px;
+    background: var(--bg-input);
+    box-shadow: 0 4px 12px var(--shadow-main);
+    padding: 12px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s ease;
+    color: var(--text-main);
+}
+
+/* Focus */
+.profile-card input:focus,
+.modal input:focus {
+    box-shadow: 0 6px 16px var(--shadow-strong);
+}
+
+/* Placeholder */
+.profile-card input::placeholder,
+.modal input::placeholder {
+    color: var(--text-placeholder);
+}

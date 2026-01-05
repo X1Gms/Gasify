@@ -1,0 +1,61 @@
+/* ====================== CHARTS ====================== */
+.charts-grid {
+    display: grid;
+    margin-top: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+/* ====================== FILTER BUTTON ====================== */
+.filter-btn {
+    background: var(--primary);
+    color: var(--bg-main);
+    margin-top: 30px;
+    padding: 12px 22px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px var(--shadow-main);
+    transition: 0.25s;
+}
+
+.filter-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* ====================== FILTER DROPDOWN ====================== */
+.filter-menu {
+    position: absolute;
+    top: 55px;
+    left: 0;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-main);
+    width: 200px;
+    box-shadow: 0 6px 18px var(--shadow-main);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 999;
+}
+
+.filter-menu.open {
+    display: flex;
+}
+
+.filter-menu .opt {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.2s;
+    color: var(--text-main);
+}
+
+.filter-menu .opt:hover {
+    background: var(--bg-hover-soft);
+    color: var(--primary-dark);
+}

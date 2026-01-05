@@ -1,0 +1,285 @@
+
+/* ====================== ADD DEVICE BUTTON ====================== */
+.add-device-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 15px var(--shadow);
+    padding: 16px 22px;
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+    color: var(--text-main);
+}
+
+.add-device-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ====================== DEVICE LIST ====================== */
+.device-list {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ====================== DEVICE CARD (BUBBLE) ====================== */
+.device-card {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 15px var(--shadow);
+    padding: 22px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+/* card ativo sobe ligeiramente */
+.device-card.active {
+    z-index: 10;
+}
+
+/* ====================== LEFT SIDE ====================== */
+.device-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+
+.device-icon.red {
+    background: var(--danger);
+}
+
+/* Serial */
+.serial {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* ====================== ALARM CARD ====================== */
+.device-card.alarm {
+    background: var(--danger-soft);
+    border-color: var(--danger-border);
+}
+
+/* ====================== 3 DOTS BUTTON ====================== */
+.dots-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 6px;
+    line-height: 1;
+    color: var(--text-main);
+}
+
+/* ====================== DEVICE MENU ====================== */
+.device-menu {
+    position: absolute;
+    top: 58px;
+    right: 18px;
+    background: var(--bg-card);
+    border-radius: 14px;
+    padding: 8px 0;
+    width: 140px;
+    border: 1px solid var(--border-main);
+    box-shadow: 0 6px 18px var(--shadow-strong);
+    display: none;
+    z-index: 20;
+}
+
+.device-menu .opt {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--text-main);
+}
+
+.device-menu .opt:hover {
+    background: var(--bg-hover-soft);
+}
+
+.device-menu .delete {
+    color: var(--danger);
+}
+
+/* ====================== CANCEL ALARM BUTTON ====================== */
+.cancel-btn {
+    background: var(--danger);
+    border: none;
+    color: var(--bg-main);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.cancel-btn:hover {
+    background: var(--danger-dark);
+}
+
+/* ====================== MODALS – BASE ====================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal {
+    display: none;
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 30px 26px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 12px 30px var(--shadow-strong);
+    position: relative;
+}
+
+.modal.show {
+    display: block;
+}
+
+/* ====================== MODAL HEADER ====================== */
+.modal h2 {
+    margin: 0 0 14px;
+    text-align: center;
+    font-size: 26px;
+    color: var(--text-main);
+}
+
+/* Texto */
+.modal-text {
+    text-align: center;
+    font-size: 15px;
+    color: var(--text-soft);
+    line-height: 1.5;
+}
+
+/* Fechar */
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+/* ====================== FORM ====================== */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.modal-form input,
+.modal-form select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: var(--bg-input);
+    box-shadow: 0 4px 10px var(--shadow-soft);
+    color: var(--text-main);
+}
+
+.modal-form input:focus,
+.modal-form select:focus {
+    outline: none;
+    box-shadow: 0 6px 14px var(--shadow-main);
+}
+
+/* Input desativado */
+.modal-form input.disabled {
+    background: var(--bg-soft);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+/* ====================== BOTÃO PRINCIPAL ====================== */
+.primary-modal-btn {
+    margin-top: 10px;
+    background: var(--primary);
+    color: var(--bg-main);
+    border: none;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 6px 16px var(--shadow-main);
+}
+
+.primary-modal-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* ====================== MODAL ACTIONS ====================== */
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+/* Confirmar */
+.confirm-btn-modal {
+    background: var(--danger);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.confirm-btn-modal:hover {
+    background: var(--danger-dark);
+    transform: translateY(-2px);
+}
+
+/* Cancelar */
+.cancel-btn-modal {
+    background: var(--primary);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.cancel-btn-modal:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
