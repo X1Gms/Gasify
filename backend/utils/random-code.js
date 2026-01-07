@@ -7,6 +7,7 @@ const codeLength = options.forgotPassword.codeLength;
  * Generates a random code of a given length
  *
  * @param {Number} length
+ * @returns {string}
  */
 function generateRandomCode(length = codeLength) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

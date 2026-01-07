@@ -3,7 +3,6 @@ const mysql = require("mysql2");
 
 const { mysqlPool } = require("../../../db/mysql-pool");
 
-// TODO: Add the cards info to the response
 /**
  * Handles the retrieval of device details including sensor readings and charts
  *

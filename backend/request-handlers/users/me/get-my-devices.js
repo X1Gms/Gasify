@@ -13,6 +13,7 @@ function getMyDevicesHandler(req, res) {
   const { id: userId } = req.user;
 
   // requires multiple statements in config.json
+  // get total devices, active alerts, average gas, average co only for the user's devices
   const getInfosAndDevicesSql = mysql.format(
     `
     SELECT
@@ -66,11 +67,11 @@ function getMyDevicesHandler(req, res) {
       active_alerts: Number(statsRaw.activeAlerts),
       avg_gas:
         statsRaw.avgGas !== null
-          ? Number(parseFloat(statsRaw.avgGas).toFixed(1))
+          ? Number(parseFloat(statsRaw.avgGas).toFixed(2))
           : null,
       avg_co:
         statsRaw.avgCo !== null
-          ? Number(parseFloat(statsRaw.avgCo).toFixed(1))
+          ? Number(parseFloat(statsRaw.avgCo).toFixed(2))
           : null,
     };
 
