@@ -75,9 +75,7 @@ function createDeviceHandler(req, res) {
       if (rawSeedReadings !== undefined && seedReadings === null) {
         return res.status(400).json({
           success: false,
-          message:
-            "Expected seedReadings to be a boolean value, got " +
-            typeof rawSeedReadings,
+          message: `Expected seedReadings to be a boolean value, got ${typeof rawSeedReadings}`,
         });
       }
 
