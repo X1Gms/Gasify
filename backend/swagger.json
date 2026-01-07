@@ -57,7 +57,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -67,7 +67,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -113,7 +113,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -123,7 +123,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -133,7 +133,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -179,7 +179,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -189,7 +189,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -235,7 +235,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -245,7 +245,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -255,7 +255,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -304,7 +304,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -314,7 +314,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -347,7 +347,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -357,7 +357,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -367,7 +367,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -417,7 +417,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -427,7 +427,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 },
                 "examples": {
                   "missingFields": {
@@ -469,7 +469,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -479,7 +479,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -489,7 +489,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -527,7 +527,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -537,7 +537,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -547,7 +547,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -557,7 +557,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -590,7 +590,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -600,7 +600,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -610,7 +610,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -621,7 +621,7 @@
     "/users/me/notifications/{id}": {
       "patch": {
         "summary": "Update a current user notification",
-        "description": "At the moment, this is only used to mark a notification as read, but it can be used to update other fields in the future because it is scalable.",
+        "description": "Marks a notification as read by setting its read_at timestamp. This endpoint does not require a request body - it automatically marks the notification as read when called. The endpoint is designed to be scalable for future updates to other notification fields.",
         "tags": ["Users"],
         "security": [
           {
@@ -713,7 +713,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -746,7 +746,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -756,7 +756,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -780,12 +780,24 @@
               },
               "examples": {
                 "createDevice": {
+                  "summary": "Create device without fake readings",
                   "value": {
                     "name": "My Device",
                     "serialNumber": "SN123456",
                     "countryId": 1,
                     "address": "123 Main St",
                     "postalCode": "1000-001"
+                  }
+                },
+                "createDeviceWithReadings": {
+                  "summary": "Create device with fake readings",
+                  "value": {
+                    "name": "My Device",
+                    "serialNumber": "SN123456",
+                    "countryId": 1,
+                    "address": "123 Main St",
+                    "postalCode": "1000-001",
+                    "seedReadings": true
                   }
                 }
               }
@@ -798,17 +810,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Missing fields",
+            "description": "Missing fields or invalid seedReadings value",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -818,7 +830,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -828,7 +840,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -838,7 +850,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -894,7 +906,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -904,7 +916,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -914,7 +926,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -974,7 +986,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -984,7 +996,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 },
                 "examples": {
                   "missingFields": {
@@ -1010,7 +1022,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 },
                 "examples": {
                   "deviceNotFound": {
@@ -1034,7 +1046,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -1066,7 +1078,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -1076,7 +1088,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -1086,7 +1098,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -1096,7 +1108,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetNotificationsResponse"
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -1127,11 +1139,17 @@
           "name": {
             "type": "string"
           },
-          "code": {
-            "type": "string"
+          "iso_code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code (2 characters)"
+          },
+          "emergency_number": {
+            "type": "string",
+            "maxLength": 10,
+            "description": "Emergency phone number for the country"
           }
         },
-        "required": ["id", "name", "code"]
+        "required": ["id", "name", "iso_code", "emergency_number"]
       },
       "GetCountriesResponse": {
         "type": "object",
@@ -1164,6 +1182,10 @@
           },
           "postalCode": {
             "type": "string"
+          },
+          "seedReadings": {
+            "type": "boolean",
+            "description": "If true, creates 12 fake readings for the newly created device. If false or not provided, only creates the device without readings. If provided, must be a valid boolean value."
           }
         },
         "required": [
@@ -1294,14 +1316,20 @@
           "user_id": {
             "type": "integer"
           },
+          "country_id": {
+            "type": "integer"
+          },
           "name": {
             "type": "string"
           },
           "serial_number": {
             "type": "string"
           },
-          "located_at": {
-            "type": ["string", "null"]
+          "address": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
           },
           "created_at": {
             "type": "string",
@@ -1310,15 +1338,23 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "has_active_alert": {
+            "type": "boolean",
+            "description": "Indicates if the device has an active alert (non-canceled MCU detection)"
           }
         },
         "required": [
           "id",
           "user_id",
+          "country_id",
           "name",
           "serial_number",
+          "address",
+          "postal_code",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "has_active_alert"
         ]
       },
       "GetMyDevicesResponse": {
@@ -1581,6 +1617,39 @@
         },
         "required": ["email", "code", "password", "passwordConfirmation"]
       },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "type_id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": ["string", "null"]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "read_at": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "description": "Notification type name (e.g., 'Important', 'Regular', 'Alert', 'Maintenance')"
+          }
+        },
+        "required": ["id", "user_id", "type_id", "title", "created_at"]
+      },
       "GetNotificationsResponse": {
         "type": "object",
         "properties": {
@@ -1590,10 +1659,11 @@
           "notifications": {
             "type": "array",
             "items": {
-              "type": "object"
+              "$ref": "#/components/schemas/Notification"
             }
           }
-        }
+        },
+        "required": ["success", "notifications"]
       }
     },
     "securitySchemes": {
