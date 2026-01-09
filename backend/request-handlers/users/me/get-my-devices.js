@@ -18,6 +18,7 @@ function getMyDevicesHandler(req, res) {
     `
     SELECT
       d.*,
+      c.name AS country,
       EXISTS(
         SELECT 1
         FROM reading r
@@ -25,6 +26,7 @@ function getMyDevicesHandler(req, res) {
         WHERE r.device_id = d.id AND md.canceled = 0
       ) AS has_active_alert
     FROM device d
+    INNER JOIN country c ON c.id = d.country_id
     WHERE d.user_id = ?;
 
     SELECT
