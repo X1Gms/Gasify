@@ -13,9 +13,13 @@
     "clean": 
   },
   "mysql": {
+    "multipleStatements":
     "host": "",
     "database": "",
     "user": "",
     "password": ""
+  },
+  "notification": {
+    "webhookUrl": ""
   }
 }
