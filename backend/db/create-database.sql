@@ -266,7 +266,7 @@ INSERT INTO reading (device_id, gas_type, humidity, temperature, mq2, mq5, creat
 -- INSERT MCU DETECTIONS
 -- ==================================
 INSERT INTO mcu_detection (reading_id, canceled) VALUES
-(2, FALSE),	
+(2, FALSE),
 (3, FALSE),
 (5, TRUE),
 (6, FALSE),
