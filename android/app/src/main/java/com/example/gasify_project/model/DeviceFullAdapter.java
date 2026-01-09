@@ -6,21 +6,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gasify_project.R;
 import com.example.gasify_project.view.DeviceSpecFragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+
 import java.util.List;
 
 public class DeviceFullAdapter extends RecyclerView.Adapter<DeviceFullAdapter.DeviceViewHolder> {
 
-    private Context context;
-    private List<DeviceItem> deviceList;
-    private OnDeviceActionListener listener;
+    private final Context context;
+    private final List<DeviceItem> deviceList;
+    private final OnDeviceActionListener listener;
 
     public interface OnDeviceActionListener {
         void onMenuClick(View view, DeviceItem device, int position);
@@ -36,7 +39,7 @@ public class DeviceFullAdapter extends RecyclerView.Adapter<DeviceFullAdapter.De
     @NonNull
     @Override
     public DeviceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_device_full, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_device_full, parent, false);
         return new DeviceViewHolder(view);
     }
 
@@ -44,70 +47,50 @@ public class DeviceFullAdapter extends RecyclerView.Adapter<DeviceFullAdapter.De
     public void onBindViewHolder(@NonNull DeviceViewHolder holder, int position) {
         DeviceItem device = deviceList.get(position);
 
-        holder.tvDeviceName.setText(device.getName());
-        holder.tvDeviceId.setText(device.getId());
-        holder.tvDeviceSerial.setText("Número de Série: " + device.getSerialNumber());
+        // safety: guard against nulls (shouldn't happen if layout ids are correct)
+        if (holder.tvDeviceName != null) holder.tvDeviceName.setText(device.getName() != null ? device.getName() : "");
+        if (holder.tvDeviceSerial != null) holder.tvDeviceSerial.setText("Número de Série: " + (device.getSerialNumber() != null ? device.getSerialNumber() : ""));
 
         // Handle alarm state
-        if (device.hasAlarm()) {
-            // RED ALARM STATE
-            holder.cardDevice.setCardBackgroundColor(
-                    context.getResources().getColor(R.color.card_destroy, null));
-            holder.deviceIconCard.setCardBackgroundColor(
-                    context.getResources().getColor(R.color.destroy, null));
-            holder.tvDeviceName.setTextColor(
-                    context.getResources().getColor(R.color.card_destroy_foreground, null));
-            holder.tvDeviceId.setTextColor(
-                    context.getResources().getColor(R.color.card_destroy_foreground, null));
-            holder.tvDeviceSerial.setTextColor(
-                    context.getResources().getColor(R.color.card_destroy_foreground, null));
+        if (device.isAlarm()) {
+            holder.cardDevice.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card_destroy));
+            holder.deviceIconCard.setCardBackgroundColor(ContextCompat.getColor(context, R.color.destroy));
+            if (holder.tvDeviceName != null) holder.tvDeviceName.setTextColor(ContextCompat.getColor(context, R.color.card_destroy_foreground));
+            if (holder.tvDeviceSerial != null) holder.tvDeviceSerial.setTextColor(ContextCompat.getColor(context, R.color.card_destroy_foreground));
 
-            // Hide menu, show cancel alarm button
             holder.btnMenu.setVisibility(View.GONE);
             holder.btnCancelAlarm.setVisibility(View.VISIBLE);
         } else {
-            // NORMAL STATE
-            holder.cardDevice.setCardBackgroundColor(
-                    context.getResources().getColor(R.color.card, null));
-            holder.deviceIconCard.setCardBackgroundColor(
-                    context.getResources().getColor(R.color.primary, null));
-            holder.tvDeviceName.setTextColor(
-                    context.getResources().getColor(R.color.foreground, null));
-            holder.tvDeviceId.setTextColor(
-                    context.getResources().getColor(R.color.card_foreground, null));
-            holder.tvDeviceSerial.setTextColor(
-                    context.getResources().getColor(R.color.card_foreground, null));
+            holder.cardDevice.setCardBackgroundColor(ContextCompat.getColor(context, R.color.card));
+            holder.deviceIconCard.setCardBackgroundColor(ContextCompat.getColor(context, R.color.primary));
+            if (holder.tvDeviceName != null) holder.tvDeviceName.setTextColor(ContextCompat.getColor(context, R.color.foreground));
+            if (holder.tvDeviceSerial != null) holder.tvDeviceSerial.setTextColor(ContextCompat.getColor(context, R.color.card_foreground));
 
-            // Show menu, hide cancel alarm button
             holder.btnMenu.setVisibility(View.VISIBLE);
             holder.btnCancelAlarm.setVisibility(View.GONE);
         }
 
         // Menu click
         holder.btnMenu.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onMenuClick(v, device, holder.getAdapterPosition());
-            }
+            if (listener != null) listener.onMenuClick(v, device, holder.getAdapterPosition());
         });
 
         // Cancel alarm click
         holder.btnCancelAlarm.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onCancelAlarm(device, holder.getAdapterPosition());
-            }
+            if (listener != null) listener.onCancelAlarm(device, holder.getAdapterPosition());
         });
 
-        holder.cardDevice.setOnClickListener(v->{
-            // create fragment instance
+        // Navigate to detail fragment on card click
+        holder.cardDevice.setOnClickListener(v -> {
             DeviceSpecFragment fragment = new DeviceSpecFragment();
-
-            // TODO: add params here later using fragment.setArguments(bundle)
-
-            ((AppCompatActivity) context).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, fragment) // your container id
-                    .addToBackStack(null)
-                    .commit();
+            // TODO: pass args to fragment via bundle if needed
+            if (context instanceof AppCompatActivity) {
+                ((AppCompatActivity) context).getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         });
     }
 
@@ -120,17 +103,17 @@ public class DeviceFullAdapter extends RecyclerView.Adapter<DeviceFullAdapter.De
         MaterialCardView cardDevice;
         MaterialCardView deviceIconCard;
         TextView tvDeviceName;
-        TextView tvDeviceId;
         TextView tvDeviceSerial;
         ImageView btnMenu;
         MaterialButton btnCancelAlarm;
 
         public DeviceViewHolder(@NonNull View itemView) {
             super(itemView);
-            cardDevice = (MaterialCardView) itemView;
+            // IMPORTANT: find views by id from the inflated itemView.
+            // Ensure these ids exist in item_device_full.xml
+            cardDevice = itemView.findViewById(R.id.cardDevice);
             deviceIconCard = itemView.findViewById(R.id.deviceIconCard);
             tvDeviceName = itemView.findViewById(R.id.tvDeviceName);
-            tvDeviceId = itemView.findViewById(R.id.tvDeviceId);
             tvDeviceSerial = itemView.findViewById(R.id.tvDeviceSerial);
             btnMenu = itemView.findViewById(R.id.btnMenu);
             btnCancelAlarm = itemView.findViewById(R.id.btnCancelAlarm);

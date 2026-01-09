@@ -1,12 +1,9 @@
 package com.example.gasify_project.controller;
 
-import android.content.Context;
+import com.example.gasify_project.model.RegisterRequest;
 import android.util.Patterns;
-import android.widget.Toast;
-
 import com.example.gasify_project.api.ApiClient;
 import com.example.gasify_project.model.User;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -36,7 +33,7 @@ public class RegisterController {
         if (listener != null) listener.onRegisterStarted();
 
         // Criar request para API
-        ApiClient.RegisterRequest request = new ApiClient.RegisterRequest(
+        RegisterRequest request = new RegisterRequest(
                 fullName, email, password, confirmPassword
         );
 
