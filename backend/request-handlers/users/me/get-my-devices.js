@@ -31,14 +31,15 @@ function getMyDevicesHandler(req, res) {
 
     SELECT
       COUNT(DISTINCT d.id) AS totalDevices,
-      SUM(
-        EXISTS(
+      COUNT(DISTINCT CASE
+        WHEN EXISTS (
           SELECT 1
           FROM reading r2
           JOIN mcu_detection md ON md.reading_id = r2.id
           WHERE r2.device_id = d.id AND md.canceled = 0
         )
-      ) AS activeAlerts,
+        THEN d.id
+      END) AS activeAlerts,
       AVG(r.mq2) AS avgGas,
       AVG(r.mq5) AS avgCo
     FROM device d
