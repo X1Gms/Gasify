@@ -6,6 +6,8 @@ const swaggerDocs = require("./swagger.json");
 
 const { invalidJsonMiddleware } = require("./middlewares/invalid-json");
 
+const { isDevelopmentEnv } = require("./utils/dev-environment");
+
 const authRoutes = require("./routes/auth-routes");
 const userRoutes = require("./routes/user-routes");
 const countriesRoutes = require("./routes/countries-routes");
@@ -18,8 +20,10 @@ app.use(express.json());
 app.use(invalidJsonMiddleware);
 app.use(express.urlencoded({ extended: true }));
 
-// swagger docs
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+// swagger docs only in development environment
+if (isDevelopmentEnv) {
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+}
 
 // use routes
 app.use("/auth", authRoutes);

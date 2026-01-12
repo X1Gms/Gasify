@@ -154,7 +154,7 @@ CREATE INDEX `idx_mcu_detection_reading`
 ON `mcu_detection` (`reading_id`);
 
 -- ==================================
--- INSERT EXISTING USERS
+-- INSERT EXISTING USERS (password = 'aBc12345678!')
 -- ==================================
 SET @pwd := '$2b$12$6g.ScdVpJSzGeICAfHfxAu9ulKX9W1mSD4sV4L0nUB/wQXS9gzEsC';
 
