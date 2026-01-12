@@ -39,7 +39,7 @@ function getMyDevicesHandler(req, res) {
           WHERE r2.device_id = d.id AND md.canceled = 0
         )
         THEN d.id
-      END) AS activeAlerts,
+      END) AS devicesWithActiveAlert,
       AVG(r.mq2) AS avgGas,
       AVG(r.mq5) AS avgCo
     FROM device d
@@ -67,7 +67,7 @@ function getMyDevicesHandler(req, res) {
 
     const cards = {
       total_devices: Number(statsRaw.totalDevices),
-      active_alerts: Number(statsRaw.activeAlerts),
+      devices_with_active_alert: Number(statsRaw.devicesWithActiveAlert),
       avg_gas:
         statsRaw.avgGas !== null
           ? Number(parseFloat(statsRaw.avgGas).toFixed(2))

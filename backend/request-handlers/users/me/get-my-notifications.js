@@ -17,7 +17,6 @@ function getMeNotificationsHandler(req, res) {
     `
     SELECT
       n.id AS notification_id,
-      n.title,
       n.created_at AS notification_created_at,
       n.read_at,
   
@@ -61,10 +60,8 @@ function getMeNotificationsHandler(req, res) {
     // transform flat result into nested objects
     const notifications = result.map((row) => ({
       id: row.notification_id,
-      title: row.title,
       created_at: row.notification_created_at,
       read_at: row.read_at,
-
       device: {
         id: row.device_id,
         name: row.device_name,

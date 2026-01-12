@@ -71,7 +71,6 @@ CREATE TABLE `notification` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT UNSIGNED NOT NULL,
   `mcu_detection_id` BIGINT UNSIGNED NOT NULL,
-  `title` VARCHAR(255) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `read_at` TIMESTAMP NULL,
   PRIMARY KEY (`id`),
@@ -203,17 +202,17 @@ INSERT INTO device (user_id, country_id, name, serial_number, address, postal_co
 -- ==================================
 -- INSERT NOTIFICATIONS
 -- ==================================
-INSERT INTO notification (user_id, mcu_detection_id, title) VALUES
-(1, 1, 'High LPG concentration detected in Kitchen Sensor'),
-(1, 10, 'Unusual gas pattern detected in Kitchen Sensor'),
-(2, 2, 'Methane levels exceeded safe threshold in Boiler Room Sensor'),
-(4, 3, 'Smoke detected in Apartment Sensor'),
-(5, 4, 'LPG leak detected in Living Room Sensor'),
-(6, 5, 'Methane spike detected in Bedroom Sensor'),
-(7, 6, 'Carbon monoxide detected in Kitchen Sensor'),
-(3, 7, 'CO levels exceeded safety limits in Office Sensor'),
-(4, 9, 'Smoke concentration rising in Apartment Sensor'),
-(1, 12, 'Routine check recommended for Kitchen Sensor'); 
+INSERT INTO notification (user_id, mcu_detection_id) VALUES
+(1, 1),
+(1, 10),
+(2, 2),
+(4, 3),
+(5, 4),
+(6, 5),
+(7, 6),
+(3, 7),
+(4, 9),
+(1, 12); 
 
 -- ==================================
 -- INSERT PASSWORD RESET CODES
