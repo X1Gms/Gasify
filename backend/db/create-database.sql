@@ -71,6 +71,7 @@ CREATE TABLE `notification` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT UNSIGNED NOT NULL,
   `mcu_detection_id` BIGINT UNSIGNED NOT NULL,
+  `alert_state` ENUM('ALERT_ON','ALERT_OFF') NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `read_at` TIMESTAMP NULL,
   PRIMARY KEY (`id`),
@@ -202,17 +203,17 @@ INSERT INTO device (user_id, country_id, name, serial_number, address, postal_co
 -- ==================================
 -- INSERT NOTIFICATIONS
 -- ==================================
-INSERT INTO notification (user_id, mcu_detection_id) VALUES
-(1, 1),
-(1, 10),
-(2, 2),
-(4, 3),
-(5, 4),
-(6, 5),
-(7, 6),
-(3, 7),
-(4, 9),
-(1, 12); 
+INSERT INTO notification (user_id, mcu_detection_id, alert_state) VALUES
+(1, 1,  'ALERT_ON'),
+(1, 2,  'ALERT_ON'),
+(4, 3,  'ALERT_OFF'),
+(3, 4,  'ALERT_ON'),
+(5, 5,  'ALERT_OFF'),
+(6, 6,  'ALERT_ON'),
+(7, 7,  'ALERT_ON'),
+(1, 8,  'ALERT_ON'),
+(4, 9,  'ALERT_OFF'),
+(1, 10, 'ALERT_ON');
 
 -- ==================================
 -- INSERT PASSWORD RESET CODES
