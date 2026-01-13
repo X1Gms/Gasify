@@ -15,13 +15,11 @@
     <link rel="stylesheet" href="css/color.css">
     <link rel="stylesheet" href="css/styles.css">
 
-    <!-- HEADER (sidebar + topbar) -->
     <link rel="stylesheet" href="css/header.css">
 
-    <!-- CSS da página -->
     <link rel="stylesheet" href="css/devices.css">
     <script src="js/sessions.js"></script>
-    <!-- Script que importa o header -->
+    <script src="js/devices.js" defer></script>
     <script src="js/include.js" defer></script>
 </head>
 
@@ -39,7 +37,6 @@
 
     <main class="devices-content">
 
-        <!-- BOTÃO ADICIONAR DISPOSITIVO -->
         <button class="add-device-btn">
             <div class="device-icon"><svg class="icon">
                             <use href="#icon-device"></use>
@@ -47,10 +44,8 @@
             <span>Adicionar Dispositivo</span>
         </button>
 
-        <!-- LISTA -->
         <section class="device-list">
 
-            <!-- DEVICE NORMAL -->
             <div class="device-card">
 
                 <div class="device-left">
@@ -66,7 +61,6 @@
 
                 <button class="dots-btn">⋮</button>
 
-                <!-- MENU INDIVIDUAL -->
                 <div class="device-menu">
                     <p class="opt">Editar</p>
                     <p class="opt delete">Eliminar</p>
@@ -74,7 +68,6 @@
 
             </div>
 
-            <!-- DEVICE EM ALARME -->
             <div class="device-card alarm">
 
                 <div class="device-left">
@@ -96,7 +89,6 @@
 
     </main>
 
-    <!-- SCRIPT FINAL DO MENU -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
 
@@ -136,6 +128,7 @@
             const addModal = document.getElementById("addDeviceModal");
             const editModal = document.getElementById("editDeviceModal");
             const deleteModal = document.getElementById("deleteDeviceModal");
+            const cancelAlarmModal = document.getElementById("cancelAlarmModal"); // Novo
 
             const addBtn = document.querySelector(".add-device-btn");
 
@@ -143,13 +136,13 @@
 
             function openModal(modal) {
                 overlay.classList.add("show");
-                [addModal, editModal, deleteModal].forEach(m => m.classList.remove("show"));
+                [addModal, editModal, deleteModal, cancelAlarmModal].forEach(m => m.classList.remove("show"));
                 modal.classList.add("show");
             }
 
             function closeModal() {
                 overlay.classList.remove("show");
-                [addModal, editModal, deleteModal].forEach(m => m.classList.remove("show"));
+                [addModal, editModal, deleteModal, cancelAlarmModal].forEach(m => m.classList.remove("show"));
             }
 
             /* ---------- ADD ---------- */
@@ -171,6 +164,13 @@
                 };
             });
 
+            /* ---------- CANCEL ALARM (Novo) ---------- */
+            document.addEventListener("click", (e) => {
+                if (e.target.classList.contains("cancel-btn")) {
+                    openModal(cancelAlarmModal);
+                }
+            });
+
             /* ---------- FECHAR ---------- */
             document.querySelectorAll("[data-close]").forEach(btn => {
                 btn.onclick = closeModal;
@@ -185,16 +185,8 @@
     </script>
 
 
-    </script>
-
-    <!-- ======================
-     MODAL OVERLAY
-====================== -->
     <div class="modal-overlay" id="modalOverlay">
 
-        <!-- ======================
-         MODAL ADICIONAR
-    ====================== -->
         <div class="modal" id="addDeviceModal">
             <button class="modal-close" data-close>✖</button>
 
@@ -204,14 +196,12 @@
                 <input type="text" placeholder="Nome do Dispositivo">
                 <input type="text" placeholder="Código de ID">
 
-                <select>
-                    <option value="">País</option>
-                    <option>Portugal</option>
-                    <option>Espanha</option>
-                    <option>França</option>
-                    <option>Alemanha</option>
-                    <option>Brasil</option>
-                </select>
+                                             <select>
+    <option value="">Selecione o País</option>
+    <option value="1">Portugal</option>
+    <option value="2">Espanha</option>
+    <option value="3">França</option>
+    </select>
 
                 <input type="text" placeholder="Morada">
                 <input type="text" placeholder="Código Postal">
@@ -220,9 +210,6 @@
             </div>
         </div>
 
-        <!-- ======================
-         MODAL EDITAR
-    ====================== -->
         <div class="modal" id="editDeviceModal">
             <button class="modal-close" data-close>✖</button>
 
@@ -246,9 +233,6 @@
             </div>
         </div>
 
-        <!-- ======================
-         MODAL ELIMINAR
-    ====================== -->
         <div class="modal" id="deleteDeviceModal">
             <button class="modal-close" data-close>✖</button>
 
@@ -263,6 +247,20 @@
             <div class="modal-actions">
                 <button class="confirm-btn-modal">Eliminar</button>
                 <button class="cancel-btn-modal" data-close>Cancelar</button>
+            </div>
+        </div>
+
+        <div class="modal" id="cancelAlarmModal">
+            <button class="modal-close" data-close>✖</button>
+
+            <h2>Cancelar Alarme</h2>
+
+            <p class="modal-text">
+                Para Cancelar o Alarme tem de ir ao dispositivo móvel.
+            </p>
+
+            <div class="modal-actions">
+                <button class="primary-modal-btn" data-close style="width: 100%;">OK</button>
             </div>
         </div>
 

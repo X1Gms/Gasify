@@ -30,13 +30,14 @@
 /* ====================== FILTER DROPDOWN ====================== */
 .filter-menu {
     position: absolute;
-    top: 55px;
-    left: 0;
+    top: 58px;            /* Alinhado com a altura do botão */
+    right: 0;             /* Alinhado à direita como o device-menu */
     background: var(--bg-card);
-    border-radius: 12px;
-    border: 1px solid var(--border-main);
+    border-radius: 14px;  /* Arredondamento igual ao outro menu */
+    padding: 8px 0;
     width: 200px;
-    box-shadow: 0 6px 18px var(--shadow-main);
+    border: 1px solid var(--border-main);
+    box-shadow: 0 6px 18px var(--shadow-strong);
     display: none;
     flex-direction: column;
     overflow: hidden;
