@@ -192,12 +192,12 @@ INSERT INTO user (full_name, email, password_hash) VALUES
 -- ==================================
 INSERT INTO country (name, iso_code, emergency_number) VALUES
 ('Portugal', 'PT', '112'),
-('Spain', 'ES', '112'),
-('France', 'FR', '112'),
-('United States', 'US', '911'),
-('Germany', 'DE', '112'),
-('Italy', 'IT', '112'),
-('Netherlands', 'NL', '112');
+('Espanha', 'ES', '112'),
+('França', 'FR', '112'),
+('Estados Unidos', 'US', '911'),
+('Alemanha', 'DE', '112'),
+('Itália', 'IT', '112'),
+('Países Baixos', 'NL', '112');
 
 -- ==================================
 -- INSERT DEVICES
@@ -266,7 +266,7 @@ INSERT INTO reading (device_id, gas_type, humidity, temperature, mq2, mq5, creat
 -- INSERT MCU DETECTIONS
 -- ==================================
 INSERT INTO mcu_detection (reading_id, canceled) VALUES
-(2, FALSE),
+(2, FALSE),	
 (3, FALSE),
 (5, TRUE),
 (6, FALSE),

@@ -1,47 +1,59 @@
 package com.example.gasify_project.model;
 
 public class DeviceItem {
+    private int id;                // novo
     private String name;
-    private String id;
+    private String locatedAt;
     private String serialNumber;
-    private boolean hasAlarm;
+    private String address;
+    private String postalCode;
+    private boolean alarm;
 
-    public DeviceItem(String name, String id, String serialNumber, boolean hasAlarm) {
-        this.name = name;
+    // construtor com id
+    public DeviceItem(int id, String name, String locatedAt, String serialNumber, boolean alarm, String address, String postalCode) {
         this.id = id;
-        this.serialNumber = serialNumber;
-        this.hasAlarm = hasAlarm;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getSerialNumber() {
-        return serialNumber;
-    }
-
-    public void setSerialNumber(String serialNumber) {
+        this.locatedAt = locatedAt;
         this.serialNumber = serialNumber;
+        this.alarm = alarm;
+        this.address = address;
+        this.postalCode = postalCode;
     }
 
-    public boolean hasAlarm() {
-        return hasAlarm;
+    // (opcional) construtor sem id (legacy)
+    public DeviceItem(String name, String locatedAt, String serialNumber, boolean alarm, String address, String postalCode) {
+        this(-1, name, locatedAt, serialNumber, alarm, address, postalCode);
     }
 
-    public void setAlarm(boolean hasAlarm) {
-        this.hasAlarm = hasAlarm;
+    // getters / setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getLocatedAt() { return locatedAt; }
+    public void setLocatedAt(String locatedAt) { this.locatedAt = locatedAt; }
+
+    public String getSerialNumber() { return serialNumber; }
+    public void setSerialNumber(String serialNumber) { this.serialNumber = serialNumber; }
+
+    public boolean isAlarm() { return alarm; }
+    public void setAlarm(boolean alarm) { this.alarm = alarm; }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
 }
