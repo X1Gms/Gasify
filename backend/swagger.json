@@ -34,6 +34,24 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "User already exists (returns success to prevent user enumeration)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "201": {
             "description": "User registered successfully",
             "content": {
@@ -376,7 +394,7 @@
       },
       "patch": {
         "summary": "Update current user",
-        "description": "Update user profile information. Password fields are optional - if provided, both password and passwordConfirmation must be included and meet security requirements.",
+        "description": "Update user profile information. At least one field (fullName, email, or password) must be provided. Password fields are optional - if provided, both password and passwordConfirmation must be included and meet security requirements.",
         "tags": ["Users"],
         "security": [
           {
@@ -431,9 +449,10 @@
                 },
                 "examples": {
                   "missingFields": {
-                    "summary": "Missing required fields",
+                    "summary": "Missing fields",
                     "value": {
-                      "message": "Missing fields, expected: fullName, email"
+                      "success": false,
+                      "message": "At least one field is expected: fullName, email, password"
                     }
                   },
                   "invalidEmail": {
@@ -476,6 +495,16 @@
           },
           "404": {
             "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already in use",
             "content": {
               "application/json": {
                 "schema": {
@@ -532,12 +561,38 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "400": {
+            "description": "Missing password field",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DefaultResponse"
+                },
+                "examples": {
+                  "missingPassword": {
+                    "value": {
+                      "success": false,
+                      "message": "Missing fields, expected: password"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized or incorrect password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                },
+                "examples": {
+                  "incorrectPassword": {
+                    "value": {
+                      "success": false,
+                      "message": "Incorrect password"
+                    }
+                  }
                 }
               }
             }
@@ -820,7 +875,32 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DefaultResponse"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/DefaultResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "missingFields": {
+                    "value": {
+                      "error": "Missing fields, expected: name, serialNumber, countryId, address, postalCode"
+                    }
+                  },
+                  "invalidSeedReadings": {
+                    "value": {
+                      "success": false,
+                      "message": "Expected seedReadings to be a boolean value, got string"
+                    }
+                  }
                 }
               }
             }
@@ -1369,7 +1449,7 @@
               "total_devices": {
                 "type": "integer"
               },
-              "active_alerts": {
+              "devices_with_active_alert": {
                 "type": "integer"
               },
               "avg_gas": {
@@ -1495,12 +1575,12 @@
           "fullName": {
             "type": "string",
             "minLength": 3,
-            "description": "User's full name (minimum 3 characters)"
+            "description": "User's full name (minimum 3 characters, optional)"
           },
           "email": {
             "type": "string",
             "format": "email",
-            "description": "User's email address"
+            "description": "User's email address (optional)"
           },
           "password": {
             "type": "string",
@@ -1513,7 +1593,8 @@
             "description": "Password confirmation (required if password is provided). Must match the password field."
           }
         },
-        "required": ["fullName", "email"]
+        "minProperties": 1,
+        "description": "At least one property must be provided (fullName, email, or password)"
       },
       "DeleteMeRequestBody": {
         "type": "object",
@@ -1623,18 +1704,6 @@
           "id": {
             "type": "integer"
           },
-          "user_id": {
-            "type": "integer"
-          },
-          "type_id": {
-            "type": "integer"
-          },
-          "title": {
-            "type": "string"
-          },
-          "body": {
-            "type": ["string", "null"]
-          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -1643,18 +1712,88 @@
             "type": ["string", "null"],
             "format": "date-time"
           },
-          "type": {
-            "type": "string",
-            "description": "Notification type name (e.g., 'Important', 'Regular', 'Alert', 'Maintenance')"
+          "device": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "serial_number": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "postal_code": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "serial_number",
+              "address",
+              "postal_code"
+            ]
+          },
+          "reading": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "gas_type": {
+                "type": "string"
+              },
+              "gas": {
+                "type": ["number", "null"],
+                "description": "MQ2 sensor reading (Methane/LPG/Smoke)"
+              },
+              "co": {
+                "type": ["number", "null"],
+                "description": "MQ5 sensor reading (CO)"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": ["id", "gas_type", "created_at"]
+          },
+          "detection": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "canceled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["id", "canceled"]
           }
         },
-        "required": ["id", "user_id", "type_id", "title", "created_at"]
+        "required": [
+          "id",
+          "title",
+          "created_at",
+          "device",
+          "reading",
+          "detection"
+        ]
       },
       "GetNotificationsResponse": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean"
+          },
+          "unread_count": {
+            "type": "integer",
+            "description": "Total number of unread notifications"
           },
           "notifications": {
             "type": "array",
@@ -1663,7 +1802,7 @@
             }
           }
         },
-        "required": ["success", "notifications"]
+        "required": ["success", "unread_count", "notifications"]
       }
     },
     "securitySchemes": {
