@@ -138,30 +138,33 @@
         <div class="modal-overlay" id="modalOverlay">
 
             <!-- MODAL ADICIONAR -->
-            <div class="modal" id="addDeviceModal">
-                <button class="modal-close" data-close>✖</button>
+<div class="modal" id="addDeviceModal">
+    <button class="modal-close" data-close>✖</button>
 
-                <h2>Adicionar Dispositivo</h2>
+    <h2>Adicionar Dispositivo</h2>
 
-                <div class="modal-form">
-                    <input type="text" placeholder="Nome do Dispositivo">
-                    <input type="text" placeholder="Código de ID">
+    <div class="modal-form">
+        <input type="text" placeholder="Nome do Dispositivo">
+        <input type="text" placeholder="Código de ID">
 
-               <select>
-    <option value="">Selecione o País</option>
-    <option value="1">Portugal</option>
-    <option value="2">Espanha</option>
-    <option value="3">França</option>
-    </select>
+        <select>
+            <option value="">Selecione o País</option>
+            <option value="1">Portugal</option>
+            <option value="2">Espanha</option>
+            <option value="3">França</option>
+        </select>
 
-                    <input type="text" placeholder="Morada">
-                    <input type="text" placeholder="Código Postal">
+        <input type="text" placeholder="Morada">
+        <input type="text" placeholder="Código Postal">
 
-                    <button class="primary-modal-btn">Adicionar</button>
-                </div>
-            </div>
+        <label style="display: flex; align-items: center; gap: 10px; margin: 10px 0; cursor: pointer; font-size: 0.9rem; opacity: 0.8;">
+            <input type="checkbox" id="seedReadings" style="width: auto; margin: 0;"> 
+            Gerar dados de teste aleatórios
+        </label>
 
-        </div>
+        <button class="primary-modal-btn">Adicionar</button>
+    </div>
+</div>
 
     </main>
     <script>

@@ -5,84 +5,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inserir Código – RSSF / PWDAM</title>
+    
     <script>
         const theme = localStorage.getItem('theme');
         if (theme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
-        const authImg = document.getElementById("auth-img");
-if (authImg && theme === "dark") {
-    authImg.src = "img/authimage2.png";
-}
-
     </script>
 
     <link rel="stylesheet" href="css/color.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/auth.css">
+    
     <script src="js/sessions.js" defer></script>
-    <script src="js/auth.js" defer></script>
+    <script src="js/insertcode.js" defer></script>
 </head>
 
 <body data-page="recover-code">
 
     <div class="auth-container">
-
-        <!-- COLUNA ESQUERDA -->
         <div class="auth-left">
             <div class="login-bubble">
-
                 <h1>Inserir Código</h1>
                 <h3>Insira o código de 6 dígitos que recebeu no seu e-mail</h3>
 
-                <input id="recover_code" placeholder="Código de recuperação" maxlength="6">
+                <input id="recover_code" placeholder="Código de recuperação" maxlength="6" type="text" inputmode="numeric">
 
                 <button id="codeButton">Autenticar</button>
 
-                <div id="code_error"></div>
+                <div id="code_error" style="display:none; color: #ff4d4d; margin-top:10px; font-size: 14px; text-align: center;"></div>
 
                 <p class="small-muted" style="margin-top:20px;">Lembrei da Palavra-Passe?</p>
                 <p><a href="login.html">Iniciar Sessão</a></p>
-
             </div>
         </div>
 
-        <!-- COLUNA DIREITA -->
         <div class="auth-right">
-            <img id="auth-img"  alt="Imagem Código">
+            <img id="auth-img" alt="Imagem Código">
         </div>
-
     </div>
 
     <script>
-        window.onload = function () {
-            const btn = document.getElementById("codeButton");
-
-            btn.onclick = () => {
-                const code = document.getElementById("recover_code").value.trim();
-                const err = document.getElementById("code_error");
-
-                err.textContent = "";
-                err.style.display = "none";
-
-                if (!code) {
-                    err.textContent = "Insira o código de recuperação.";
-                    err.style.display = "block";
-                    return;
-                }
-
-                if (code.length !== 6 || !/^[0-9]+$/.test(code)) {
-                    err.textContent = "O código deve ter 6 dígitos.";
-                    err.style.display = "block";
-                    return;
-                }
-
-                // Aqui farás o fetch ao servidor para validar o código
-                alert("Verificação de código ainda não implementada.");
-            };
-        };
+        document.addEventListener("DOMContentLoaded", () => {
+            const authImg = document.getElementById("auth-img");
+            const theme = localStorage.getItem('theme');
+            if (authImg) {
+                authImg.src = theme === "dark" ? "img/authimage2.png" : "img/authimage.png";
+            }
+        });
     </script>
-
 </body>
-
 </html>

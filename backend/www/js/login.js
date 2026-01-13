@@ -1,5 +1,5 @@
 // ===============================================================
-// LOGIN – Standalone (Substitui o auth.js)
+// LOGIN
 // ===============================================================
 
 const API_BASE = "http://localhost:8081"; 
@@ -44,7 +44,6 @@ async function loginPage() {
         localStorage.setItem("userId", data.user.id);
 
         // Se o teu sessions.js tiver uma função de inicialização, podes chamá-la aqui
-        // Ex: saveSession(data.token, data.user);
 
         // 5. Redirecionar
         window.location.href = "home.html";

@@ -4,7 +4,7 @@
 function checkSession() {
     const token = localStorage.getItem("token");
     const path = window.location.pathname;
-    const isAuthPage = path.includes("login.html") || path.includes("register.html");
+    const isAuthPage = path.includes("login.html") || path.includes("register.html") || path.includes("recoverpass.html") || path.includes("insertcode.html") || path.includes("newpassword.html");
 
     if (!token && !isAuthPage) {
         if (path !== "/" && !path.includes("index.html")) {
@@ -28,39 +28,28 @@ function logout() {
 }
 
 /**
- * Insere o nome no HTML (com insistência)
- */
-/**
- * Injeta o nome imediatamente para evitar o "User"
+ * Injeta o nome imediatamente. 
+ * Ajustado para esperar tanto pelo HTML quanto pelo dado no localStorage.
  */
 function fastInjectName() {
-    const cachedName = localStorage.getItem("userName");
-    if (!cachedName) return;
-
-    // Função que tenta encontrar o span e injetar o nome
-    const tryInject = () => {
+    // Tenta injetar a cada 50ms para ser mais eficiente
+    const fastInterval = setInterval(() => {
+        const cachedName = localStorage.getItem("userName");
         const nameSpan = document.getElementById("userName");
-        if (nameSpan) {
+
+        // Se encontrou o elemento no HTML e já existe o nome no cache
+        if (nameSpan && cachedName) {
             nameSpan.textContent = cachedName;
-            return true;
+            clearInterval(fastInterval); // Para o loop pois teve sucesso
         }
-        return false;
-    };
+    }, 50);
 
-    // 1. Tenta injetar logo
-    if (!tryInject()) {
-        // 2. Se não conseguiu, tenta a cada 10ms (super rápido) até o HTML aparecer
-        const fastInterval = setInterval(() => {
-            if (tryInject()) clearInterval(fastInterval);
-        }, 10);
-
-        // Para não ficar a correr infinitamente se o elemento não existir
-        setTimeout(() => clearInterval(fastInterval), 2000);
-    }
+    // Para de tentar após 5 segundos para não consumir recursos
+    setTimeout(() => clearInterval(fastInterval), 5000);
 }
 
 /**
- * Carrega os dados da API
+ * Carrega os dados da API e atualiza o Header imediatamente
  */
 async function loadUserData() {
     const token = localStorage.getItem("token");
@@ -78,19 +67,25 @@ async function loadUserData() {
         const data = await response.json();
 
         if (response.ok && data.success && data.user) {
+            // Guarda o nome atualizado no cache
             localStorage.setItem("userName", data.user.fullName);
-            injectNameToHeader(); // Tenta injetar o nome novo
+            
+            // Injeta logo sem esperar pelo próximo ciclo do intervalo
+            const nameSpan = document.getElementById("userName");
+            if (nameSpan) {
+                nameSpan.textContent = data.user.fullName;
+            }
         }
     } catch (error) {
         console.error("Erro ao carregar dados:", error);
     }
 }
 
-// 1. Executa verificação de sessão
+// 1. Executa verificação de sessão antes de tudo
 checkSession();
 
-// 2. Tenta injetar o nome que já temos guardado mal o script corre
+// 2. Inicia o monitoramento para injeção do nome (vai esperar pelo fetch e pelo HTML)
 fastInjectName();
 
-// 3. Vai buscar dados frescos e tenta injetar de novo
+// 3. Dispara a atualização dos dados assim que a estrutura base carrega
 document.addEventListener("DOMContentLoaded", loadUserData);

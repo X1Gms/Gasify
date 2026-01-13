@@ -11,9 +11,9 @@
             document.documentElement.setAttribute('data-theme', 'dark');
         }
         const authImg = document.getElementById("auth-img");
-if (authImg && theme === "dark") {
-    authImg.src = "img/authimage2.png";
-}
+        if (authImg && theme === "dark") {
+            authImg.src = "img/authimage2.png";
+        }
 
     </script>
 
@@ -53,6 +53,11 @@ if (authImg && theme === "dark") {
                     </span>
                 </div>
 
+                <div style="text-align: right; margin-top: -8px; margin-bottom: 15px;">
+                    <a href="recoverpass.html" class="small-link"
+                        style="font-size: 13px; text-decoration: none; opacity: 0.8;">Esqueci-me da palavra-passe</a>
+                </div>
+
                 <button id="loginButton">Entrar</button>
 
                 <div id="login_error"></div>
@@ -65,7 +70,7 @@ if (authImg && theme === "dark") {
 
         <!-- COLUNA DIREITA (IMAGEM) -->
         <div class="auth-right">
-            <img id="auth-img"  alt="Imagem Login">
+            <img id="auth-img" alt="Imagem Login">
         </div>
 
     </div>

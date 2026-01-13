@@ -124,6 +124,7 @@ button {
 
 .status-box:hover {
     transform: translateY(-4px);
+    background: var(--bg-input);
 }
 
 .status-box strong {
@@ -198,3 +199,106 @@ html {
     fill: white;
 }
 
+/*Charts Style*/
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Mantém a grelha responsiva */
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.chart-box {
+    background: var(--bg-card); /* Ou a tua cor de fundo */
+    border-radius: 12px;
+    padding: 15px;
+    height: 300px; /* IMPORTANTE: Define uma altura fixa para o box */
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-box h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.chart-box canvas {
+    flex: 1; /* Faz o canvas ocupar o resto do espaço da box */
+    max-height: 220px !important; /* Limita a altura real do gráfico */
+    width: 100% !important;
+}
+
+/* =======================================
+    DEVICE LIST (HOME + DEVICES)
+======================================= */
+.device-item, .device-card {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 8px var(--shadow-soft);
+    padding: 16px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+    
+    /* Base */
+    position: relative; 
+    z-index: 1;
+}
+
+/* Card com rato em cima: sobe um pouco na camada */
+.device-item:hover, .device-card:hover {
+    transform: translateX(8px);
+    box-shadow: 0 4px 12px var(--shadow);
+    background: var(--bg-input);
+    z-index: 5; 
+}
+
+/* PRIORIDADE MÁXIMA: 
+   Quando o menu está aberto (.active), este card ganha de todos, 
+   mesmo dos que têm o hover no momento. */
+.device-card.active {
+    z-index: 999 !important; 
+    transform: translateX(8px); /* Mantém ele deslocado enquanto o menu estiver aberto */
+}
+
+.device-menu {
+    position: absolute;
+    z-index: 1000; /* O menu fica ainda acima do card active */
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 16px var(--shadow-strong);
+    right: 10px;
+    top: 40px;
+    display: none;
+}
+
+/* Garante que o contentor da lista não corte elementos filhos (menus) */
+.device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 80px; /* Adiciona um espaço extra no fundo para o menu do último card não cortar */
+    overflow: visible !important; /* IMPORTANTE: Garante que o menu possa "sair" do card */
+}
+
+/* Garante que o main permita o conteúdo transbordar */
+.devices-content {
+    overflow: visible;
+}
+
+/* Ajuste no menu para ele não forçar um scroll horizontal desnecessário */
+.device-menu {
+    position: absolute;
+    z-index: 1000;
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 16px var(--shadow-strong);
+    right: 10px;
+    top: 45px; /* Ajusta conforme o tamanho do teu botão */
+    width: 140px; /* Define um tamanho fixo para evitar saltos de layout */
+    border-radius: 12px;
+    padding: 8px 0;
+}
