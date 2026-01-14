@@ -394,7 +394,7 @@
       },
       "patch": {
         "summary": "Update current user",
-        "description": "Update user profile information. At least one field (fullName, email, or password) must be provided. Password fields are optional - if provided, both password and passwordConfirmation must be included and meet security requirements.",
+        "description": "Update user profile information. At least one field (fullName, email, or newPassword) must be provided. Password fields are optional - if provided, both newPassword and newPasswordConfirmation must be included and meet security requirements. currentPassword is required if newPassword is provided.",
         "tags": ["Users"],
         "security": [
           {
@@ -421,8 +421,9 @@
                   "value": {
                     "fullName": "John Lee",
                     "email": "john.lee@example.com",
-                    "password": "NewPassword123!",
-                    "passwordConfirmation": "NewPassword123!"
+                    "newPassword": "NewPassword123!",
+                    "newPasswordConfirmation": "NewPassword123!",
+                    "currentPassword": "OldPassword123!"
                   }
                 }
               }
@@ -452,7 +453,7 @@
                     "summary": "Missing fields",
                     "value": {
                       "success": false,
-                      "message": "At least one field is expected: fullName, email, password"
+                      "message": "At least one field is expected: fullName, email, newPassword"
                     }
                   },
                   "invalidEmail": {
@@ -476,7 +477,19 @@
                   "incompletePasswordFields": {
                     "summary": "Both password fields required",
                     "value": {
-                      "message": "Both password and passwordConfirmation are required"
+                      "message": "Both newPassword and newPasswordConfirmation are required"
+                    }
+                  },
+                  "missingCurrentPassword": {
+                    "summary": "Missing current password",
+                    "value": {
+                      "message": "Current password is required to change password"
+                    }
+                  },
+                  "samePassword": {
+                    "summary": "New password same as current",
+                    "value": {
+                      "message": "New password cannot be the same as the current password"
                     }
                   }
                 }
@@ -1582,19 +1595,23 @@
             "format": "email",
             "description": "User's email address (optional)"
           },
-          "password": {
+          "newPassword": {
             "type": "string",
             "minLength": 8,
-            "description": "New password (optional). Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character. If provided, passwordConfirmation is also required."
+            "description": "New password (optional). Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character. If provided, newPasswordConfirmation is also required."
           },
-          "passwordConfirmation": {
+          "newPasswordConfirmation": {
             "type": "string",
             "minLength": 8,
-            "description": "Password confirmation (required if password is provided). Must match the password field."
+            "description": "Password confirmation (required if newPassword is provided). Must match the newPassword field."
+          },
+          "currentPassword": {
+            "type": "string",
+            "description": "Current password (required if newPassword is provided)."
           }
         },
         "minProperties": 1,
-        "description": "At least one property must be provided (fullName, email, or password)"
+        "description": "At least one property must be provided (fullName, email, or newPassword)"
       },
       "DeleteMeRequestBody": {
         "type": "object",
