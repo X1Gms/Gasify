@@ -16,13 +16,19 @@ function updateMeHandler(req, res) {
   const { id: userId } = req.user;
 
   // destructuring request body
-  let { fullName, email, password, passwordConfirmation } = req.body;
+  let {
+    fullName,
+    email,
+    currentPassword,
+    newPassword,
+    newPasswordConfirmation,
+  } = req.body;
 
   // check if at least one field is provided
-  if (!fullName && !email && !password) {
+  if (!fullName && !email && !newPassword) {
     return res.status(400).json({
       success: false,
-      message: "At least one field is expected: fullName, email, password",
+      message: "At least one field is expected: fullName, email, newPassword",
     });
   }
 
@@ -44,53 +50,98 @@ function updateMeHandler(req, res) {
       .json({ success: false, message: "Invalid email format" });
   }
 
-  // validate password if provided
-  if (password) {
-    // if password is provided, passwordConfirmation must also be provided
-    if (!passwordConfirmation) {
-      return res.status(400).json({
-        success: false,
-        message: "Both password and passwordConfirmation are required",
-      });
-    }
-
-    // validate passwords match
-    if (password !== passwordConfirmation) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Passwords do not match" });
-    }
-
-    // validate password format using passwordRegex
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-      });
-    }
-  }
-
   // prepare fields to update
   const updateFields = {};
 
   if (fullName) updateFields.full_name = fullName;
   if (email) updateFields.email = email;
 
-  // if password provided, hash it first then proceed
-  if (password) {
-    const saltRounds = options.auth.saltRounds;
-    bcrypt.hash(password, saltRounds, (hashErr, hashedPassword) => {
-      if (hashErr) {
-        console.error(hashErr);
+  // if newPassword provided, verify current password first
+  if (newPassword) {
+    if (!currentPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password is required to change password",
+      });
+    }
+
+    if (newPassword === currentPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "New password cannot be the same as the current password",
+      });
+    }
+
+    // fetch current user hash to compare
+    const getUserSql = "SELECT password_hash FROM user WHERE id = ?";
+    mysqlPool.query(getUserSql, [userId], (err, rows) => {
+      if (err) {
+        console.error("Error fetching user for password check:", err);
         return res
           .status(500)
           .json({ success: false, message: "Internal server error" });
       }
 
-      // add hashed password to update fields
-      updateFields.password_hash = hashedPassword;
-      executeUpdate(updateFields, userId, res);
+      if (rows.length === 0) {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+
+      const storedHash = rows[0].password_hash;
+      bcrypt.compare(currentPassword, storedHash, (compareErr, isMatch) => {
+        if (compareErr) {
+          console.error(compareErr);
+          return res
+            .status(500)
+            .json({ success: false, message: "Internal server error" });
+        }
+
+        if (!isMatch) {
+          return res
+            .status(401)
+            .json({ success: false, message: "Current password is incorrect" });
+        }
+
+        // if newPassword is provided, newPasswordConfirmation must also be provided
+        if (!newPasswordConfirmation) {
+          return res.status(400).json({
+            success: false,
+            message:
+              "Both newPassword and newPasswordConfirmation are required",
+          });
+        }
+
+        // validate passwords match
+        if (newPassword !== newPasswordConfirmation) {
+          return res
+            .status(400)
+            .json({ success: false, message: "Passwords do not match" });
+        }
+
+        // validate password format using passwordRegex
+        if (!passwordRegex.test(newPassword)) {
+          return res.status(400).json({
+            success: false,
+            message:
+              "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+          });
+        }
+
+        const saltRounds = options.auth.saltRounds;
+        bcrypt.hash(newPassword, saltRounds, (hashErr, hashedPassword) => {
+          if (hashErr) {
+            console.error(hashErr);
+            return res
+              .status(500)
+              .json({ success: false, message: "Internal server error" });
+          }
+
+          // add hashed password to update fields
+          updateFields.password_hash = hashedPassword;
+          executeUpdate(updateFields, userId, res);
+        });
+      });
     });
   } else {
     // proceed without password
