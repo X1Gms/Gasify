@@ -142,7 +142,7 @@ CREATE TABLE `mcu_detection` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `reading_id` BIGINT UNSIGNED NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `canceled` BOOLEAN NOT NULL DEFAULT FALSE,
+  `canceled` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_mcu_detection_reading`
     FOREIGN KEY (`reading_id`)
