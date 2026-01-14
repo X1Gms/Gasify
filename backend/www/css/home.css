@@ -1,5 +1,5 @@
 /* ======================
-   DEVICES CONTAINER (HOME)
+    DEVICES CONTAINER (HOME)
 ====================== */
 .devices-container {
     background: var(--bg-card);
@@ -11,7 +11,7 @@
 }
 
 /* ======================
-   DEVICES HEADER
+    DEVICES HEADER
 ====================== */
 .devices-header {
     display: flex;
@@ -26,7 +26,7 @@
 }
 
 /* ======================
-   ADD DEVICE BUTTON (+)
+    ADD DEVICE BUTTON (+)
 ====================== */
 .add-device-btn {
     background: var(--primary);
@@ -49,6 +49,49 @@
     transform: translateY(-2px);
 }
 
+/* ====================== 
+    DEVICE ITEM (DESIGN IGUAL AO DEVICE-CARD)
+====================== */
+.device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Mesma folga do outro CSS */
+}
+
+.device-item {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 15px var(--shadow);
+    padding: 22px; /* Padding igual ao device-card */
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    position: relative;
+}
+
+.device-item:hover {
+    transform: translateY(-2px);
+    background: var(--bg-input);
+}
+
+/* ====================== 
+    ALARM / ALERT ACTIVE (DESIGN COPIADO)
+====================== */
+.device-item.alert-active, 
+.device-item.alarm {
+    background: var(--danger-soft) !important;
+    border-color: var(--danger-border) !important;
+}
+
+/* Ícone vermelho em alerta */
+.device-item.alert-active .device-icon, 
+.device-item.alarm .device-icon {
+    background: var(--danger) !important;
+}
+
 /* ====================== MODALS – BASE ====================== */
 .modal-overlay {
     position: fixed;
@@ -61,9 +104,7 @@
     z-index: 3000;
 }
 
-.modal-overlay.show {
-    display: flex;
-}
+.modal-overlay.show { display: flex; }
 
 .modal {
     display: none;
@@ -76,11 +117,8 @@
     position: relative;
 }
 
-.modal.show {
-    display: block;
-}
+.modal.show { display: block; }
 
-/* ====================== MODAL HEADER ====================== */
 .modal h2 {
     margin: 0 0 14px;
     text-align: center;
@@ -88,7 +126,6 @@
     color: var(--text-main);
 }
 
-/* Texto */
 .modal-text {
     text-align: center;
     font-size: 15px;
@@ -96,7 +133,6 @@
     line-height: 1.5;
 }
 
-/* Fechar */
 .modal-close {
     position: absolute;
     top: 14px;
@@ -108,7 +144,6 @@
     color: var(--text-main);
 }
 
-/* ====================== FORM ====================== */
 .modal-form {
     display: flex;
     flex-direction: column;
@@ -124,24 +159,9 @@
     border-radius: 12px;
     border: 1px solid var(--glass-border);
     background: var(--bg-input);
-    box-shadow: 0 4px 10px var(--shadow-soft);
     color: var(--text-main);
 }
 
-.modal-form input:focus,
-.modal-form select:focus {
-    outline: none;
-    box-shadow: 0 6px 14px var(--shadow-main);
-}
-
-/* Input desativado */
-.modal-form input.disabled {
-    background: var(--bg-soft);
-    color: var(--text-muted);
-    cursor: not-allowed;
-}
-
-/* ====================== BOTÃO PRINCIPAL ====================== */
 .primary-modal-btn {
     margin-top: 10px;
     background: var(--primary);
@@ -153,7 +173,6 @@
     border-radius: 14px;
     cursor: pointer;
     transition: 0.25s ease;
-    box-shadow: 0 6px 16px var(--shadow-main);
 }
 
 .primary-modal-btn:hover {
@@ -161,7 +180,6 @@
     transform: translateY(-2px);
 }
 
-/* ====================== MODAL ACTIONS ====================== */
 .modal-actions {
     display: flex;
     justify-content: space-between;
@@ -169,7 +187,6 @@
     margin-top: 25px;
 }
 
-/* Confirmar */
 .confirm-btn-modal {
     background: var(--danger);
     color: var(--bg-main);
@@ -179,15 +196,8 @@
     font-weight: bold;
     border-radius: 12px;
     cursor: pointer;
-    transition: 0.25s ease;
 }
 
-.confirm-btn-modal:hover {
-    background: var(--danger-dark);
-    transform: translateY(-2px);
-}
-
-/* Cancelar */
 .cancel-btn-modal {
     background: var(--primary);
     color: var(--bg-main);
@@ -197,10 +207,4 @@
     font-weight: bold;
     border-radius: 12px;
     cursor: pointer;
-    transition: 0.25s ease;
-}
-
-.cancel-btn-modal:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
 }

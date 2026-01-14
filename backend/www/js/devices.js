@@ -1,5 +1,5 @@
 /**
- * Gestão Completa de Dispositivos (Listagem, Criação, Eliminação)
+ * Gestão Completa de Dispositivos (Listagem, Criação, Eliminação) com Toasts
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -41,7 +41,7 @@ async function fetchCountriesForManagement() {
             if (editSelect) editSelect.innerHTML = placeholder + optionsHTML;
         }
     } catch (error) {
-        console.error("Erro ao carregar países:", error);
+        showToast('error', 'Erro de Países', 'Não foi possível carregar a lista de países.');
     }
 }
 
@@ -66,16 +66,17 @@ async function fetchManagementDevices() {
             renderManagementCards(data.devices);
         }
     } catch (error) {
-        console.error("Erro ao carregar dispositivos:", error);
+        showToast('error', 'Erro de Ligação', 'Não conseguimos obter a sua lista de dispositivos.');
     }
 }
 
 
 /**
- * Desenha os cartões na lista tornando quase todo o card clicável
+ * Desenha os cartões na lista
  */
 function renderManagementCards(devices) {
     const listContainer = document.querySelector(".device-list");
+    if (!listContainer) return;
     listContainer.innerHTML = ""; 
 
     devices.forEach(device => {
@@ -106,7 +107,6 @@ function renderManagementCards(devices) {
             </div>
         `;
 
-        // CLIQUE NO CARD TODO (Navegação)
         card.onclick = () => {
             window.location.href = `device.html?id=${device.id}`;
         };
@@ -115,39 +115,28 @@ function renderManagementCards(devices) {
     });
 }
 
-/**
- * Função para abrir o menu sem navegar para a página do dispositivo
- */
 function toggleDeviceMenu(event, btn) {
     event.stopPropagation();
-    
     const card = btn.closest(".device-card");
     const menu = btn.nextElementSibling;
     const isVisible = menu.style.display === "block";
 
-    // 1. Esconde todos os menus e retira o topo de todos os cards
     document.querySelectorAll(".device-menu").forEach(m => m.style.display = "none");
     document.querySelectorAll(".device-card").forEach(c => c.classList.remove("active"));
     
-    // 2. Se o menu ia abrir, mostra-o e coloca este card no topo absoluto
     if (!isVisible) {
         menu.style.display = "block";
         card.classList.add("active"); 
     }
 }
 
-// Fechar menu ao clicar fora
 document.addEventListener("click", () => {
     document.querySelectorAll(".device-menu").forEach(m => m.style.display = "none");
     document.querySelectorAll(".device-card").forEach(c => c.classList.remove("active"));
 });
 
-/**
- * Impede navegação ao clicar no cancelar alarme
- */
 function handleCancelClick(event) {
     event.stopPropagation();
-    // Aqui podes abrir o modal de cancelamento que já tens no HTML
     const cancelModal = document.getElementById("cancelAlarmModal");
     const overlay = document.getElementById("modalOverlay");
     if(cancelModal && overlay) {
@@ -155,6 +144,7 @@ function handleCancelClick(event) {
         cancelModal.classList.add("show");
     }
 }
+
 /**
  * Lógica para Adicionar Dispositivo
  */
@@ -163,13 +153,18 @@ async function handleAddDevice() {
     const modal = document.getElementById("addDeviceModal");
     
     const payload = {
-        name: modal.querySelector('input[placeholder="Nome do Dispositivo"]').value,
-        serialNumber: modal.querySelector('input[placeholder="Código de ID"]').value,
+        name: modal.querySelector('input[placeholder="Nome do Dispositivo"]').value.trim(),
+        serialNumber: modal.querySelector('input[placeholder="Código de ID"]').value.trim(),
         countryId: parseInt(modal.querySelector('select').value),
-        address: modal.querySelector('input[placeholder="Morada"]').value,
-        postalCode: modal.querySelector('input[placeholder="Código Postal"]').value,
-        seedReadings: false // Forçado a false em gestão
+        address: modal.querySelector('input[placeholder="Morada"]').value.trim(),
+        postalCode: modal.querySelector('input[placeholder="Código Postal"]').value.trim(),
+        seedReadings: false
     };
+
+    if (!payload.name || !payload.serialNumber || !payload.countryId) {
+        showToast('error', 'Campos Obrigatórios', 'Preencha o Nome, ID e País.');
+        return;
+    }
 
     try {
         const response = await fetch("http://localhost:8081/users/me/devices", {
@@ -182,13 +177,14 @@ async function handleAddDevice() {
         });
 
         if (response.ok) {
-            location.reload();
+            showToast('success', 'Dispositivo Adicionado', 'O novo dispositivo foi registado com sucesso.');
+            setTimeout(() => location.reload(), 1500);
         } else {
             const err = await response.json();
-            alert("Erro: " + (err.message || err.error));
+            showToast('error', 'Falha ao Criar', err.message || "Erro no servidor.");
         }
     } catch (error) {
-        console.error("Erro ao criar:", error);
+        showToast('error', 'Erro de Rede', 'Não foi possível ligar ao servidor.');
     }
 }
 
@@ -216,10 +212,10 @@ async function handleEditDevice() {
     const modal = document.getElementById("editDeviceModal");
 
     const payload = {
-        name: modal.querySelector('input[placeholder="Nome do Dispositivo"]').value,
+        name: modal.querySelector('input[placeholder="Nome do Dispositivo"]').value.trim(),
         countryId: parseInt(modal.querySelector('select').value),
-        address: modal.querySelector('input[placeholder="Morada"]').value,
-        postalCode: modal.querySelector('input[placeholder="Código Postal"]').value
+        address: modal.querySelector('input[placeholder="Morada"]').value.trim(),
+        postalCode: modal.querySelector('input[placeholder="Código Postal"]').value.trim()
     };
 
     try {
@@ -232,9 +228,14 @@ async function handleEditDevice() {
             body: JSON.stringify(payload)
         });
 
-        if (response.ok) location.reload();
+        if (response.ok) {
+            showToast('success', 'Dispositivo Atualizado', 'As alterações foram guardadas.');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('error', 'Erro na Edição', 'Não foi possível atualizar o dispositivo.');
+        }
     } catch (error) {
-        console.error("Erro ao editar:", error);
+        showToast('error', 'Erro de Rede', 'Ligação perdida com o servidor.');
     }
 }
 
@@ -259,8 +260,13 @@ document.querySelector(".confirm-btn-modal")?.addEventListener("click", async ()
             headers: { "Authorization": `Bearer ${token}` }
         });
 
-        if (response.ok) location.reload();
+        if (response.ok) {
+            showToast('success', 'Dispositivo Removido', 'O dispositivo foi apagado com sucesso.');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('error', 'Erro ao Eliminar', 'Não foi possível remover o dispositivo.');
+        }
     } catch (error) {
-        console.error("Erro ao eliminar:", error);
+        showToast('error', 'Erro Crítico', 'Falha ao processar a eliminação.');
     }
 });

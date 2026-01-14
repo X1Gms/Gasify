@@ -10,7 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const deviceId = urlParams.get('id');
 
     if (!deviceId) {
-        window.location.href = "home.html";
+        showToast('error', 'Dispositivo não encontrado', 'A redirecionar para a página principal...');
+        setTimeout(() => {
+            window.location.href = "home.html";
+        }, 2000);
         return;
     }
 
@@ -36,18 +39,20 @@ async function fetchDeviceDetails(id, range) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            updateDeviceUI(data);      // Atualiza textos e bubbles
-            renderAllCharts(data.charts); // Desenha os gráficos
+            updateDeviceUI(data);         // Atualiza textos e bubbles
+            renderAllCharts(data.charts);    // Desenha os gráficos
+        } else {
+            showToast('error', 'Erro de Sincronização', 'Não foi possível obter as leituras deste dispositivo.');
         }
     } catch (error) {
         console.error("Erro ao carregar detalhes:", error);
+        showToast('error', 'Erro de Rede', 'Falha ao ligar ao servidor para carregar os gráficos.');
     }
 }
 
 function updateDeviceUI(data) {
     // Atualiza Nome e Serial
     document.querySelector(".device-title").textContent = data.name;
-    // Seleciona o elemento strong e altera o texto a seguir a ele
     const serialElem = document.querySelector(".device-subtitle strong");
     if (serialElem) serialElem.nextSibling.textContent = ` ${data.serial_number}`;
     
@@ -69,6 +74,11 @@ function updateDeviceUI(data) {
         // Humidade
         const hum = data.cards.humidity;
         statusValues[3].textContent = hum === null ? "---" : (hum < 40 ? "Baixa" : (hum < 70 ? "Média" : "Alta"));
+        
+        // ALERTA CRÍTICO: Só mostramos toast se houver de facto uma emergência
+        if (data.has_active_alert) {
+            showToast('error', 'ALERTA DE SEGURANÇA', 'Fuga detetada neste dispositivo! Verifique o local imediatamente.');
+        }
     }
 }
 
@@ -82,9 +92,10 @@ function setupFilters(deviceId) {
 
     document.querySelectorAll(".filter-menu .opt").forEach(o => {
         o.onclick = () => {
-            const range = rangeMap[o.textContent.trim()] || "hour";
+            const rangeText = o.textContent.trim();
+            const range = rangeMap[rangeText] || "hour";
             fetchDeviceDetails(deviceId, range);
-            document.getElementById("filterBtn").textContent = o.textContent + " ▼";
+            document.getElementById("filterBtn").textContent = rangeText + " ▼";
         };
     });
 }

@@ -1,22 +1,16 @@
-// ===============================================================
-// LOGIN
-// ===============================================================
+/**
+ * login.js - Lógica de Autenticação com Toasts
+ */
 
 const API_BASE = "http://localhost:8081"; 
+
 async function loginPage() {
     const email = document.getElementById("login_email").value.trim();
     const password = document.getElementById("login_pass").value;
-    const errorDiv = document.getElementById("login_error");
 
-    // Reset de mensagens
-    if (errorDiv) {
-        errorDiv.textContent = "";
-        errorDiv.style.display = "none";
-    }
-
-    // 1. Validação simples
+    // 1. Validação simples (Toast de Erro à Direita)
     if (!email || !password) {
-        showError("Preencha todos os campos.");
+        showToast('error', 'Campos em Falta', 'Por favor, introduza o seu email e palavra-passe.');
         return;
     }
 
@@ -32,34 +26,28 @@ async function loginPage() {
 
         const data = await res.json();
 
-        // 3. Verificação de Erro (401 Unauthorized ou 400 Bad Request)
+        // 3. Verificação de Erro (Canto Direito)
         if (!res.ok) {
-            showError(data.message || "Email ou password incorretos.");
+            showToast('error', 'Falha no Login', data.message || 'Email ou password incorretos.');
             return;
         }
 
-        // 4. SUCESSO: Guardar Token e ID do utilizador
-        // Guardamos o token para usar em pedidos futuros (Authorization: Bearer <token>)
+        // 4. SUCESSO: Guardar Token e dados do utilizador
+        // Importante: Guardamos o fullName para o sessions.js injetar o nome no header sem delay
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", data.user.id);
+        localStorage.setItem("userName", data.user.fullName);
 
-        // Se o teu sessions.js tiver uma função de inicialização, podes chamá-la aqui
+        // 5. Toast de Sucesso (Canto Esquerdo)
+        showToast('success', 'Bem-vindo!', `Login efetuado com sucesso. A entrar no sistema...`);
 
-        // 5. Redirecionar
-        window.location.href = "home.html";
+        // 6. Redirecionar após o utilizador ver a mensagem
+        setTimeout(() => {
+            window.location.href = "home.html";
+        }, 1500);
 
     } catch (err) {
         console.error("Erro na ligação:", err);
-        showError("Erro de ligação ao servidor.");
-    }
-
-    // Função interna para mostrar erros na UI
-    function showError(msg) {
-        if (errorDiv) {
-            errorDiv.textContent = msg;
-            errorDiv.style.display = "block";
-        } else {
-            alert(msg);
-        }
+        showToast('error', 'Erro de Servidor', 'Não foi possível ligar ao servidor. Tente mais tarde.');
     }
 }

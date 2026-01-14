@@ -1,5 +1,5 @@
 /**
- * js/insertcode.js - Validação do código de recuperação
+ * js/insertcode.js - Validação do código de recuperação com Toasts
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -14,16 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btn.onclick = async () => {
         const code = document.getElementById("recover_code").value.trim();
-        const err = document.getElementById("code_error");
 
-        // Reset de erros
-        err.textContent = "";
-        err.style.display = "none";
-
-        // Validação local simples
-        if (!code || code.length !== 6 || !/^[0-9]+$/.test(code)) {
-            err.textContent = "O código deve ter 6 dígitos.";
-            err.style.display = "block";
+        // Validação local simples (Toast à Direita)
+        if (!code || code.length !== 6) {
+            showToast('error', 'Código Inválido', 'O código deve conter exatamente 6 dígitos numéricos.');
             return;
         }
 
@@ -45,18 +39,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 // SUCESSO: Código válido!
                 // Guardamos o código na sessão para a página de nova password o poder usar
                 sessionStorage.setItem("recovery_code", code);
+                
+                // Redireciona imediatamente para a definição da nova password
                 window.location.href = "newpassword.html";
             } else {
-                // ERRO: Código inválido ou expirado
-                err.textContent = data.message || "Código inválido ou expirado.";
-                err.style.display = "block";
+                // ERRO: Código inválido ou expirado (Toast à Direita)
+                showToast('error', 'Verificação Falhou', data.message || "Código inválido ou expirado.");
                 btn.disabled = false;
                 btn.textContent = "Autenticar";
             }
         } catch (error) {
             console.error("Erro ao verificar código:", error);
-            err.textContent = "Erro de ligação ao servidor.";
-            err.style.display = "block";
+            showToast('error', 'Erro de Ligação', 'Não foi possível contactar o servidor.');
             btn.disabled = false;
             btn.textContent = "Autenticar";
         }

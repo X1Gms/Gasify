@@ -1,5 +1,5 @@
 /**
- * js/newpassword.js - Definição da nova palavra-passe
+ * js/newpassword.js - Definição da nova palavra-passe com Toasts
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -18,28 +18,20 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.onclick = async () => {
         const password = document.getElementById("new_pass").value;
         const passwordConfirmation = document.getElementById("new_pass2").value;
-        const err = document.getElementById("reset_error");
-        const ok = document.getElementById("reset_success");
 
-        // Reset de mensagens
-        err.textContent = "";
-        ok.textContent = "";
-        err.style.display = "none";
-        ok.style.display = "none";
-
-        // Validações locais básicas
+        // Validações locais básicas (Toasts à Direita)
         if (!password || !passwordConfirmation) {
-            showError("Preencha ambos os campos.");
+            showToast('error', 'Campos Vazios', 'Por favor, preencha ambos os campos de password.');
             return;
         }
 
         if (password !== passwordConfirmation) {
-            showError("As passwords não coincidem.");
+            showToast('error', 'Erro de Confirmação', 'As palavras-passe introduzidas não coincidem.');
             return;
         }
 
         if (password.length < 8) {
-            showError("A password deve ter pelo menos 8 caracteres.");
+            showToast('error', 'Password Fraca', 'A nova palavra-passe deve ter pelo menos 8 caracteres.');
             return;
         }
 
@@ -63,35 +55,28 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                // Sucesso absoluto
-                ok.textContent = "Palavra-passe atualizada com sucesso!";
-                ok.style.display = "block";
+                // Sucesso absoluto (Toast à Esquerda)
+                showToast('success', 'Password Alterada', 'A sua palavra-passe foi atualizada! A redirecionar para o login...');
                 
-                // Limpar a sessão
+                // Limpar a sessão de recuperação
                 sessionStorage.removeItem("recovery_email");
                 sessionStorage.removeItem("recovery_code");
 
-                // Redirecionar para o login após 2 segundos
+                // Redirecionar para o login após 2.5 segundos
                 setTimeout(() => {
                     window.location.href = "login.html";
-                }, 2000);
+                }, 2500);
             } else {
-                // Erro do servidor (ex: password fraca ou erro no código)
-                showError(data.message || "Erro ao atualizar a password.");
+                // Erro do servidor (Canto Direito)
+                showToast('error', 'Falha no Reset', data.message || 'Não foi possível atualizar a password.');
                 btn.disabled = false;
                 btn.textContent = "Confirmar";
             }
         } catch (error) {
             console.error("Erro no reset:", error);
-            showError("Erro de ligação ao servidor.");
+            showToast('error', 'Erro de Conexão', 'Não foi possível ligar ao servidor.');
             btn.disabled = false;
             btn.textContent = "Confirmar";
         }
     };
-
-    function showError(msg) {
-        const errDiv = document.getElementById("reset_error");
-        errDiv.textContent = msg;
-        errDiv.style.display = "block";
-    }
 });

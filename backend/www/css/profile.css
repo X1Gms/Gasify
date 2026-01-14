@@ -286,3 +286,25 @@
 .modal input::placeholder {
     color: var(--text-placeholder);
 }
+
+/* ======================
+   MODAL CONFIRMAR EDIÇÃO (IDÊNTICO AO EDIT-BTN)
+====================== */
+
+.confirm-btn-edit {
+    background: var(--success-text);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 4px 12px var(--shadow-main);
+}
+
+.confirm-btn-edit:hover {
+    background: var(--success-border);
+    transform: translateY(-2px);
+}

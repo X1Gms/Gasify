@@ -1,3 +1,7 @@
+/**
+ * register.js - Lógica de Registo de Utilizadores com Toasts
+ */
+
 const API_BASE = "http://localhost:8081";
 
 // Regex iguais ao backend
@@ -17,35 +21,26 @@ async function registerPage() {
     const password = document.getElementById("reg_pass").value;
     const passwordConfirmation = document.getElementById("reg_pass2").value;
 
-    const errDiv = document.getElementById("reg_error");
-    const okDiv = document.getElementById("reg_success");
-
-    // reset mensagens
-    errDiv.textContent = "";
-    okDiv.textContent = "";
-    errDiv.style.display = "none";
-    okDiv.style.display = "none";
-
     // ======================
-    // VALIDAÇÕES FRONTEND
+    // VALIDAÇÕES FRONTEND (Toasts à Direita)
     // ======================
     if (!fullName || !email || !password || !passwordConfirmation) {
-        showError("Preencha todos os campos.");
+        showToast('error', 'Campos Vazios', 'Por favor, preencha todos os campos do formulário.');
         return;
     }
 
     if (fullName.length < 3) {
-        showError("O nome deve ter pelo menos 3 caracteres.");
+        showToast('error', 'Nome Inválido', 'O nome deve ter pelo menos 3 caracteres.');
         return;
     }
 
     if (!emailRegex.test(email)) {
-        showError("O email introduzido não é válido.");
+        showToast('error', 'Email Inválido', 'O formato do email introduzido não é válido.');
         return;
     }
 
     if (password !== passwordConfirmation) {
-        showError("As passwords não coincidem.");
+        showToast('error', 'Passwords Diferentes', 'As passwords introduzidas não coincidem.');
         return;
     }
 
@@ -56,9 +51,7 @@ async function registerPage() {
         !passwordRules.number.test(password) ||
         !passwordRules.special.test(password)
     ) {
-        showError(
-            "A password deve ter pelo menos 8 caracteres, uma letra maiúscula, uma minúscula, um número e um símbolo."
-        );
+        showToast('error', 'Password Fraca', 'A password deve ter 8+ caracteres, maiúscula, minúscula, número e símbolo.');
         return;
     }
 
@@ -79,28 +72,22 @@ async function registerPage() {
 
         const data = await res.json();
 
-        // ERRO
+        // ERRO NO BACKEND (Canto Direito)
         if (!res.ok) {
-            showError(data.message || "Erro ao criar conta.");
+            showToast('error', 'Erro no Registo', data.message || 'Não foi possível criar a conta.');
             return;
         }
 
-        // SUCESSO (201 ou 200)
-        okDiv.textContent = data.message || "Conta criada com sucesso!";
-        okDiv.style.display = "block";
+        // SUCESSO (Canto Esquerdo)
+        showToast('success', 'Conta Criada', 'Registo efetuado com sucesso! A redirecionar para o login...');
 
-        // redirecionar para login
+        // Redirecionar após o utilizador ver o toast
         setTimeout(() => {
             window.location.href = "login.html";
-        }, 1200);
+        }, 2500);
 
     } catch (err) {
         console.error(err);
-        showError("Erro de ligação ao servidor.");
-    }
-
-    function showError(msg) {
-        errDiv.textContent = msg;
-        errDiv.style.display = "block";
+        showToast('error', 'Erro de Ligação', 'Não foi possível estabelecer ligação com o servidor.');
     }
 }

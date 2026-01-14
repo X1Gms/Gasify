@@ -1,18 +1,18 @@
 /**
- * profile.js - Gestão de Perfil do Utilizador
+ * profile.js - Gestão de Perfil do Utilizador com Toasts
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Carregar dados atuais do utilizador
+    // 1. Carregar dados atuais do utilizador ao abrir a página
     fetchUserProfile();
 
-    // 2. Evento para o botão de Editar
-    const editBtn = document.querySelector(".edit-btn");
-    if (editBtn) {
-        editBtn.addEventListener("click", handleUpdateProfile);
+    // 2. Evento para o botão de Guardar (dentro do modal de Edição)
+    const finalConfirmEdit = document.getElementById("finalConfirmEdit");
+    if (finalConfirmEdit) {
+        finalConfirmEdit.addEventListener("click", handleUpdateProfile);
     }
 
-    // 3. Evento para o botão de Confirmar Eliminação (dentro do modal)
+    // 3. Evento para o botão de Confirmar Eliminação (dentro do modal de Eliminar)
     const confirmDeleteBtn = document.querySelector(".confirm-btn-modal");
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener("click", handleDeleteAccount);
@@ -38,19 +38,21 @@ async function fetchUserProfile() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            // Preenche os inputs do HTML
-            document.getElementById("name").value = data.user.fullName;
-            document.getElementById("email").value = data.user.email;
+            // Preenche os inputs do HTML com os dados vindos da BD
+            document.getElementById("name").value = data.user.fullName || "";
+            document.getElementById("email").value = data.user.email || "";
         } else {
             console.error("Erro ao carregar perfil:", data.message);
+            showToast('error', 'Erro de Perfil', 'Não foi possível carregar os teus dados.');
         }
     } catch (error) {
-        console.error("Erro de rede:", error);
+        console.error("Erro de rede ao carregar perfil:", error);
+        showToast('error', 'Erro de Rede', 'Sem ligação ao servidor para carregar o perfil.');
     }
 }
 
 /**
- * Envia os dados atualizados para o servidor
+ * Envia os dados atualizados para o servidor após confirmação no modal
  */
 async function handleUpdateProfile() {
     const token = localStorage.getItem("token");
@@ -58,16 +60,25 @@ async function handleUpdateProfile() {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
     const passwordConfirmation = document.getElementById("password2").value;
+    
+    // Password introduzida no modal para confirmar a edição
+    const currentPassword = document.getElementById("confirmEditPassword").value;
 
-    // Criar o payload apenas com o que foi preenchido
-    const payload = {};
+    if (!currentPassword) {
+        showToast('error', 'Palavra-passe em falta', 'Precisas de introduzir a password atual para guardar.');
+        return;
+    }
+
+    const payload = {
+        currentPassword: currentPassword 
+    };
+
     if (fullName) payload.fullName = fullName;
     if (email) payload.email = email;
     
-    // Só envia password se o utilizador escreveu algo
     if (password) {
         if (password !== passwordConfirmation) {
-            alert("As palavras-passe não coincidem!");
+            showToast('error', 'Passwords Diferentes', 'A nova password e a confirmação não coincidem.');
             return;
         }
         payload.password = password;
@@ -87,28 +98,36 @@ async function handleUpdateProfile() {
         const data = await response.json();
 
         if (response.ok) {
-            alert("Perfil atualizado com sucesso!");
-            // Limpa os campos de password por segurança
-            document.getElementById("password").value = "";
-            document.getElementById("password2").value = "";
+            showToast('success', 'Perfil Atualizado', 'As tuas alterações foram guardadas com sucesso.');
+            
+            // Atualiza o nome no localStorage
+            if (payload.fullName) {
+                localStorage.setItem("userName", payload.fullName);
+            }
+
+            // Aguarda um pouco para o utilizador ver o toast antes de dar refresh
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+            
         } else {
-            alert("Erro: " + data.message);
+            showToast('error', 'Falha ao Guardar', data.message || 'Verifica se a password atual está correta.');
         }
     } catch (error) {
-        console.error("Erro ao atualizar:", error);
-        alert("Erro ao ligar ao servidor.");
+        console.error("Erro ao atualizar perfil:", error);
+        showToast('error', 'Erro de Conexão', 'Não foi possível ligar ao servidor.');
     }
 }
 
 /**
- * Elimina a conta do utilizador após confirmação da password
+ * Elimina a conta do utilizador após confirmação da password no modal de eliminação
  */
 async function handleDeleteAccount() {
     const token = localStorage.getItem("token");
     const password = document.getElementById("deletePassword").value;
 
     if (!password) {
-        alert("Por favor, introduza a sua palavra-passe para confirmar.");
+        showToast('error', 'Confirmação Necessária', 'Deves introduzir a password para eliminar a conta.');
         return;
     }
 
@@ -125,14 +144,17 @@ async function handleDeleteAccount() {
         const data = await response.json();
 
         if (response.ok) {
-            alert("Conta eliminada com sucesso. Até breve!");
-            // Limpa o token e redireciona para o /login
-            localStorage.removeItem("token");
-            window.location.href = "login.html";
+            showToast('success', 'Conta Eliminada', 'A tua conta foi removida. A redirecionar...');
+            
+            setTimeout(() => {
+                localStorage.clear();
+                window.location.href = "login.html";
+            }, 2000);
         } else {
-            alert("Erro: " + data.message);
+            showToast('error', 'Erro ao Eliminar', data.message || 'Palavra-passe incorreta.');
         }
     } catch (error) {
         console.error("Erro ao eliminar conta:", error);
+        showToast('error', 'Erro de Servidor', 'Ocorreu um erro ao tentar eliminar a conta.');
     }
 }

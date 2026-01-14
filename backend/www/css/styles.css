@@ -280,7 +280,7 @@ html {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    padding-bottom: 80px; /* Adiciona um espaço extra no fundo para o menu do último card não cortar */
+    padding-bottom: 20px; /* Adiciona um espaço extra no fundo para o menu do último card não cortar */
     overflow: visible !important; /* IMPORTANTE: Garante que o menu possa "sair" do card */
 }
 

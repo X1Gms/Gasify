@@ -1,5 +1,5 @@
 /**
- * Lógica de Recuperação de Palavra-Passe
+ * js/recoverpass.js - Lógica de Recuperação de Palavra-Passe com Toasts
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,22 +12,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function handleRecoverPassword() {
     const emailInput = document.getElementById("recover_email");
-    const errorDiv = document.getElementById("recover_error");
     const email = emailInput.value.trim();
+    const btn = document.getElementById("recoverButton");
 
-    // Reset de mensagens
-    errorDiv.textContent = "";
-    errorDiv.style.display = "none";
-    errorDiv.style.color = "red";
-
+    // 1. Validação simples (Toast de Erro à Direita)
     if (!email) {
-        showError("Por favor, insira o seu e-mail.");
+        showToast('error', 'Campo Vazio', 'Por favor, insira o seu e-mail para continuar.');
         return;
     }
 
     try {
         // Bloquear o botão para evitar múltiplos cliques
-        const btn = document.getElementById("recoverButton");
         btn.disabled = true;
         btn.textContent = "A enviar...";
 
@@ -42,28 +37,27 @@ async function handleRecoverPassword() {
         const data = await response.json();
 
         if (response.ok) {
-            // Sucesso (Mensagem Neutra conforme o teu Handler)
-            alert("Se a conta existir, um código foi enviado para o seu e-mail.");
+            // Sucesso (Toast à Esquerda)
+            showToast('success', 'E-mail Enviado', 'Se a conta existir, enviámos um código para o seu e-mail.');
             
-            // Opcional: Guardar o email em sessionStorage para usar na próxima página
+            // Guardar o email em sessionStorage para usar na página de validação do código
             sessionStorage.setItem("recovery_email", email);
             
-            // Redirecionar para a página de inserção de código
-            window.location.href = "insertcode.html"; 
+            // Redirecionar para a página de inserção de código após o utilizador ver o toast
+            setTimeout(() => {
+                window.location.href = "insertcode.html"; 
+            }, 2500);
+
         } else {
-            showError(data.message || "Erro ao processar o pedido.");
+            // Erro do servidor (Canto Direito)
+            showToast('error', 'Erro no Pedido', data.message || "Não foi possível processar o pedido.");
             btn.disabled = false;
             btn.textContent = "Enviar";
         }
     } catch (error) {
         console.error("Erro na recuperação:", error);
-        showError("Erro de ligação ao servidor.");
-        document.getElementById("recoverButton").disabled = false;
+        showToast('error', 'Erro de Ligação', 'Ocorreu um problema ao ligar ao servidor.');
+        btn.disabled = false;
+        btn.textContent = "Enviar";
     }
-}
-
-function showError(msg) {
-    const err = document.getElementById("recover_error");
-    err.textContent = msg;
-    err.style.display = "block";
 }
