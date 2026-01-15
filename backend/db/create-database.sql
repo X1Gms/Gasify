@@ -120,7 +120,7 @@ ON `password_reset_code` (`user_id`);
 CREATE TABLE `reading` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `device_id` BIGINT UNSIGNED NOT NULL,
-  `gas_type` ENUM('LPG','Methane','CO','Smoke') NOT NULL,
+  `gas_type` ENUM('NOTHING', 'GAS', 'CO') NOT NULL,
   `humidity` DECIMAL(5,2),
   `temperature` DECIMAL(5,2),
   `mq2` SMALLINT,
@@ -233,18 +233,18 @@ INSERT INTO password_reset_code (user_id, code, expires_at, used_at) VALUES
 -- INSERT READINGS
 -- ==================================
 INSERT INTO reading (id, device_id, gas_type, humidity, temperature, mq2, mq5, created_at) VALUES
-(1, 1, 'LPG', 45.20, 22.80, 120, 95, NOW() - INTERVAL 2 HOUR),
-(2, 1, 'LPG', 48.10, 23.40, 380, 310, NOW() - INTERVAL 50 MINUTE),
-(3, 2, 'Methane', 52.00, 21.10, 620, 580, NOW() - INTERVAL 3 HOUR),
+(1, 1, 'GAS', 45.20, 22.80, 120, 95, NOW() - INTERVAL 2 HOUR),
+(2, 1, 'GAS', 48.10, 23.40, 380, 310, NOW() - INTERVAL 50 MINUTE),
+(3, 2, 'CO', 52.00, 21.10, 620, 580, NOW() - INTERVAL 3 HOUR),
 (4, 3, 'CO', 40.00, 19.50, 90, 70, NOW() - INTERVAL 5 DAY),
-(5, 4, 'Smoke', 60.30, 25.90, 710, 690, NOW() - INTERVAL 15 MINUTE),
-(6, 5, 'LPG', 47.50, 22.00, 200, 180, NOW() - INTERVAL 10 MINUTE),
-(7, 6, 'Methane', 50.10, 21.50, 600, 570, NOW() - INTERVAL 7 DAY),
+(5, 4, 'CO', 60.30, 25.90, 710, 690, NOW() - INTERVAL 15 MINUTE),
+(6, 5, 'GAS', 47.50, 22.00, 200, 180, NOW() - INTERVAL 10 MINUTE),
+(7, 6, 'CO', 50.10, 21.50, 600, 570, NOW() - INTERVAL 7 DAY),
 (8, 7, 'CO', 38.70, 20.30, 80, 75, NOW() - INTERVAL 20 MINUTE),
-(9, 8, 'Smoke', 62.40, 26.10, 720, 700, NOW() - INTERVAL 1 HOUR),
-(10, 2, 'LPG', 49.00, 23.10, 410, 330, NOW() - INTERVAL 30 MINUTE),
-(11, 4, 'Smoke', 65.00, 26.50, 730, 710, NOW() - INTERVAL 45 MINUTE),
-(12, 1, 'LPG', 46.50, 22.90, 390, 320, NOW() - INTERVAL 25 MINUTE);
+(9, 8, 'CO', 62.40, 26.10, 720, 700, NOW() - INTERVAL 1 HOUR),
+(10, 2, 'GAS', 49.00, 23.10, 410, 330, NOW() - INTERVAL 30 MINUTE),
+(11, 4, 'CO', 65.00, 26.50, 730, 710, NOW() - INTERVAL 45 MINUTE),
+(12, 1, 'GAS', 46.50, 22.90, 390, 320, NOW() - INTERVAL 25 MINUTE);
 
 -- ==================================
 -- INSERT MCU DETECTIONS

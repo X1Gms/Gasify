@@ -16,6 +16,8 @@ const countriesRoutes = require("./routes/countries-routes");
 const app = express();
 const PORT = options.server.port || 8081;
 
+const { createMqttClient } = require("../mqtt_server/mqtt/client");
+
 // middlewares
 app.use(express.json());
 app.use(invalidJsonMiddleware);
@@ -34,5 +36,7 @@ app.use("/countries", countriesRoutes);
 
 // start server
 app.listen(PORT, () => {
+  // create mqtt client
+  createMqttClient();
   console.log(`Server running on port http://localhost:${PORT}`);
 });
