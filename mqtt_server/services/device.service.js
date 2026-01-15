@@ -77,7 +77,6 @@ const registerDetection = async (data) => {
 
 module.exports = {
   findDeviceByMac,
-  createDevice,
   saveReading,
   registerDetection,
 };
