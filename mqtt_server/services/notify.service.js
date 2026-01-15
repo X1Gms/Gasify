@@ -1,10 +1,10 @@
 const axios = require("axios");
-const { discord } = require("../config/options.json").notification;
+const notification = require("../config/options.json").notification;
 const { buildEmergencyEmbed } = require("../templates/emergency.template");
 
 const notifyEmergency = async (data) => {
-    if (!discord.webhookUrl) {
-        console.warn("Discord webhook not configured");
+    if (!notification.webhookUrl) {
+        console.warn("Notification webhook not configured");
         return;
     }
 
@@ -16,7 +16,7 @@ const notifyEmergency = async (data) => {
     });
 
     try {
-        await axios.post(discord.webhookUrl, payload);
+        await axios.post(notification.webhookUrl, payload);
     } catch (err) {
         console.error("Failed to send emergency notification:", err.message);
     }
