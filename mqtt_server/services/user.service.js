@@ -2,11 +2,15 @@
 
 const pool = require("../db/db.js");
 
-const findUserByDeviceMac = async (mac) => {
+const findUserIdByDeviceMac = async (mac) => {
     console.log(mac);
-    const [rows] = await pool.query("SELECT * FROM device d left join user u on d.user_id = u.id AND serial_number = ?", [mac]);
+    const [rows] = await pool.query("SELECT user_id FROM device where serial_number = ?", [mac]);
     console.log(rows);
     return rows[0];
 }
 
-module.exports = {findUserByDeviceMac};
+const findUserById = async (id) => {
+    const [rows] = await pool.query("SELECT * FROM user WHERE id = ?", [id]);
+    return rows[0];
+}
+module.exports = {findUserById,findUserIdByDeviceMac};

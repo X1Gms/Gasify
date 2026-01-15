@@ -42,7 +42,7 @@ const handleMessage = async (_, message) => {
                 const myItem = {"serial_number": data.mac, status: "PENDING", "id": reading}
                 myArray.push(myItem);
                 const index = myArray.findIndex(obj => obj.serial_number === data.mac);
-                myItem.userID = await userService.findUserByDeviceMac(data.mac);
+                myItem.userID = await userService.findUserIdByDeviceMac(data.mac);
                 myArray[index].detectId = await deviceService.registerDetection(myItem);
                 return;
             }
@@ -65,13 +65,14 @@ const handleMessage = async (_, message) => {
             if(exists){
                 myArray[index].status = "EMERGENCY";
                 await deviceService.registerDetection(myArray[index]);
-                const {name, located_at} = await userService.findUserByDeviceMac(data.mac);
+                const userID = await userService.findUserIdByDeviceMac(data.mac);
+                const user = await userService.findUserById(userID);
                 await deviceService.registerDetection("EMERGENCY");
                 await notifyEmergency({
-                    nome: name || "",      // replace when you have real data
-                    morada: located_at | "",  // same here
-                    temperature: data.temperature || "",
-                    humidity: data.humidity || ""
+                    nome: user.full_name || "",      // replace when you have real data
+                    // morada: located_at | "",  // same here
+                    // temperature: data.temperature || "",
+                    // humidity: data.humidity || ""
                 });
             }
             myArray[index].status = "EMERGENCY_POP";
