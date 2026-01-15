@@ -1,0 +1,25 @@
+{
+  "server": {
+    "PORT": ,
+    "mqtt": {
+      "PORT": 
+    }
+  },
+  "ttn": {
+    "apikey": "",
+    "username": "",
+    "url": "",
+    "connectTimeout": ,
+    "clean": 
+  },
+  "mysql": {
+    "multipleStatements":
+    "host": "",
+    "database": "",
+    "user": "",
+    "password": ""
+  },
+  "notification": {
+    "webhookUrl": ""
+  }
+}
