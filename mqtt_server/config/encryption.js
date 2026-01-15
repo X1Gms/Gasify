@@ -1,9 +1,8 @@
 const crypto = require('crypto'); // Nativo do Node.js
-const ENCRYPTION_KEY = Buffer.from([
-    0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-    0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10,
-    0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18
-]);
+const config = require("../config/options.json").security;
+const keyHex = config['3DES'].join('');
+const ENCRYPTION_KEY = Buffer.from(keyHex, 'hex');
+// const ENCRYPTION_KEY = Buffer.from();
 
 const decrypt3DES = (encryptedBuffer) => {
     try {
