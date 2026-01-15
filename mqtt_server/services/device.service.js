@@ -18,7 +18,7 @@ const saveReading = async (deviceId, data) => {
     return result.insertId;
 };
 const insertDetection = async (data) => {
-    const [result] = await pool.execute("INSERT INTO `gasify`.`detection` (`readings_id`,`created_at`,`canceled`) " +
+    const [result] = await pool.execute("INSERT INTO `gasify`.`mcu_detection` (`readings_id`,`created_at`,`canceled`) " +
         "VALUES (?,NOW(),?);",[data.id,-1]);
     return result.insertId;
 }
@@ -52,6 +52,6 @@ const registerDetection = async (data) => {
 }
 
 module.exports = {
-    findDeviceByMac, createDevice, saveReading,
+    findDeviceByMac, saveReading,
     registerDetection
 };
