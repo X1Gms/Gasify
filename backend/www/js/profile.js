@@ -61,24 +61,25 @@ async function handleUpdateProfile() {
     const password = document.getElementById("password").value;
     const passwordConfirmation = document.getElementById("password2").value;
     
-    // Password introduzida no modal para confirmar a edição
-    const currentPassword = document.getElementById("confirmEditPassword").value;
+    // Campo do modal de confirmação
+    const currentPasswordInput = document.getElementById("confirmEditPassword");
+    const currentPassword = currentPasswordInput.value;
 
     if (!currentPassword) {
-        showToast('error', 'Palavra-passe em falta', 'Precisas de introduzir a password atual para guardar.');
+        showToast('error', 'Confirmação Necessária', 'Introduz a tua password atual para autorizar as alterações.');
         return;
     }
 
     const payload = {
-        currentPassword: currentPassword 
+        fullName: fullName,
+        email: email,
+        currentPassword: currentPassword // Enviado sempre
     };
 
-    if (fullName) payload.fullName = fullName;
-    if (email) payload.email = email;
-    
+    // Se o utilizador preencheu o campo de nova password
     if (password) {
         if (password !== passwordConfirmation) {
-            showToast('error', 'Passwords Diferentes', 'A nova password e a confirmação não coincidem.');
+            showToast('error', 'Erro de Validação', 'A nova password e a confirmação não coincidem.');
             return;
         }
         payload.password = password;
@@ -98,24 +99,17 @@ async function handleUpdateProfile() {
         const data = await response.json();
 
         if (response.ok) {
-            showToast('success', 'Perfil Atualizado', 'As tuas alterações foram guardadas com sucesso.');
+            showToast('success', 'Sucesso', 'Perfil atualizado com sucesso!');
+            if (payload.fullName) localStorage.setItem("userName", payload.fullName);
             
-            // Atualiza o nome no localStorage
-            if (payload.fullName) {
-                localStorage.setItem("userName", payload.fullName);
-            }
-
-            // Aguarda um pouco para o utilizador ver o toast antes de dar refresh
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
-            
+            setTimeout(() => window.location.reload(), 1500);
         } else {
-            showToast('error', 'Falha ao Guardar', data.message || 'Verifica se a password atual está correta.');
+            // Caso a password atual esteja errada, o backend devolve 401
+            showToast('error', 'Erro', data.message || 'Não foi possível guardar.');
+            currentPasswordInput.value = ""; // Limpa para nova tentativa
         }
     } catch (error) {
-        console.error("Erro ao atualizar perfil:", error);
-        showToast('error', 'Erro de Conexão', 'Não foi possível ligar ao servidor.');
+        showToast('error', 'Erro de Rede', 'Servidor offline.');
     }
 }
 

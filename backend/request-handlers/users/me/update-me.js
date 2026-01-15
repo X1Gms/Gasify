@@ -14,139 +14,61 @@ const { mysqlPool } = require("../../../db/mysql-pool");
  */
 function updateMeHandler(req, res) {
   const { id: userId } = req.user;
+  let { fullName, email, currentPassword, password: newPassword, passwordConfirmation: newPasswordConfirmation } = req.body;
 
-  // destructuring request body
-  let {
-    fullName,
-    email,
-    currentPassword,
-    newPassword,
-    newPasswordConfirmation,
-  } = req.body;
+  // 1. A password atual é OBRIGATÓRIA para qualquer alteração
+  if (!currentPassword) {
+    return res.status(400).json({ success: false, message: "A palavra-passe atual é obrigatória para guardar alterações." });
+  }
 
-  // check if at least one field is provided
+  // 2. Verificar se há algo para atualizar
   if (!fullName && !email && !newPassword) {
-    return res.status(400).json({
-      success: false,
-      message: "At least one field is expected: fullName, email, newPassword",
-    });
+    return res.status(400).json({ success: false, message: "Nenhum dado fornecido para atualização." });
   }
 
-  // validate fullName if provided
-  if (fullName) {
-    fullName = fullName.trim();
-    if (fullName.length < 3) {
-      return res.status(400).json({
-        success: false,
-        message: "Full name must be at least 3 characters long",
-      });
-    }
-  }
-
-  // validate email if provided
-  if (email && !emailRegex.test(email)) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid email format" });
-  }
-
-  // prepare fields to update
-  const updateFields = {};
-
-  if (fullName) updateFields.full_name = fullName;
-  if (email) updateFields.email = email;
-
-  // if newPassword provided, verify current password first
-  if (newPassword) {
-    if (!currentPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Current password is required to change password",
-      });
+  // 3. Primeiro: Validar a Password Atual contra a BD
+  const getUserSql = "SELECT password_hash FROM user WHERE id = ?";
+  mysqlPool.query(getUserSql, [userId], (err, rows) => {
+    if (err || rows.length === 0) {
+      return res.status(500).json({ success: false, message: "Erro ao validar utilizador." });
     }
 
-    if (newPassword === currentPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "New password cannot be the same as the current password",
-      });
-    }
-
-    // fetch current user hash to compare
-    const getUserSql = "SELECT password_hash FROM user WHERE id = ?";
-    mysqlPool.query(getUserSql, [userId], (err, rows) => {
-      if (err) {
-        console.error("Error fetching user for password check:", err);
-        return res
-          .status(500)
-          .json({ success: false, message: "Internal server error" });
+    const storedHash = rows[0].password_hash;
+    bcrypt.compare(currentPassword, storedHash, (compareErr, isMatch) => {
+      if (!isMatch) {
+        return res.status(401).json({ success: false, message: "A palavra-passe atual está incorreta." });
       }
 
-      if (rows.length === 0) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found" });
-      }
+      // Se chegamos aqui, a password está correta. Preparamos os campos.
+      const updateFields = {};
+      if (fullName) updateFields.full_name = fullName.trim();
+      if (email) updateFields.email = email.trim();
 
-      const storedHash = rows[0].password_hash;
-      bcrypt.compare(currentPassword, storedHash, (compareErr, isMatch) => {
-        if (compareErr) {
-          console.error(compareErr);
-          return res
-            .status(500)
-            .json({ success: false, message: "Internal server error" });
+      // 4. Lógica de Nova Password (se fornecida)
+      if (newPassword) {
+        if (newPassword === currentPassword) {
+          return res.status(400).json({ success: false, message: "A nova password não pode ser igual à atual." });
         }
-
-        if (!isMatch) {
-          return res
-            .status(401)
-            .json({ success: false, message: "Current password is incorrect" });
-        }
-
-        // if newPassword is provided, newPasswordConfirmation must also be provided
-        if (!newPasswordConfirmation) {
-          return res.status(400).json({
-            success: false,
-            message:
-              "Both newPassword and newPasswordConfirmation are required",
-          });
-        }
-
-        // validate passwords match
         if (newPassword !== newPasswordConfirmation) {
-          return res
-            .status(400)
-            .json({ success: false, message: "Passwords do not match" });
+          return res.status(400).json({ success: false, message: "As passwords não coincidem." });
         }
-
-        // validate password format using passwordRegex
         if (!passwordRegex.test(newPassword)) {
-          return res.status(400).json({
-            success: false,
-            message:
-              "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-          });
+          return res.status(400).json({ success: false, message: "Formato da nova password inválido." });
         }
 
         const saltRounds = options.auth.saltRounds;
         bcrypt.hash(newPassword, saltRounds, (hashErr, hashedPassword) => {
-          if (hashErr) {
-            console.error(hashErr);
-            return res
-              .status(500)
-              .json({ success: false, message: "Internal server error" });
-          }
-
-          // add hashed password to update fields
+          if (hashErr) return res.status(500).json({ success: false, message: "Erro ao processar password." });
+          
           updateFields.password_hash = hashedPassword;
           executeUpdate(updateFields, userId, res);
         });
-      });
+      } else {
+        // Atualiza apenas nome/email
+        executeUpdate(updateFields, userId, res);
+      }
     });
-  } else {
-    // proceed without password
-    executeUpdate(updateFields, userId, res);
-  }
+  });
 }
 module.exports.updateMeHandler = updateMeHandler;
 
