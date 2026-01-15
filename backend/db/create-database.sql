@@ -43,7 +43,7 @@ CREATE UNIQUE INDEX `ux_country_iso` ON `country` (`iso_code`);
 CREATE TABLE `device` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT UNSIGNED NULL,
-  `country_id` SMALLINT UNSIGNED NOT NULL,
+  `country_id` SMALLINT UNSIGNED NULL,
   `name` VARCHAR(255) NOT NULL,
   `serial_number` VARCHAR(255) NOT NULL,
   `address` VARCHAR(255) NOT NULL,
@@ -58,6 +58,7 @@ CREATE TABLE `device` (
   CONSTRAINT `fk_device_country`
     FOREIGN KEY (`country_id`)
     REFERENCES `country` (`id`)
+    ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX `ux_device_serial` ON `device` (`serial_number`);
