@@ -18,12 +18,12 @@ const saveReading = async (deviceId, data) => {
     return result.insertId;
 };
 const insertDetection = async (data) => {
-    const [result] = await pool.execute("INSERT INTO `gasify`.`mcu_detetion` (`readings_id`,`created_at`,`canceled`) " +
+    const [result] = await pool.execute("INSERT INTO `gasify`.`detection` (`readings_id`,`created_at`,`canceled`) " +
         "VALUES (?,NOW(),?);",[data.id,-1]);
     return result.insertId;
 }
 const updateDetection = async(data,bit) => {
-    const [result] = await pool.execute( "UPDATE `gasify`.`mcu_detetion` SET `canceled` = ? WHERE `id` = ?;", [bit,data.detectId]);
+    const [result] = await pool.execute( "UPDATE `gasify`.`mcu_detection` SET `canceled` = ? WHERE `id` = ?;", [bit,data.detectId]);
     return data.detectId;
 }
 
