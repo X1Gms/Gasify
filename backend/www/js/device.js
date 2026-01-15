@@ -1,32 +1,34 @@
 /**
- * js/device.js - Lógica da Página de Detalhes e Gráficos
+ * js/device.js - Lógica de Gráficos em PPM com Escalas Fixas e Alerta Inicial
  */
 
-let chartsInstances = {}; // Armazena os gráficos para permitir atualizações
+let chartsInstances = {}; 
+
+// Fórmulas de conversão do teu Backend (Base 4095)
+const convertCO = (v) => (v * 106.0) / 4095.0;
+const convertGas = (v) => (v * 6363.0) / 4095.0;
+
+// Valores máximos possíveis em PPM (4095 na fórmula)
+const MAX_CO_PPM = 106;
+const MAX_GAS_PPM = 6363;
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Pega o ID do dispositivo da URL
     const urlParams = new URLSearchParams(window.location.search);
     const deviceId = urlParams.get('id');
 
     if (!deviceId) {
-        showToast('error', 'Dispositivo não encontrado', 'A redirecionar para a página principal...');
-        setTimeout(() => {
-            window.location.href = "home.html";
-        }, 2000);
+        showToast('error', 'Dispositivo não encontrado', 'A redirecionar...');
+        setTimeout(() => { window.location.href = "home.html"; }, 2000);
         return;
     }
 
-    // 2. Carrega os dados (por padrão, da última hora)
-    fetchDeviceDetails(deviceId, 'hour');
-
-    // 3. Configura os filtros de tempo (Última hora, semana, etc.)
+    // Carrega dados iniciais e PERMITE o toast de alerta (true)
+    fetchDeviceDetails(deviceId, 'hour', true);
     setupFilters(deviceId);
 });
 
-async function fetchDeviceDetails(id, range) {
+async function fetchDeviceDetails(id, range, allowToast = false) {
     const token = localStorage.getItem("token");
-    
     try {
         const response = await fetch(`http://localhost:8081/users/me/devices/${id}?range=${range}`, {
             method: "GET",
@@ -35,79 +37,55 @@ async function fetchDeviceDetails(id, range) {
                 "Content-Type": "application/json"
             }
         });
-
         const data = await response.json();
-
         if (response.ok && data.success) {
-            updateDeviceUI(data);         // Atualiza textos e bubbles
-            renderAllCharts(data.charts);    // Desenha os gráficos
-        } else {
-            showToast('error', 'Erro de Sincronização', 'Não foi possível obter as leituras deste dispositivo.');
+            updateDeviceUI(data, allowToast); 
+            renderAllCharts(data.charts);
         }
     } catch (error) {
-        console.error("Erro ao carregar detalhes:", error);
-        showToast('error', 'Erro de Rede', 'Falha ao ligar ao servidor para carregar os gráficos.');
+        showToast('error', 'Erro de Rede', 'Falha ao ligar ao servidor.');
     }
 }
 
-function updateDeviceUI(data) {
-    // Atualiza Nome e Serial
+function updateDeviceUI(data, allowToast) {
     document.querySelector(".device-title").textContent = data.name;
-    const serialElem = document.querySelector(".device-subtitle strong");
-    if (serialElem) serialElem.nextSibling.textContent = ` ${data.serial_number}`;
-    
     const statusValues = document.querySelectorAll(".status-box .big-text");
 
-    // Preenche as Bubbles (Lógica Baixa/Média/Alta)
     if (statusValues.length >= 4) {
-        // Gás (MQ2)
-        const gas = data.cards.gas;
-        statusValues[0].textContent = gas === null ? "---" : (gas < 300 ? "Baixa" : (gas < 600 ? "Média" : "Alta"));
+        const coPpm = data.cards.co !== null ? convertCO(data.cards.co) : null;
+        statusValues[1].textContent = coPpm === null ? "---" : 
+                                     (coPpm <= 34 ? "Baixa" : (coPpm <= 69 ? "Média" : "Alta"));
 
-        // Monóxido (MQ5)
-        const co = data.cards.co;
-        statusValues[1].textContent = co === null ? "---" : (co < 200 ? "Baixa" : (co < 500 ? "Média" : "Alta"));
+        const gasPpm = data.cards.gas !== null ? convertGas(data.cards.gas) : null;
+        statusValues[0].textContent = gasPpm === null ? "---" : 
+                                      (gasPpm <= 2100 ? "Baixa" : (gasPpm <= 4199 ? "Média" : "Alta"));
 
-        // Temperatura
         statusValues[2].textContent = data.cards.temperature ? `${data.cards.temperature}ºC` : "---";
-
-        // Humidade
-        const hum = data.cards.humidity;
-        statusValues[3].textContent = hum === null ? "---" : (hum < 40 ? "Baixa" : (hum < 70 ? "Média" : "Alta"));
+        statusValues[3].textContent = data.cards.humidity !== null ? `${data.cards.humidity}%` : "---";
         
-        // ALERTA CRÍTICO: Só mostramos toast se houver de facto uma emergência
-        if (data.has_active_alert) {
-            showToast('error', 'ALERTA DE SEGURANÇA', 'Fuga detetada neste dispositivo! Verifique o local imediatamente.');
+        // Só mostra o toast se for o carregamento inicial (allowToast === true)
+        if (data.has_active_alert && allowToast) {
+            showToast('error', 'ALERTA CRÍTICO', 'Fuga detectada! Verifique o local.');
         }
     }
-}
-
-function setupFilters(deviceId) {
-    const rangeMap = {
-        "Últimas Horas": "hour",
-        "Últimas Semanas": "week",
-        "Última Quinzena": "fortnight",
-        "Último Mês": "month"
-    };
-
-    document.querySelectorAll(".filter-menu .opt").forEach(o => {
-        o.onclick = () => {
-            const rangeText = o.textContent.trim();
-            const range = rangeMap[rangeText] || "hour";
-            fetchDeviceDetails(deviceId, range);
-            document.getElementById("filterBtn").textContent = rangeText + " ▼";
-        };
-    });
 }
 
 function renderAllCharts(chartsData) {
-    createChart("chartGas", "Gás (MQ2)", chartsData.gas, "#f1c40f");
-    createChart("chartCO", "Monóxido (MQ5)", chartsData.co, "#e67e22");
-    createChart("chartTemp", "Temperatura (ºC)", chartsData.temperature, "#e74c3c");
-    createChart("chartHum", "Humidade (%)", chartsData.humidity, "#3498db");
+    const coLimitAlto = 70;
+    const gasLimitAlto = 4200;
+
+    // CO e Gás: Escala vai até o máximo teórico (106 e 6363)
+    createChart("chartCO", "Monóxido (PPM)", chartsData.co, "#e67e22", coLimitAlto, " ppm", convertCO, MAX_CO_PPM);
+    createChart("chartGas", "Gás (PPM)", chartsData.gas, "#f1c40f", gasLimitAlto, " ppm", convertGas, MAX_GAS_PPM);
+    
+    // Temperatura: Escala dinâmica (melhor para visualização de pequenas mudanças)
+    createChart("chartTemp", "Temperatura", chartsData.temperature, "#e74c3c", null, "ºC", v => v, null);
+    
+    // Humidade: Escala fixa de 0 a 100%
+    createChart("chartHum", "Humidade", chartsData.humidity, "#3498db", null, "%", v => v, 100);
 }
 
-function createChart(canvasId, label, dataArray, color) {
+function createChart(canvasId, label, dataArray, color, limitLine, unit, conversionFn, yMax) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -120,7 +98,27 @@ function createChart(canvasId, label, dataArray, color) {
         const date = new Date(d.timestamp);
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     });
-    const values = dataArray.map(d => d.value);
+    const values = dataArray.map(d => conversionFn(d.value));
+
+    const annotations = {};
+    if (limitLine !== null) {
+        annotations.line1 = {
+            type: 'line',
+            yMin: limitLine,
+            yMax: limitLine,
+            borderColor: '#ff0000',
+            borderWidth: 3,
+            borderDash: [5, 5],
+            label: {
+                display: true,
+                content: 'NÍVEL ALTO',
+                position: 'end',
+                backgroundColor: 'rgba(255, 0, 0, 0.8)',
+                color: '#fff',
+                font: { size: 10, weight: 'bold' }
+            }
+        };
+    }
 
     chartsInstances[canvasId] = new Chart(ctx, {
         type: 'line',
@@ -139,11 +137,41 @@ function createChart(canvasId, label, dataArray, color) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: { 
+                legend: { display: false },
+                annotation: { annotations: annotations },
+                tooltip: {
+                    callbacks: {
+                        label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(1)}${unit}`
+                    }
+                }
+            },
             scales: {
-                x: { grid: { display: false } },
-                y: { beginAtZero: false }
+                y: { 
+                    beginAtZero: true,
+                    max: yMax, // Aplica o valor máximo definido (106, 6363 ou 100)
+                    ticks: { callback: (value) => value + unit }
+                }
             }
         }
+    });
+}
+
+function setupFilters(deviceId) {
+    const rangeMap = {
+        "Últimas Horas": "hour",
+        "Últimas Semanas": "week",
+        "Última Quinzena": "fortnight",
+        "Último Mês": "month"
+    };
+
+    document.querySelectorAll(".filter-menu .opt").forEach(o => {
+        o.onclick = () => {
+            const rangeText = o.textContent.trim();
+            const range = rangeMap[rangeText] || "hour";
+            // Ao mudar o filtro, allowToast é false (valor por defeito omitido ou false)
+            fetchDeviceDetails(deviceId, range, false);
+            document.getElementById("filterBtn").textContent = rangeText + " ▼";
+        };
     });
 }

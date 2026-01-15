@@ -113,22 +113,6 @@
     color: var(--danger);
 }
 
-/* ====================== CANCEL ALARM BUTTON ====================== */
-.cancel-btn {
-    background: var(--danger);
-    border: none;
-    color: var(--bg-main);
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.cancel-btn:hover {
-    background: var(--danger-dark);
-}
-
 /* ====================== MODALS – BASE ====================== */
 .modal-overlay {
     position: fixed;

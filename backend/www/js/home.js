@@ -1,6 +1,10 @@
 /**
- * js/home.js - Lógica da Página Home com Toasts
+ * js/home.js - Lógica da Página Home
  */
+
+// Fórmulas de conversão fornecidas para PPM
+const convertCO = (v) => (v * 106.0) / 4095.0;
+const convertGas = (v) => (v * 6363.0) / 4095.0;
 
 async function fetchDevices() {
     const token = localStorage.getItem("token");
@@ -18,25 +22,19 @@ async function fetchDevices() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            // 1. Atualiza os quadradinhos de status
             renderStatusCards(data.cards, data.devices.length);
-            
-            // 2. Renderiza a lista de dispositivos
             renderDevices(data.devices);
-            
-            // Opcional: Toast silencioso de sucesso ao carregar
-            // showToast('success', 'Dados Atualizados', 'As leituras dos seus dispositivos foram carregadas.');
         } else {
-            showToast('error', 'Erro de Dados', 'Não foi possível sincronizar os seus dispositivos.');
+            showToast('error', 'Erro de Dados', 'Não foi possível sincronizar os dispositivos.');
         }
     } catch (error) {
         console.error("Erro ao carregar dispositivos:", error);
-        showToast('error', 'Erro de Rede', 'Falha ao ligar ao servidor para obter dispositivos.');
+        showToast('error', 'Erro de Rede', 'Falha ao ligar ao servidor.');
     }
 }
 
 /**
- * Preenche os blocos de status com lógica de níveis
+ * Preenche os blocos de status com a lógica PPM e mapeamento Baixa/Média/Alta
  */
 function renderStatusCards(cards, totalDevices) {
     const statusValues = document.querySelectorAll(".status-box .big-text");
@@ -44,37 +42,33 @@ function renderStatusCards(cards, totalDevices) {
     if (statusValues.length >= 4 && cards) {
         statusValues[0].textContent = cards.total_devices ?? totalDevices ?? 0;
 
-        const gas = cards.avg_gas;
-        if (gas === null) {
+        // Mapeamento de Gás (Médio) -> PPM
+        const gasPpm = cards.avg_gas !== null ? convertGas(cards.avg_gas) : null;
+        if (gasPpm === null) {
             statusValues[1].textContent = "---";
-        } else if (gas < 300) {
-            statusValues[1].textContent = "Baixo";
-        } else if (gas < 600) {
-            statusValues[1].textContent = "Médio";
         } else {
-            statusValues[1].textContent = "Alto";
+            if (gasPpm <= 2100) statusValues[1].textContent = "Baixa";
+            else if (gasPpm <= 4199) statusValues[1].textContent = "Média";
+            else statusValues[1].textContent = "Alta";
         }
 
-        const co = cards.avg_co;
-        if (co === null) {
+        // Mapeamento de CO (Médio) -> PPM
+        const coPpm = cards.avg_co !== null ? convertCO(cards.avg_co) : null;
+        if (coPpm === null) {
             statusValues[2].textContent = "---";
-        } else if (co < 200) {
-            statusValues[2].textContent = "Baixo";
-        } else if (co < 500) {
-            statusValues[2].textContent = "Médio";
         } else {
-            statusValues[2].textContent = "Alto";
+            if (coPpm <= 34) statusValues[2].textContent = "Baixa";
+            else if (coPpm <= 69) statusValues[2].textContent = "Média";
+            else statusValues[2].textContent = "Alta";
         }
 
         statusValues[3].textContent = cards.active_alerts || 0;
-        
-        // Se houver alertas ativos, avisa o utilizador no canto direito (Erro/Perigo)
-        if (cards.active_alerts > 0) {
-            showToast('error', 'Emergência Ativa', `Existem ${cards.active_alerts} dispositivos com fugas detetadas!`);
-        }
     }
 }
 
+/**
+ * Renderiza os cartões com estrutura para alinhar o botão à direita
+ */
 function renderDevices(devices) {
     const deviceList = document.querySelector(".device-list");
     if (!deviceList) return;
@@ -82,55 +76,62 @@ function renderDevices(devices) {
 
     devices.forEach(device => {
         const deviceItem = document.createElement("div");
-        
-        // Verifica se tem alerta ativo
-        if (device.has_active_alert) {
-            // Adiciona a classe que criámos no CSS global para brilhar e pulsar
-            deviceItem.className = "device-item alert-active";
-        } else {
-            deviceItem.className = "device-item";
-        }
+        deviceItem.className = device.has_active_alert ? "device-item alert-active" : "device-item";
 
         deviceItem.innerHTML = `
-            <div class="device-icon">
-                <svg class="icon"><use href="#icon-device"></use></svg>
+            <div class="device-left-group">
+                <div class="device-icon">
+                    <svg class="icon"><use href="#icon-device"></use></svg>
+                </div>
+                <div class="device-info">
+                    <strong>${device.name}</strong>
+                    <p>Serial: ${device.serial_number}</p>
+                </div>
             </div>
-            <div>
-                <strong>${device.name}</strong>
-                <p>Serial Number : ${device.serial_number}</p>
+            
+            <div class="device-actions">
+                ${device.has_active_alert 
+                    ? `<button class="cancel-btn" onclick="handleCancelClick(event)">Cancelar Alarme</button>` 
+                    : ''
+                }
             </div>
         `;
 
-        deviceItem.addEventListener("click", () => {
+        deviceItem.onclick = (e) => {
+            if (e.target.closest('.device-actions')) return;
             window.location.href = `device.html?id=${device.id}`;
-        });
+        };
 
         deviceList.appendChild(deviceItem);
     });
 }
 
+function handleCancelClick(event) {
+    event.stopPropagation();
+    const overlay = document.getElementById("modalOverlay");
+    const cancelModal = document.getElementById("cancelAlarmModal");
+
+    if (overlay && cancelModal) {
+        overlay.classList.add("show");
+        cancelModal.classList.add("show");
+    }
+}
+
 async function handleCreateDevice() {
     const token = localStorage.getItem("token");
-    if (!token) return;
-
-    const nameInput = document.querySelector('input[placeholder="Nome do Dispositivo"]');
-    const serialInput = document.querySelector('input[placeholder="Código de ID"]');
-    const countrySelect = document.querySelector('#addDeviceModal select');
-    const addressInput = document.querySelector('input[placeholder="Morada"]');
-    const postalInput = document.querySelector('input[placeholder="Código Postal"]');
-    const seedCheckbox = document.getElementById("seedReadings");
-
+    const modal = document.getElementById("addDeviceModal");
+    
     const deviceData = {
-        name: nameInput.value.trim(),
-        serialNumber: serialInput.value.trim(),
-        countryId: parseInt(countrySelect.value),
-        address: addressInput.value.trim(),
-        postalCode: postalInput.value.trim(),
-        seedReadings: seedCheckbox.checked
+        name: modal.querySelector('input[placeholder="Nome do Dispositivo"]').value.trim(),
+        serialNumber: modal.querySelector('input[placeholder="Código de ID"]').value.trim(),
+        countryId: parseInt(modal.querySelector('select').value),
+        address: modal.querySelector('input[placeholder="Morada"]').value.trim(),
+        postalCode: modal.querySelector('input[placeholder="Código Postal"]').value.trim(),
+        seedReadings: document.getElementById("seedReadings").checked
     };
 
     if (!deviceData.name || !deviceData.serialNumber || !deviceData.countryId) {
-        showToast('error', 'Campos Incompletos', 'O nome, ID e país são obrigatórios.');
+        showToast('error', 'Campos Incompletos', 'Nome, ID e País são obrigatórios.');
         return;
     }
 
@@ -145,18 +146,14 @@ async function handleCreateDevice() {
         });
 
         if (response.status === 201) {
-            showToast('success', 'Dispositivo Criado', 'O seu novo dispositivo foi registado com sucesso.');
-            
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
+            showToast('success', 'Sucesso', 'Dispositivo criado!');
+            setTimeout(() => location.reload(), 1500);
         } else {
             const data = await response.json();
-            showToast('error', 'Erro ao Criar', data.message || "Não foi possível registar o dispositivo.");
+            showToast('error', 'Erro', data.message);
         }
     } catch (error) {
-        console.error(error);
-        showToast('error', 'Erro de Sistema', 'Falha ao comunicar com o servidor.');
+        showToast('error', 'Erro', 'Falha na comunicação.');
     }
 }
 
@@ -164,33 +161,25 @@ async function fetchCountries() {
     try {
         const response = await fetch("http://localhost:8081/countries");
         const data = await response.json();
-
         if (response.ok && data.success) {
-            renderCountryOptions(data.countries);
+            const select = document.querySelector("#addDeviceModal select");
+            if (select) {
+                select.innerHTML = '<option value="">Selecione o País</option>';
+                data.countries.forEach(c => {
+                    const opt = document.createElement("option");
+                    opt.value = c.id;
+                    opt.textContent = c.name;
+                    select.appendChild(opt);
+                });
+            }
         }
-    } catch (error) {
-        console.error("Erro ao carregar países:", error);
-    }
-}
-
-function renderCountryOptions(countries) {
-    const select = document.querySelector("#addDeviceModal select");
-    if (!select) return;
-
-    select.innerHTML = '<option value="">Selecione o País</option>';
-
-    countries.forEach(country => {
-        const option = document.createElement("option");
-        option.value = country.id;
-        option.textContent = country.name;
-        select.appendChild(option);
-    });
+    } catch (e) { console.error(e); }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     fetchDevices();
     fetchCountries();
     
-    const btnAdicionar = document.querySelector(".primary-modal-btn");
+    const btnAdicionar = document.querySelector("#addDeviceModal .primary-modal-btn");
     if (btnAdicionar) btnAdicionar.addEventListener("click", handleCreateDevice);
 });
