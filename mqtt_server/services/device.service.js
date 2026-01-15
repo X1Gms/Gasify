@@ -11,14 +11,14 @@ const findDeviceByMac = async (mac) => {
 // };
 
 const saveReading = async (deviceId, data) => {
-    const [result] = await pool.execute(`INSERT INTO readings
+    const [result] = await pool.execute(`INSERT INTO reading
                             (device_id, created_at, gas_type, humidity, temperature, mq2, mq5)
                         VALUES (?, NOW(), ?, ?, ?, ?,
                                 ?)`, [deviceId, data.gas_result, data.humidity, data.temperature, data.mq2_analog, data.mq5_analog]);
     return result.insertId;
 };
 const insertDetection = async (data) => {
-    const [result] = await pool.execute("INSERT INTO `gasify`.`mcu_detection` (`readings_id`,`created_at`,`canceled`) " +
+    const [result] = await pool.execute("INSERT INTO `gasify`.`mcu_detection` (`reading_id`,`created_at`,`canceled`) " +
         "VALUES (?,NOW(),?);",[data.id,-1]);
     return result.insertId;
 }
