@@ -41,6 +41,7 @@ const handleMessage = async (_, message) => {
                 const myItem = {"serial_number": data.mac, status: "PENDING", "id": reading}
                 myArray.push(myItem);
                 const index = myArray.findIndex(obj => obj.serial_number === data.mac);
+                myItem.userID = await userService.findUserByDeviceMac(data.mac);
                 myArray[index].detectId = await deviceService.registerDetection(myItem);
                 return;
             }

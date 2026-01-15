@@ -6,7 +6,8 @@ const findDeviceByMac = async (mac) => {
 };
 
 const createDevice = async (mac) => {
-    await pool.execute("INSERT INTO device (user_id,name,serial_number,located_at,created_at,updated_at) " + "VALUES (null,'',?,null,now(),null)", [mac]);
+    await pool.execute("INSERT INTO device (user_id,country_id,name,serial_number,address,postal_code,created_at,updated_at) " +
+        "VALUES (null,null,null,?,null,null,NOW(),null)", [mac]);
 };
 
 const saveReading = async (deviceId, data) => {
@@ -25,12 +26,19 @@ const updateDetection = async(data,bit) => {
     const [result] = await pool.execute( "UPDATE `gasify`.`mcu_detetion` SET `canceled` = ? WHERE `id` = ?;", [bit,data.detectId]);
     return data.detectId;
 }
+
+const insertNotification = async (data,mcuId,value) =>{
+    const [result] = await pool.execute("INSERT INTO `gasify`.`notification` (`user_id`,`mcu_detection_id`,`alert_state`,`created_at`,`read_at`) " +
+        "VALUES (?,?,?,NOW(),null)", [data.userID,mcuId,value]);
+    return result.insertId;
+}
 const registerDetection = async (data) => {
     let id = null;
     console.log(data);
     switch (data.status){
         case "PENDING":
             id = insertDetection(data);
+            await insertNotification(data,id,"ALERT_ON");
             break;
         case "CANCELED":
             id = updateDetection(data,1);
