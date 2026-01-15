@@ -29,8 +29,8 @@ const {
   deleteMyDeviceHandler,
 } = require("../request-handlers/users/me/delete-my-device");
 const {
-  cancelDeviceAlarmHandler,
-} = require("../request-handlers/users/me/cancel-device-alarm");
+  cancelDeviceAlertHandler,
+} = require("../request-handlers/users/me/cancel-device-alert");
 
 const router = Router();
 
@@ -45,6 +45,6 @@ router.get("/me/devices/:id", requireAuth, getMyDeviceHandler);
 router.post("/me/devices", requireAuth, createDeviceHandler);
 router.patch("/me/devices/:id", requireAuth, updateMeDeviceHandler);
 router.delete("/me/devices/:id", requireAuth, deleteMyDeviceHandler);
-router.delete("/me/devices/:id/alarm", requireAuth, cancelDeviceAlarmHandler);
+router.delete("/me/devices/:id/alert", requireAuth, cancelDeviceAlertHandler);
 
 module.exports = router;

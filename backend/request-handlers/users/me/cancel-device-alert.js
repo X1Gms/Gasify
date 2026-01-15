@@ -7,12 +7,12 @@ const config = require("../../../config/options.json");
 const { mysqlPool } = require("../../../db/mysql-pool");
 
 /**
- * Handles the cancel of a device alarm for the authenticated user
+ * Handles the cancel of a device alert for the authenticated user
  *
  * @param {express.Request} req
  * @param {express.Response} res
  */
-function cancelDeviceAlarmHandler(req, res) {
+function cancelDeviceAlertHandler(req, res) {
   const { id: userId } = req.user;
   const { id: deviceId } = req.params;
 
@@ -60,17 +60,17 @@ function cancelDeviceAlarmHandler(req, res) {
         if (!response.ok) {
           return res.status(response.status).json({
             success: false,
-            message: "Failed to cancel device alarm",
+            message: "Failed to cancel device alert",
           });
         }
 
         res.status(200).json({
           success: true,
-          message: "Device alarm cancelled successfully",
+          message: "Device alert cancelled successfully",
         });
       })
       .catch((err) => {
-        console.error("Error cancelling device alarm:", err);
+        console.error("Error cancelling device alert:", err);
         res.status(500).json({
           success: false,
           message: "Internal server error",
@@ -78,10 +78,10 @@ function cancelDeviceAlarmHandler(req, res) {
       });
   });
 }
-module.exports.cancelDeviceAlarmHandler = cancelDeviceAlarmHandler;
+module.exports.cancelDeviceAlertHandler = cancelDeviceAlertHandler;
 
 /**
- * Builds the URL for the device alarm cancellation
+ * Builds the URL for the device alert cancellation
  *
  * @returns {string}
  */
@@ -90,7 +90,7 @@ function urlBuilder() {
 }
 
 /**
- * Generates a payload for the device alarm cancellation
+ * Generates a payload for the device alert cancellation
  *
  * @param {string} serialNumber
  * @returns {string}

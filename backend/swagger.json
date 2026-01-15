@@ -1209,9 +1209,9 @@
         }
       }
     },
-    "/users/me/devices/{id}/alarm": {
+    "/users/me/devices/{id}/alert": {
       "delete": {
-        "summary": "Cancel device alarm",
+        "summary": "Cancel device alert",
         "tags": ["Users"],
         "security": [
           {
@@ -1231,7 +1231,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Device alarm cancelled successfully",
+            "description": "Device alert cancelled successfully",
             "content": {
               "application/json": {
                 "schema": {
