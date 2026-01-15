@@ -1,8 +1,5 @@
 const { Router } = require("express");
 
-// import middlewares
-const { requireAuth } = require("../middlewares/require-auth");
-
 // import handlers
 const { getMeHandler } = require("../request-handlers/users/me/get-me");
 const { updateMeHandler } = require("../request-handlers/users/me/update-me");
@@ -35,16 +32,16 @@ const {
 const router = Router();
 
 // routes
-router.get("/me", requireAuth, getMeHandler);
-router.patch("/me", requireAuth, updateMeHandler);
-router.delete("/me", requireAuth, deleteMeHandler);
-router.get("/me/notifications", requireAuth, getMeNotificationsHandler);
-router.patch("/me/notifications/:id", requireAuth, updateMeNotificationHandler);
-router.get("/me/devices", requireAuth, getMyDevicesHandler);
-router.get("/me/devices/:id", requireAuth, getMyDeviceHandler);
-router.post("/me/devices", requireAuth, createDeviceHandler);
-router.patch("/me/devices/:id", requireAuth, updateMeDeviceHandler);
-router.delete("/me/devices/:id", requireAuth, deleteMyDeviceHandler);
-router.delete("/me/devices/:id/alert", requireAuth, cancelDeviceAlertHandler);
+router.get("/me", getMeHandler);
+router.patch("/me", updateMeHandler);
+router.delete("/me", deleteMeHandler);
+router.get("/me/notifications", getMeNotificationsHandler);
+router.patch("/me/notifications/:id", updateMeNotificationHandler);
+router.get("/me/devices", getMyDevicesHandler);
+router.get("/me/devices/:id", getMyDeviceHandler);
+router.post("/me/devices", createDeviceHandler);
+router.patch("/me/devices/:id", updateMeDeviceHandler);
+router.delete("/me/devices/:id", deleteMyDeviceHandler);
+router.delete("/me/devices/:id/alert", cancelDeviceAlertHandler);
 
 module.exports = router;

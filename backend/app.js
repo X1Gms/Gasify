@@ -5,6 +5,7 @@ const options = require("./config/options.json");
 const swaggerDocs = require("./swagger.json");
 
 const { invalidJsonMiddleware } = require("./middlewares/invalid-json");
+const { requireAuth } = require("./middlewares/require-auth");
 
 const { isDevelopmentEnv } = require("./utils/dev-environment");
 
@@ -28,7 +29,7 @@ if (isDevelopmentEnv) {
 
 // use routes
 app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
+app.use("/users", requireAuth, userRoutes);
 app.use("/countries", countriesRoutes);
 
 // start server
