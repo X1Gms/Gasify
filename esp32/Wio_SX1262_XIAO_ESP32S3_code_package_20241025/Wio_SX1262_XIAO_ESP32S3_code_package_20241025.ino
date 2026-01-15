@@ -1,9 +1,10 @@
 #include "config.h"
 #include "EEPROM.h"
-#include <Wire.h>
 #include <DES.h>
+#include <Wire.h>
 #include "DHT.h"
 #include "GasDetector.h"
+#include <MD5Builder.h>
 #define debounceDelay 1000
 #define BUZZER_PIN D7
 #define BUTTON_PIN D6
@@ -22,18 +23,50 @@ bool needsCancel = false;
 #define CANCELED 2   // 10 -> canceled
 #define CONFIRMED 3  // 11 -> not canceled
 volatile int status = IDLE;
-byte des_key[] = {
+DHT dht(DHT_PIN, DHTTYPE);
+int16_t state = RADIOLIB_ERR_NONE;
+DES des;
+uint8_t downlinkBuf[64];
+size_t downlinkLen = sizeof(downlinkBuf);
+byte des_key[24] = {
   0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
   0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10,
   0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18
 };
+String encryptPayload3DES(char *input, int len) {
+  String encryptedHex = "";
 
-DES des;
+  // Calculate how many 8-byte blocks we need
+  // (Adding 7 and dividing by 8 handles the padding)
+  int numBlocks = (len + 7) / 8;
 
+  for (int b = 0; b < numBlocks; b++) {
+    byte blockInput[8] = { 0 };  // Initialize with zeros (Zero Padding)
+    byte blockOutput[8] = { 0 };
 
-//
-DHT dht(DHT_PIN, DHTTYPE);
-int16_t state = RADIOLIB_ERR_NONE;
+    // Fill the 8-byte block with data from the payload
+    for (int i = 0; i < 8; i++) {
+      int charIdx = (b * 8) + i;
+      if (charIdx < len) {
+        blockInput[i] = (byte)input[charIdx];
+      } else {
+        blockInput[i] = 0x00;  // Padding character
+      }
+    }
+
+    // Encrypt this specific 8-byte block
+    des.tripleEncrypt(blockOutput, blockInput, des_key);
+
+    // Convert this block to Hex and append to result
+    for (int i = 0; i < 8; i++) {
+      if (blockOutput[i] < 0x10) encryptedHex += "0";
+      encryptedHex += String(blockOutput[i], HEX);
+    }
+  }
+
+  encryptedHex.toUpperCase();
+  return encryptedHex;
+}
 
 // regional choices: EU868, US915, AU915, AS923, IN865, KR920, CN780, CN500
 const LoRaWANBand_t Region = EU868;
@@ -118,10 +151,6 @@ void setup() {
   digitalWrite(BUZZER_PIN, LOW);
 }
 
-// Defina isto no topo do código (fora do loop)
-// byte triple_key[24] = { ... 24 bytes ... };
-// DES des;
-
 void loop() {
   if (status == CANCELED) {
     digitalWrite(BUZZER_PIN, LOW);
@@ -134,11 +163,66 @@ void loop() {
   int dv2 = !digitalRead(MQ2_D_PIN);
   int dv5 = !digitalRead(MQ5_D_PIN);
   int result = detectGas(dv2, dv5, MQ2AV, MQ5AV);
+  float tempF = dht.readTemperature();
+  float humF = dht.readHumidity();
+
+  int Temperature = 0;
+  int Hum = 0;
+
+  if (!isnan(tempF) && !isnan(humF)) {
+    Temperature = (int)tempF;
+    Hum = (int)humF;
+  }
+  uint64_t efuseMac = ESP.getEfuseMac();
+
+
+  delay(100);
   bool btnState = (bool)digitalRead(BUTTON_PIN);
   static bool _ = -1;
   if ((status == PENDING) && btnState) {
-    status = CANCELED;
-    needsCancel = true;
+
+
+    delay(1000);
+
+    uplinkPayloadLen = snprintf(
+      (char *)uplinkPayload,
+      sizeof(uplinkPayload),
+      "%d;%d;%d;%d;%d;%04X%08X;%d",
+      result,
+      MQ2AV,
+      MQ5AV,
+      Temperature,
+      Hum,
+      (uint16_t)(efuseMac >> 32),  // upper 16 bits
+      (uint32_t)efuseMac,          // lower 32 bits,
+      CANCELED);
+    Serial.print("Raw Payload (String): ");
+    Serial.println((char *)uplinkPayload);  // Prints the human-readable string
+
+    Serial.print("Raw Payload (Hex):    ");
+    for (int i = 0; i < uplinkPayloadLen; i++) {
+      Serial.printf("%02X ", uplinkPayload[i]);  // Prints the ASCII hex codes
+    }
+    Serial.println();
+    String encryptedString = encryptPayload3DES((char *)uplinkPayload, uplinkPayloadLen);
+    uint8_t loraBuffer[256];
+    encryptedString.getBytes(loraBuffer, 256);
+    int finalLen = encryptedString.length();
+
+    Serial.print("Uplink payload (Encrypted Hex): ");
+    for (int i = 0; i < uplinkPayloadLen; i++) {
+      Serial.printf("%02X", uplinkPayload[i]);
+    }
+
+    downlinkLen = sizeof(downlinkBuf);
+    int16_t state = node.sendReceive(
+      loraBuffer,
+      finalLen,
+      LORAWAN_UPLINK_USER_PORT,
+      downlinkBuf,
+      &downlinkLen);
+    status = IDLE;
+    needsCancel = false;
   }
   if ((result > 0) && (status == IDLE)) {
     status = PENDING;
@@ -166,28 +250,14 @@ void loop() {
   // int Temperature = dht.readTemperature();
   // int Hum = dht.readHumidity();
 
-  float tempF = dht.readTemperature();
-  float humF = dht.readHumidity();
 
-  int Temperature = 0;
-  int Hum = 0;
-
-  if (!isnan(tempF) && !isnan(humF)) {
-    Temperature = (int)tempF;
-    Hum = (int)humF;
-  }
-
-  delay(100);
 
   // Payload format:
   // result;MQ2_AV;MQ5_AV;T;H;MAC
-  uint64_t efuseMac = ESP.getEfuseMac();
 
-  // --- MANTENDO A TUA LÓGICA DE FORMATAÇÃO ---
-  char clearText[128];
-  int clearLen = snprintf(
-    clearText,
-    sizeof(clearText),
+  uplinkPayloadLen = snprintf(
+    (char *)uplinkPayload,
+    sizeof(uplinkPayload),
     "%d;%d;%d;%d;%d;%04X%08X;%d",
     result,
     MQ2AV,
@@ -197,19 +267,18 @@ void loop() {
     (uint16_t)(efuseMac >> 32),  // upper 16 bits
     (uint32_t)efuseMac,          // lower 32 bits,
     status);
+  Serial.print("Raw Payload (String): ");
+  Serial.println((char *)uplinkPayload);  // Prints the human-readable string
 
-  // --- IMPLEMENTAÇÃO 3DES ---
-  // O DES exige blocos de 8 bytes. Calculamos o preenchimento (padding)
-  int paddedLen = ((clearLen + 7) / 8) * 8;
-  byte inputBlock[64];  // Buffer para criptografia
-  memset(inputBlock, 0, sizeof(inputBlock));
-  memcpy(inputBlock, clearText, clearLen);
-
-  // Criptografar em blocos de 8 bytes e guardar no uplinkPayload
-  for (int i = 0; i < paddedLen; i += 8) {
-    des.triple_encrypt(inputBlock + i, uplinkPayload + i, triple_key);
+  Serial.print("Raw Payload (Hex):    ");
+  for (int i = 0; i < uplinkPayloadLen; i++) {
+    Serial.printf("%02X ", uplinkPayload[i]);  // Prints the ASCII hex codes
   }
-  uplinkPayloadLen = paddedLen;
+  Serial.println();
+  String encryptedString = encryptPayload3DES((char *)uplinkPayload, uplinkPayloadLen);
+  uint8_t loraBuffer[256];
+  encryptedString.getBytes(loraBuffer, 256);
+  int finalLen = encryptedString.length();
 
   Serial.print("Uplink payload (Encrypted Hex): ");
   for (int i = 0; i < uplinkPayloadLen; i++) {
@@ -224,12 +293,81 @@ void loop() {
 
     Serial.println(F("Sending uplink"));
     // Envio do payload já criptografado
+    downlinkLen = sizeof(downlinkBuf);
+
     int16_t state = node.sendReceive(
-      uplinkPayload,
-      uplinkPayloadLen,
-      LORAWAN_UPLINK_USER_PORT);
+      loraBuffer,
+      finalLen,
+      LORAWAN_UPLINK_USER_PORT,
+      downlinkBuf,
+      &downlinkLen);
 
     if (state == RADIOLIB_ERR_NONE) {
+      if (downlinkLen > 0) {
+        Serial.println("\nAAAAAAAAAA\n");
+        downlinkBuf[downlinkLen] = '\0';  // make it a C string
+        String cmd = (char *)downlinkBuf;
+        // Serial.println(cmd);
+        // String decryptedText = decryptPayload3DES(cmd);
+        String macStr = String((efuseMac >> 40) & 0xFF, HEX) + String((efuseMac >> 32) & 0xFF, HEX) + String((efuseMac >> 24) & 0xFF, HEX) + String((efuseMac >> 16) & 0xFF, HEX) + String((efuseMac >> 8) & 0xFF, HEX) + String(efuseMac & 0xFF, HEX);
+
+        // Ensure uppercase and two digits per byte
+        macStr.toUpperCase();
+
+
+        MD5Builder md;
+
+        md.begin();
+        md.add(macStr);
+        md.calculate();
+
+        Serial.println(md.toString());
+        if (md.toString() == cmd) {
+          // status = CANCELED;
+          // needsCancel = true;
+          delay(1000);
+
+          uplinkPayloadLen = snprintf(
+            (char *)uplinkPayload,
+            sizeof(uplinkPayload),
+            "%d;%d;%d;%d;%d;%04X%08X;%d",
+            result,
+            MQ2AV,
+            MQ5AV,
+            Temperature,
+            Hum,
+            (uint16_t)(efuseMac >> 32),  // upper 16 bits
+            (uint32_t)efuseMac,          // lower 32 bits,
+            CANCELED);
+          Serial.print("Raw Payload (String): ");
+          Serial.println((char *)uplinkPayload);  // Prints the human-readable string
+
+          Serial.print("Raw Payload (Hex):    ");
+          for (int i = 0; i < uplinkPayloadLen; i++) {
+            Serial.printf("%02X ", uplinkPayload[i]);  // Prints the ASCII hex codes
+          }
+          Serial.println();
+          String encryptedString = encryptPayload3DES((char *)uplinkPayload, uplinkPayloadLen);
+          uint8_t loraBuffer[256];
+          encryptedString.getBytes(loraBuffer, 256);
+          int finalLen = encryptedString.length();
+
+          Serial.print("Uplink payload (Encrypted Hex): ");
+          for (int i = 0; i < uplinkPayloadLen; i++) {
+            Serial.printf("%02X", uplinkPayload[i]);
+          }
+
+          downlinkLen = sizeof(downlinkBuf);
+          int16_t state = node.sendReceive(
+            loraBuffer,
+            finalLen,
+            LORAWAN_UPLINK_USER_PORT,
+            downlinkBuf,
+            &downlinkLen);
+          status = IDLE;
+          needsCancel = false;
+        }
+      }
       if (state == CANCELED && needsCancel) {
         needsCancel = false;
         state = IDLE;
@@ -242,117 +380,10 @@ void loop() {
       Serial.println("Sending uplink successful!");
     }
   }
-
   delay(1000);
   if (status == CANCELED) status = IDLE;
 }
 
-// void loop() {
-//   if (status == CANCELED) {
-//     digitalWrite(BUZZER_PIN, LOW);
-//   }
-//   Serial.println(status);
-//   uplinkPayloadLen = 0;
-//   memset(uplinkPayload, 0, sizeof(uplinkPayload));
-//   int MQ2AV = analogRead(MQ2_A_PIN);
-//   int MQ5AV = analogRead(MQ5_A_PIN);
-//   int dv2 = !digitalRead(MQ2_D_PIN);
-//   int dv5 = !digitalRead(MQ5_D_PIN);
-//   int result = detectGas(dv2, dv5, MQ2AV, MQ5AV);
-//   bool btnState = (bool)digitalRead(BUTTON_PIN);
-//   static bool _ = -1;
-//   if ((status == PENDING) && btnState) {
-//     status = CANCELED;
-//     needsCancel = true;
-//   }
-//   if ((result > 0) && (status == IDLE)) {
-//     status = PENDING;
-//     alarmStartMillis = millis();
-//     _ = result;
-//   }
-//   if (status == PENDING && alarmStartMillis != 0) {
-//     if (millis() - alarmStartMillis >= ALARM_TIMEOUT) {
-//       status = CONFIRMED;
-//       if (result < 0) {
-//         if (!(status == IDLE)) {
-//           result = _;
-//         }
-//       }
-//     }
-//   }
-//   if (status == PENDING) {
-//     digitalWrite(BUZZER_PIN, HIGH);
-//   } else if (status == CONFIRMED) {
-//     digitalWrite(BUZZER_PIN, HIGH);
-//     if (btnState) {
-//       status = IDLE;
-//     }
-//   }
-//   // int Temperature = dht.readTemperature();
-//   // int Hum = dht.readHumidity();
-
-//   float tempF = dht.readTemperature();
-//   float humF = dht.readHumidity();
-
-//   int Temperature = 0;
-//   int Hum = 0;
-
-//   if (!isnan(tempF) && !isnan(humF)) {
-//     Temperature = (int)tempF;
-//     Hum = (int)humF;
-//   }
-
-//   delay(100);
-
-//   // Payload format:
-//   // result;MQ2_AV;MQ5_AV;T;H;MAC
-//   uint64_t efuseMac = ESP.getEfuseMac();
-//   uplinkPayloadLen = snprintf(
-//     (char *)uplinkPayload,
-//     sizeof(uplinkPayload),
-//     "%d;%d;%d;%d;%d;%04X%08X;%d",
-//     result,
-//     MQ2AV,
-//     MQ5AV,
-//     Temperature,
-//     Hum,
-//     (uint16_t)(efuseMac >> 32),  // upper 16 bits
-//     (uint32_t)efuseMac,          // lower 32 bits,
-//     status);
-
-
-//   Serial.print("Uplink payload: ");
-//   Serial.write(uplinkPayload, uplinkPayloadLen);
-//   Serial.println();
-
-
-//   uint32_t currentMillis = millis();
-//   if (currentMillis - previousMillis >= LORAWAN_UPLINK_PERIOD) {
-//     previousMillis = currentMillis;
-
-//     Serial.println(F("Sending uplink"));
-//     int16_t state = node.sendReceive(
-//       uplinkPayload,
-//       uplinkPayloadLen,
-//       LORAWAN_UPLINK_USER_PORT);
-
-//     if (state == RADIOLIB_ERR_NONE) {
-//       if (state == CANCELED && needsCancel) {
-//         needsCancel = false;
-//         state = IDLE;
-//       }
-//     }
-//     if (state != RADIOLIB_LORAWAN_NO_DOWNLINK && state != RADIOLIB_ERR_NONE) {
-//       Serial.println("Error in sendReceive:");
-//       Serial.println(state);
-//     } else {
-//       Serial.println("Sending uplink successful!");
-//     }
-//   }
-
-//   delay(1000);
-//   if (status == CANCELED) status = IDLE;
-// }
 
 void deviceInfoLoad() {
   uint16_t checkSum = 0, checkSum_ = 0;
