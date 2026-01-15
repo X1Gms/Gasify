@@ -23,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 // swagger docs only in development environment
 if (isDevelopmentEnv) {
   app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+  console.log(`Swagger docs running on http://localhost:${PORT}/docs`);
 }
 
 // use routes
