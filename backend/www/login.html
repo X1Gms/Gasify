@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/toasts.css">
-<script src="js/toasts.js"></script>
+    <script src="js/toasts.js"></script>
     <script src="js/sessions.js" defer></script>
     <script src="js/login.js" defer></script>
     <script src="js/eye.js" defer> </script>
@@ -54,10 +54,16 @@
                         </svg>
                     </span>
                 </div>
+                <div class="auth-options-row">
+                    <label class="remember-me-custom" onclick="toggleRemember()">
+                        <input type="checkbox" id="rememberMe" style="display: none;">
+                        <div class="custom-box" id="customBox"></div>
+                        <span class="auth-text-orange">Lembrar-me</span>
+                    </label>
 
-                <div style="text-align: right; margin-top: -8px; margin-bottom: 15px;">
-                    <a href="recoverpass.html" class="small-link"
-                        style="font-size: 13px; text-decoration: none; opacity: 0.8;">Esqueci-me da palavra-passe</a>
+                    <a href="recoverpass.html" class="auth-text-small forgot-link">
+                        Esqueci-me da <br> palavra-passe
+                    </a>
                 </div>
 
                 <button id="loginButton">Entrar</button>
@@ -83,6 +89,25 @@
             const loginBtn = document.getElementById("loginButton");
             if (loginBtn && typeof loginPage === "function") loginBtn.onclick = loginPage;
         };
+    </script>
+
+
+    <script>
+
+        function toggleRemember() {
+            const checkbox = document.getElementById("rememberMe");
+            const box = document.getElementById("customBox");
+
+            // Inverte o estado do input escondido
+            checkbox.checked = !checkbox.checked;
+
+            // Muda o visual do quadrado
+            if (checkbox.checked) {
+                box.classList.add("checked");
+            } else {
+                box.classList.remove("checked");
+            }
+        }
     </script>
 
 </body>

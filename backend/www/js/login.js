@@ -1,5 +1,5 @@
 /**
- * login.js - Lógica de Autenticação com Toasts
+ * login.js - Lógica de Autenticação com Toasts e Remember Me
  */
 
 const API_BASE = "http://localhost:8081"; 
@@ -7,8 +7,9 @@ const API_BASE = "http://localhost:8081";
 async function loginPage() {
     const email = document.getElementById("login_email").value.trim();
     const password = document.getElementById("login_pass").value;
+    const rememberMe = document.getElementById("rememberMe").checked; // Captura o estado da checkbox
 
-    // 1. Validação simples (Toast de Erro à Direita)
+    // 1. Validação simples
     if (!email || !password) {
         showToast('error', 'Campos em Falta', 'Por favor, introduza o seu email e palavra-passe.');
         return;
@@ -26,22 +27,31 @@ async function loginPage() {
 
         const data = await res.json();
 
-        // 3. Verificação de Erro (Canto Direito)
+        // 3. Verificação de Erro
         if (!res.ok) {
             showToast('error', 'Falha no Login', data.message || 'Email ou password incorretos.');
             return;
         }
 
-        // 4. SUCESSO: Guardar Token e dados do utilizador
-        // Importante: Guardamos o fullName para o sessions.js injetar o nome no header sem delay
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.user.id);
-        localStorage.setItem("userName", data.user.fullName);
+        // 4. SUCESSO: Gestão de Sessão (Remember Me)
+        // Se Remember Me estiver ativo, usamos localStorage (permanente)
+        // Se não, usamos sessionStorage (apaga ao fechar a aba/navegador)
+        const storage = rememberMe ? localStorage : sessionStorage;
 
-        // 5. Toast de Sucesso (Canto Esquerdo)
+        // Limpar possíveis dados antigos de ambos para evitar conflitos
+        localStorage.clear();
+        sessionStorage.clear();
+
+        storage.setItem("token", data.token);
+        storage.setItem("userId", data.user.id);
+        storage.setItem("userName", data.user.fullName);
+        // Guardamos também se o utilizador queria ser lembrado para o sessions.js saber onde procurar
+        storage.setItem("remembered", rememberMe);
+
+        // 5. Toast de Sucesso
         showToast('success', 'Bem-vindo!', `Login efetuado com sucesso. A entrar no sistema...`);
 
-        // 6. Redirecionar após o utilizador ver a mensagem
+        // 6. Redirecionar
         setTimeout(() => {
             window.location.href = "home.html";
         }, 1500);
