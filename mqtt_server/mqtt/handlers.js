@@ -23,7 +23,8 @@ const handleMessage = async (_, message) => {
 
         const device = await deviceService.findDeviceByMac(data.mac);
         if (!device) {
-            await deviceService.createDevice(data.mac);
+            // await deviceService.createDevice(data.mac);
+            console.warn(`Device pending a register! Serial number ${data.mac}`);
             return;
         }
 

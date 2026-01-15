@@ -4,11 +4,11 @@ const findDeviceByMac = async (mac) => {
     const [rows] = await pool.query('SELECT * FROM device WHERE serial_number = ?',[mac]);
     return rows[0] || null;
 };
-
-const createDevice = async (mac) => {
-    await pool.execute("INSERT INTO device (user_id,country_id,name,serial_number,address,postal_code,created_at,updated_at) " +
-        "VALUES (null,null,null,?,null,null,NOW(),null)", [mac]);
-};
+//
+// const createDevice = async (mac) => {
+//     await pool.execute("INSERT INTO device (user_id,country_id,name,serial_number,address,postal_code,created_at,updated_at) " +
+//         "VALUES (null,null,null,?,null,null,NOW(),null)", [mac]);
+// };
 
 const saveReading = async (deviceId, data) => {
     const [result] = await pool.execute(`INSERT INTO readings
