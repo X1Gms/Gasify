@@ -7,6 +7,7 @@ let myArray = [];
 const handleMessage = async (_, message) => {
     try {
         const payload = JSON.parse(message.toString());
+        // console.log(myArray);
         const encryptedBytes = payload?.uplink_message?.decoded_payload?.encrypted_bytes;
         if (!encryptedBytes) return;
 
@@ -27,7 +28,6 @@ const handleMessage = async (_, message) => {
             console.warn(`Device pending a register! Serial number ${data.mac}`);
             return;
         }
-
         const reading = await deviceService.saveReading(device.id, data);
         if(data.status === "IDLE"){
             const index = myArray.findIndex(obj => obj.serial_number === data.mac);
@@ -67,12 +67,15 @@ const handleMessage = async (_, message) => {
                 await deviceService.registerDetection(myArray[index]);
                 const userID = await userService.findUserIdByDeviceMac(data.mac);
                 const user = await userService.findUserById(userID);
-                await deviceService.registerDetection("EMERGENCY");
+                await deviceService.registerDetection(data.status);
+                const device = await deviceService.findDeviceByMac(data.mac);
+                // console.log(device)
+                const address = `${device.address} ${device.postal_code} ${device.country_name} identified as ${device.name}`
                 await notifyEmergency({
                     nome: user.full_name || "",      // replace when you have real data
-                    // morada: located_at | "",  // same here
-                    // temperature: data.temperature || "",
-                    // humidity: data.humidity || ""
+                    morada: address  || "",  // same here
+                    temperature: data.temperature || "",
+                    humidity: data.humidity || ""
                 });
             }
             myArray[index].status = "EMERGENCY_POP";

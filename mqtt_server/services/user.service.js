@@ -6,7 +6,7 @@ const findUserIdByDeviceMac = async (mac) => {
     console.log(mac);
     const [rows] = await pool.query("SELECT user_id FROM device where serial_number = ?", [mac]);
     console.log(rows);
-    return rows[0];
+    return rows[0]?.user_id || null;
 }
 
 const findUserById = async (id) => {

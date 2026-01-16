@@ -1,7 +1,7 @@
 const pool = require("../db/db.js");
 
 const findDeviceByMac = async (mac) => {
-    const [rows] = await pool.query('SELECT * FROM device WHERE serial_number = ?',[mac]);
+    const [rows] = await pool.query('SELECT device.*, country.name AS country_name FROM device inner join country WHERE device.country_id = country.id and serial_number = ?',[mac]);
     return rows[0] || null;
 };
 //
@@ -12,9 +12,9 @@ const findDeviceByMac = async (mac) => {
 
 const saveReading = async (deviceId, data) => {
     const [result] = await pool.execute(`INSERT INTO reading
-                            (device_id, created_at, gas_type, humidity, temperature, mq2, mq5)
-                        VALUES (?, NOW(), ?, ?, ?, ?,
-                                ?)`, [deviceId, data.gas_result, data.humidity, data.temperature, data.mq2_analog, data.mq5_analog]);
+                                             (device_id, created_at, gas_type, humidity, temperature, mq2, mq5)
+                                         VALUES (?, NOW(), ?, ?, ?, ?,
+                                                 ?)`, [deviceId, data.gas_result, data.humidity, data.temperature, data.mq2_analog, data.mq5_analog]);
     return result.insertId;
 };
 const insertDetection = async (data) => {
@@ -37,14 +37,21 @@ const registerDetection = async (data) => {
     console.log(data);
     switch (data.status){
         case "PENDING":
-            id = insertDetection(data);
-            await insertNotification(data,id,"ALERT_ON");
+            id = await insertDetection(data);
+            let result = await insertNotification(data,id,"ALERT_PENDING");
+            // console.log(result);
             break;
         case "CANCELED":
-            id = updateDetection(data,1);
+            // console.log(data);
+            // console.log("INSIDE CANCELDED BLOCK!");
+            id = await updateDetection(data,1);
+            // console.log(id);
+            // console.log(data);
+            await insertNotification(data, id, "ALERT_OFF");
             break;
         case "EMERGENCY":
-            id = updateDetection(data,0);
+            id = await updateDetection(data,0);
+            await insertNotification(data, id, "ALERT_ON");
             break;
         default: console.warn("Invalid data status!");break;
     }
