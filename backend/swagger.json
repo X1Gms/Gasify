@@ -413,7 +413,8 @@
                   "summary": "Update only profile information",
                   "value": {
                     "fullName": "John Lee",
-                    "email": "john.lee@example.com"
+                    "email": "john.lee@example.com",
+                    "currentPassword": "OldPassword123!"
                   }
                 },
                 "updateWithPassword": {

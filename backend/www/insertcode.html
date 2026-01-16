@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inserir Código</title>
+    
+    <script>
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/color.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/toasts.css">
+<script src="js/toasts.js"></script>
+    <script src="js/sessions.js" defer></script>
+    <script src="js/insertcode.js" defer></script>
+</head>
+
+<body data-page="recover-code">
+
+    <div class="auth-container">
+        <div class="auth-left">
+            <div class="login-bubble">
+                <h1>Inserir Código</h1>
+                <h3>Insira o código de 6 dígitos que recebeu no seu e-mail</h3>
+
+                <input id="recover_code" placeholder="Código de recuperação" maxlength="6" type="text" inputmode="numeric">
+
+                <button id="codeButton">Autenticar</button>
+
+                <div id="code_error" style="display:none; color: #ff4d4d; margin-top:10px; font-size: 14px; text-align: center;"></div>
+
+                <p class="small-muted" style="margin-top:20px;">Lembrei da Palavra-Passe?</p>
+                <p><a href="login.html">Iniciar Sessão</a></p>
+            </div>
+        </div>
+
+        <div class="auth-right">
+            <img id="auth-img" alt="Imagem Código">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const authImg = document.getElementById("auth-img");
+            const theme = localStorage.getItem('theme');
+            if (authImg) {
+                authImg.src = theme === "dark" ? "img/authimage2.png" : "img/authimage.png";
+            }
+        });
+    </script>
+</body>
+</html>

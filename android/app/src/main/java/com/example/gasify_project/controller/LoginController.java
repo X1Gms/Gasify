@@ -4,10 +4,10 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.gasify_project.api.ApiClient;
-import com.example.gasify_project.model.LoginResponse;
-import com.example.gasify_project.model.MeResponse;
+import com.example.gasify_project.model.account.LoginResponse;
+import com.example.gasify_project.model.account.MeResponse;
 import com.example.gasify_project.model.SessionManager;
-import com.example.gasify_project.model.User;
+import com.example.gasify_project.model.account.User;
 
 import retrofit2.Call;
 import retrofit2.Callback;

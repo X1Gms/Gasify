@@ -1,0 +1,231 @@
+/* ======================
+    DEVICES CONTAINER (HOME)
+====================== */
+.devices-container {
+    background: var(--bg-card);
+    margin-top: 40px;
+    padding: 26px;
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 15px var(--shadow);
+}
+
+/* ======================
+    DEVICES HEADER
+====================== */
+.devices-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.devices-header h2 {
+    margin: 0;
+    color: var(--text-main);
+}
+
+/* ======================
+    ADD DEVICE BUTTON (+)
+====================== */
+.add-device-btn {
+    background: var(--primary);
+    color: var(--bg-main);
+    border: none;
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.25s ease;
+}
+
+.add-device-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+/* ====================== 
+    DEVICE ITEM - POSICIONAMENTO (HOME)
+====================== */
+.device-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    overflow: hidden; 
+    min-width: 0;      
+    gap: 15px; 
+    padding: 22px; /* Mantendo a tua altura original */
+}
+
+/* Agrupamento da Esquerda */
+.device-left-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;      /* Permite encolher */
+    min-width: 75px; /* Essencial para o texto encolher */
+}
+
+.device-info {
+    min-width: 0; /* Permite que o strong e o p encolham */
+    flex: 1;
+}
+
+.device-info strong {
+    display: block;
+}
+
+
+/* Agrupamento da Direita (Ações) */
+.device-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 1;    /* PERMITE que o container do botão encolha */
+    margin-left: 10px;
+    max-width: 45%;    /* Limite para não abafar o texto da esquerda */
+}
+
+
+/* ====================== 
+    ALARM / ALERT ACTIVE (DESIGN COPIADO)
+====================== */
+.device-item.alert-active,
+.device-item.alarm {
+    background: var(--danger-soft) !important;
+    border-color: var(--danger-border) !important;
+}
+
+/* Ícone vermelho em alerta */
+.device-item.alert-active .device-icon,
+.device-item.alarm .device-icon {
+    background: var(--danger) !important;
+}
+
+/* ====================== MODALS – BASE ====================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal {
+    display: none;
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 30px 26px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 12px 30px var(--shadow-strong);
+    position: relative;
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal h2 {
+    margin: 0 0 14px;
+    text-align: center;
+    font-size: 26px;
+    color: var(--text-main);
+}
+
+.modal-text {
+    text-align: center;
+    font-size: 15px;
+    color: var(--text-soft);
+    line-height: 1.5;
+}
+
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.modal-form input,
+.modal-form select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: var(--bg-input);
+    color: var(--text-main);
+}
+
+.primary-modal-btn {
+    margin-top: 10px;
+    background: var(--primary);
+    color: var(--bg-main);
+    border: none;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.primary-modal-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.confirm-btn-modal {
+    background: var(--danger);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.cancel-btn-modal {
+    background: var(--primary);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+
+

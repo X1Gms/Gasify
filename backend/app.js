@@ -1,5 +1,6 @@
 const express = require("express");
 const swaggerUi = require("swagger-ui-express");
+const path = require("path");
 
 const options = require("./config/options.json");
 const swaggerDocs = require("./swagger.json");
@@ -22,6 +23,8 @@ const { createMqttClient } = require("../mqtt_server/mqtt/client");
 app.use(express.json());
 app.use(invalidJsonMiddleware);
 app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static(path.join(__dirname, "www")));
 
 // swagger docs only in development environment
 if (isDevelopmentEnv) {

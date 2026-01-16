@@ -1,9 +1,9 @@
 package com.example.gasify_project.controller;
 
-import com.example.gasify_project.model.RegisterRequest;
+import com.example.gasify_project.model.account.RegisterRequest;
 import android.util.Patterns;
 import com.example.gasify_project.api.ApiClient;
-import com.example.gasify_project.model.User;
+import com.example.gasify_project.model.account.User;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

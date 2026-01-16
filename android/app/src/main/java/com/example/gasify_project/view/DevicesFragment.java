@@ -28,14 +28,14 @@ import com.example.gasify_project.R;
 import com.example.gasify_project.api.ApiClient;
 import com.example.gasify_project.controller.CountryController;
 import com.example.gasify_project.controller.DevicesController;
-import com.example.gasify_project.model.Country;
-import com.example.gasify_project.model.CountriesResponse;
-import com.example.gasify_project.model.DeviceDetailResponse;
-import com.example.gasify_project.model.DeviceDto;
-import com.example.gasify_project.model.DeviceFullAdapter;
-import com.example.gasify_project.model.DeviceItem;
-import com.example.gasify_project.model.DeviceRequest;
-import com.example.gasify_project.model.DevicesResponse;
+import com.example.gasify_project.model.country.Country;
+import com.example.gasify_project.model.country.CountriesResponse;
+import com.example.gasify_project.model.device.DeviceDetailResponse;
+import com.example.gasify_project.model.device.DeviceDto;
+import com.example.gasify_project.model.device.DeviceFullAdapter;
+import com.example.gasify_project.model.device.DeviceItem;
+import com.example.gasify_project.model.device.DeviceRequest;
+import com.example.gasify_project.model.device.DevicesResponse;
 import com.example.gasify_project.model.SimpleResponse;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.button.MaterialButton;
@@ -387,7 +387,7 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
 
             int countryId = apiCountriesList.get(selectedIndex[0]).getId();
 
-            DeviceRequest deviceRequest = new DeviceRequest(name, serial, countryId, address, postal);
+            DeviceRequest deviceRequest = new DeviceRequest(name, serial, countryId, address, postal, true);
 
             devicesController.createDevice(deviceRequest, new Callback<SimpleResponse>() {
                 @Override
@@ -673,13 +673,20 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
                 countryIdToSend = deviceCountryId[0];
             }
 
+// validação defensiva
+            if (countryIdToSend == null) {
+                Toast.makeText(getContext(), "Por favor selecione um país", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             DeviceRequest updateReq = new DeviceRequest(
                     newName,
                     device.getSerialNumber(),
-                    countryIdToSend,
+                    countryIdToSend, // agora garantido não-nulo
                     newAddress,
                     newPostal
             );
+
 
             devicesController.updateDevice(device.getId(), updateReq, new Callback<SimpleResponse>() {
                 @Override

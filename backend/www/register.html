@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registo</title>
+    <script>
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/color.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/toasts.css">
+<script src="js/toasts.js"></script>
+    <script src="js/sessions.js" defer></script>
+    <script src="js/register.js" defer></script>
+    <script src="js/eye.js" defer> </script>
+</head>
+
+<body data-page="register">
+
+    <div class="auth-container">
+
+        <!-- COLUNA ESQUERDA -->
+        <div class="auth-left">
+            <div class="register-bubble">
+
+                <h1>Registar Conta</h1>
+
+                <input id="reg_name" placeholder="Nome completo">
+                <input id="reg_email" placeholder="Email">
+
+                <div class="password-wrapper">
+                    <input id="reg_pass" placeholder="Password" type="password">
+                    <span class="toggle-pass" onclick="togglePassword('reg_pass', this)">
+                        <svg class="eye-closed" viewBox="0 0 24 24">
+                            <path
+                                d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5ZM12 16A4 4 0 1 1 12 8A4 4 0 0 1 12 16Z" />
+                        </svg>
+                        <svg class="eye-open" viewBox="0 0 24 24">
+                            <path
+                                d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5Z" />
+                            <path d="M4 4L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </span>
+                </div>
+
+                <div class="password-wrapper">
+                    <input id="reg_pass2" placeholder="Confirmar Password" type="password">
+                    <span class="toggle-pass" onclick="togglePassword('reg_pass2', this)">
+                        <svg class="eye-closed" viewBox="0 0 24 24">
+                            <path
+                                d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5ZM12 16A4 4 0 1 1 12 8A4 4 0 0 1 12 16Z" />
+                        </svg>
+                        <svg class="eye-open" viewBox="0 0 24 24">
+                            <path
+                                d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5Z" />
+                            <path d="M4 4L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </span>
+                </div>
+
+                <button id="registerButton">Registar</button>
+
+                <div id="reg_error"></div>
+                <div id="reg_success"></div>
+
+                <p class="small-muted">Utilizadores registados passam a ter perfil "User".</p>
+                <p style="margin-top:20px;"><a href="login.html">Voltar ao Login</a></p>
+
+            </div>
+        </div>
+
+        <!-- COLUNA DIREITA (IMAGEM) -->
+        <div class="auth-right">
+            <img id="auth-img"  alt="Imagem Registo">
+        </div>
+
+    </div>
+
+    <script>
+        window.onload = function () {
+            if (typeof redirectIfLoggedIn === "function") redirectIfLoggedIn();
+
+            const regBtn = document.getElementById("registerButton");
+
+            // liga ao registerPage() que já existe no teu auth.js
+            if (regBtn && typeof registerPage === "function") {
+                regBtn.onclick = registerPage;
+            }
+        };
+    </script>
+
+</body>
+
+</html>

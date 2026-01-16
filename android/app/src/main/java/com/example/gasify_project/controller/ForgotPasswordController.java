@@ -4,10 +4,10 @@ import android.util.Log;
 import android.util.Patterns;
 
 import com.example.gasify_project.api.ApiClient;
-import com.example.gasify_project.model.ForgotPasswordRequest;
-import com.example.gasify_project.model.ResetPasswordRequest;
+import com.example.gasify_project.model.account.ForgotPasswordRequest;
+import com.example.gasify_project.model.account.ResetPasswordRequest;
 import com.example.gasify_project.model.SimpleResponse;
-import com.example.gasify_project.model.VerifyCodeRequest;
+import com.example.gasify_project.model.account.VerifyCodeRequest;
 import com.google.gson.Gson;
 
 import okhttp3.ResponseBody;

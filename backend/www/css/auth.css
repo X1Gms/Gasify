@@ -1,0 +1,317 @@
+/* ======================================= GLOBAL ======================================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-family: Arial, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Background inclinado */
+body::before {
+    content: "";
+    position: fixed;
+    bottom: -200px;
+    left: -100px;
+    width: 150vw;
+    height: 40vh;
+    background: var(--bg-accent);
+    transform: rotate(8deg);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* ======================================= CONTAINER LOGIN / REGISTO ======================================= */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    padding: 40px;
+    gap: 40px;
+}
+
+/* Coluna esquerda */
+.auth-left {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 200px;
+}
+
+/* Bubble */
+.login-bubble,
+.register-bubble {
+    background: var(--bubble-bg);
+    border: 1px solid var(--bubble-border);
+    border-radius: 18px;
+    padding: 35px 40px;
+    width: 100%;
+    max-width: 420px;
+    min-width: 380px;
+    text-align: center;
+    color: var(--text-main);
+    box-shadow: 0 0 15px var(--bubble-shadow);
+}
+
+.login-bubble h1,
+.register-bubble h1 {
+    color: var(--primary);
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.login-bubble h3,
+.register-bubble h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+/* Inputs */
+.login-bubble input,
+.register-bubble input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    font-size: 15px;
+    border-radius: 12px;
+    border: 2px solid var(--input-border);
+    background: var(--input-bg);
+}
+
+.login-bubble input:focus,
+.register-bubble input:focus {
+    background: var(--input-focus);
+}
+
+.login-bubble a,
+.register-bubble a {
+    color: var(--primary);
+    font-weight: bold;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.login-bubble a:hover,
+.register-bubble a:hover {
+    color: var(--primary-dark);
+}
+
+/* Password wrapper */
+.password-wrapper {
+    position: relative;
+    margin: 8px 0;
+}
+
+.password-wrapper input {
+    padding-right: 45px;
+}
+
+/* Eye toggle */
+.toggle-pass {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-pass svg {
+    width: 24px;
+    height: 24px;
+}
+
+.toggle-pass svg * {
+    fill: var(--primary) !important;
+    stroke: var(--primary) !important;
+}
+
+.eye-open {
+    display: none;
+}
+
+.eye-closed {
+    display: block;
+}
+
+/* Buttons */
+.login-bubble button,
+.register-bubble button {
+    background: var(--primary);
+    color: var(--bg-main);
+    border: none;
+    padding: 12px 40px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.login-bubble button:hover,
+.register-bubble button:hover {
+    background: var(--primary-dark);
+}
+
+/* Errors / Success */
+#login_error,
+#reg_error,
+#reg_success {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    display: none;
+    font-size: 14px;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#login_error,
+#reg_error {
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    color: var(--error-text);
+}
+
+#reg_success {
+    background: var(--success-bg);
+    border: 1px solid var(--success-border);
+    color: var(--success-text);
+}
+
+/* ======================================= IMAGEM DIREITA ======================================= */
+.auth-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    padding-right: 100px;
+}
+
+#auth-img {
+    width: 100%;
+    max-width: 650px;
+    min-width: 420px;
+    height: auto;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    display: block;
+    object-fit: contain;
+}
+
+/* ======================================= RESPONSIVO ======================================= */
+@media (max-width: 900px) {
+    .auth-container {
+        flex-direction: column;
+        padding: 20px;
+        height: auto;
+        gap: 20px;
+    }
+
+    .auth-left {
+        justify-content: center !important;
+        align-items: center;
+        width: 100%;
+        padding-left: 0 !important;
+    }
+
+    .login-bubble,
+    .register-bubble {
+        max-width: 360px;
+        min-width: 280px;
+        width: 100%;
+    }
+
+    .auth-right {
+        justify-content: center !important;
+        width: 100%;
+        padding-right: 0 !important;
+    }
+
+    #auth-img {
+        max-width: 300px;
+        min-width: unset;
+        width: 100%;
+        height: auto;
+        margin: 20px auto 0 auto;
+        display: block;
+    }
+}
+
+/* Contentor da linha */
+.auth-options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* Texto Laranja (Igual ao link em tamanho) */
+.auth-text-orange {
+    font-size: 13px;
+    color: #ff8c00; /* Laranja */
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Texto Pequeno (Link da direita) */
+.auth-text-small {
+    font-size: 13px;
+    opacity: 0.8;
+    color: var(--text-main);
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+/* O Quadrado Personalizado */
+.remember-me-custom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.custom-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ff8c00; /* Linha Laranja */
+    border-radius: 4px;
+    position: relative;
+    transition: 0.2s;
+    background: transparent;
+}
+
+/* Quando estiver checado (via JS adicionamos a classe 'checked') */
+.custom-box.checked {
+    background: #ff8c00;
+}
+
+/* O "V" branco dentro do quadrado quando marcado */
+.custom-box.checked::after {
+    content: "✓";
+    position: absolute;
+    color: white;
+    font-size: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.forgot-link {
+    display: block;
+    text-align: right;
+}

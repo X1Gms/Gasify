@@ -1,0 +1,320 @@
+/* =======================================
+   GLOBAL RESET
+======================================= */
+* {
+    box-sizing: border-box;
+}
+
+/* =======================================
+   BODY
+======================================= */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--bg-main);
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+/* =======================================
+   LAYOUT BASE
+======================================= */
+.page-wrapper,
+.content,
+.device-content {
+    padding: 120px 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.devices-content {
+    padding: 120px 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* =======================================
+   INPUT BASE
+======================================= */
+input {
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: var(--bg-input);
+    color: var(--text-main);
+}
+
+input:focus {
+    border-color: var(--primary);
+    outline: none;
+    background: var(--bg-input-focus);
+}
+
+/* =======================================
+   BOTÕES BASE
+======================================= */
+button {
+    border: 0px;
+    outline: 0;
+}
+
+.btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: var(--bg-main);
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: var(--bg-main);
+}
+
+.btn-danger:hover {
+    background: var(--danger-dark);
+}
+
+/* =======================================
+   TITULOS
+======================================= */
+.page-title,
+.device-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--primary-dark);
+    margin-bottom: 5px;
+}
+
+.page-subtitle,
+.device-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 30px;
+}
+
+/* =======================================
+   STATUS GRID
+======================================= */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.status-box {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 15px var(--shadow);
+    border-radius: 20px;
+    padding: 25px;
+    text-align: center;
+    transition: 0.25s ease;
+}
+
+.status-box:hover {
+    transform: translateY(-4px);
+    background: var(--bg-input);
+}
+
+.status-box strong {
+    font-size: 28px;
+    color: var(--primary-dark);
+    display: block;
+    margin-bottom: 6px;
+}
+
+.status-box p {
+    margin: 0;
+    color: var(--text-muted-2);
+    font-size: 15px;
+}
+
+/* =======================================
+   CARDS BASE
+======================================= */
+.card,
+.chart-box {
+    background: var(--bg-card);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    padding: 20px;
+    box-shadow: 0 0 15px var(--shadow);
+}
+
+/* =======================================
+   DEVICE LIST (HOME + DEVICES)
+======================================= */
+.device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.device-item {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 8px var(--shadow-soft);
+    padding: 16px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: 0.25s ease;
+}
+
+.device-item:hover {
+    transform: translateX(4px);
+}
+
+
+html {
+    overflow-y: scroll;
+}
+
+.device-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    fill: white;
+}
+
+/*Charts Style*/
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Mantém a grelha responsiva */
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.chart-box {
+    background: var(--bg-card); /* Ou a tua cor de fundo */
+    border-radius: 12px;
+    padding: 15px;
+    height: 300px; /* IMPORTANTE: Define uma altura fixa para o box */
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-box h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.chart-box canvas {
+    flex: 1; /* Faz o canvas ocupar o resto do espaço da box */
+    max-height: 220px !important; /* Limita a altura real do gráfico */
+    width: 100% !important;
+}
+
+/* =======================================
+    DEVICE LIST (HOME + DEVICES)
+======================================= */
+.device-item, .device-card {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 0 8px var(--shadow-soft);
+    padding: 16px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+    
+    /* Base */
+    position: relative; 
+    z-index: 1;
+}
+
+/* Card com rato em cima: sobe um pouco na camada */
+.device-item:hover, .device-card:hover {
+    transform: translateX(8px);
+    box-shadow: 0 4px 12px var(--shadow);
+    background: var(--bg-input);
+    z-index: 5; 
+}
+
+/* PRIORIDADE MÁXIMA: 
+   Quando o menu está aberto (.active), este card ganha de todos, 
+   mesmo dos que têm o hover no momento. */
+.device-card.active {
+    z-index: 999 !important; 
+    transform: translateX(8px); /* Mantém ele deslocado enquanto o menu estiver aberto */
+}
+
+.device-menu {
+    position: absolute;
+    z-index: 1000; /* O menu fica ainda acima do card active */
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 16px var(--shadow-strong);
+    right: 10px;
+    top: 40px;
+    display: none;
+}
+
+/* Garante que o contentor da lista não corte elementos filhos (menus) */
+.device-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 20px; /* Adiciona um espaço extra no fundo para o menu do último card não cortar */
+    overflow: visible !important; /* IMPORTANTE: Garante que o menu possa "sair" do card */
+}
+
+/* Garante que o main permita o conteúdo transbordar */
+.devices-content {
+    overflow: visible;
+}
+
+/* Ajuste no menu para ele não forçar um scroll horizontal desnecessário */
+.device-menu {
+    position: absolute;
+    z-index: 1000;
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 16px var(--shadow-strong);
+    right: 10px;
+    top: 45px; /* Ajusta conforme o tamanho do teu botão */
+    width: 140px; /* Define um tamanho fixo para evitar saltos de layout */
+    border-radius: 12px;
+    padding: 8px 0;
+}
+
+/* ====================== CANCEL ALARM BUTTON ====================== */
+.cancel-btn {
+    background: var(--danger);
+    border: none;
+    color: var(--bg-main);
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.cancel-btn:hover {
+    background: var(--danger-dark);
+}

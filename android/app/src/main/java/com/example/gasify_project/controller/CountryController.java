@@ -3,7 +3,7 @@ package com.example.gasify_project.controller;
 import android.content.Context;
 
 import com.example.gasify_project.api.ApiClient;
-import com.example.gasify_project.model.CountriesResponse;
+import com.example.gasify_project.model.country.CountriesResponse;
 import com.example.gasify_project.model.SessionManager;
 
 import retrofit2.Call;

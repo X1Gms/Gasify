@@ -26,13 +26,13 @@ import com.example.gasify_project.R;
 import com.example.gasify_project.api.ApiClient;
 import com.example.gasify_project.controller.CountryController;
 import com.example.gasify_project.controller.DevicesController;
-import com.example.gasify_project.model.CountriesResponse;
-import com.example.gasify_project.model.Country;
-import com.example.gasify_project.model.Device;
-import com.example.gasify_project.model.DeviceAdapter;
-import com.example.gasify_project.model.DeviceDto;
-import com.example.gasify_project.model.DeviceRequest;
-import com.example.gasify_project.model.DevicesResponse;
+import com.example.gasify_project.model.country.CountriesResponse;
+import com.example.gasify_project.model.country.Country;
+import com.example.gasify_project.model.device.Device;
+import com.example.gasify_project.model.device.DeviceAdapter;
+import com.example.gasify_project.model.device.DeviceDto;
+import com.example.gasify_project.model.device.DeviceRequest;
+import com.example.gasify_project.model.device.DevicesResponse;
 import com.example.gasify_project.model.SimpleResponse;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -111,6 +111,23 @@ public class HomeFragment extends Fragment {
                 if (!isAdded()) return;
 
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    tvDeviceCount.setText(
+                            response.body().getCards().getTotalDevices() != null
+                                    ? response.body().getCards().getTotalDevices().toString()
+                                    : "0"
+                    );
+                    tvTemperature.setText(mapToGas(
+                            response.body().getCards().getAvg_gas() != null
+                            ? response.body().getCards().getAvg_gas()
+                            : null));
+                    tvCarbonLevel.setText(mapToCo(
+                            response.body().getCards().getAvg_co() != null
+                            ? response.body().getCards().getAvg_co()
+                            : null));
+                    tvEmergencyCount.setText(
+                            response.body().getCards().getActive_alerts() != null
+                            ? response.body().getCards().getActive_alerts().toString()
+                            : "0");
                     List<DeviceDto> devicesFromApi = response.body().getDevices();
                     deviceList.clear();
 
@@ -118,11 +135,12 @@ public class HomeFragment extends Fragment {
                         for (DeviceDto d : devicesFromApi) {
                             // Mapeamento para DeviceItem (adapta se o teu construtor for diferente)
                             // DeviceItem(String name, String locatedAt, String serialNumber, boolean alarm)
+                            int id = d.getId();
                             String name = d.getName() != null ? d.getName() : "Sem nome";
                             String locatedAt = d.getLocatedAt() != null ? d.getLocatedAt() : "";
                             String serial = d.getSerialNumber() != null ? d.getSerialNumber() : "";
 
-                            Device item = new Device(name, serial);
+                            Device item = new Device(id,name, serial);
                             deviceList.add(item);
                         }
                     }
@@ -148,6 +166,19 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getContext(), "Falha na rede: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private String mapToCo(Double v){
+        if (v == null) return "Nula";
+        if(v <= 34) return "Baixa";
+        else if(v > 34 && v <= 69) return "Média";
+        else return "Alta";
+    }
+
+    private String mapToGas(Double v){
+        if (v == null) return "Nulo";
+        if(v <= 2100) return "Baixa";
+        else if(v > 2100 && v <= 4199) return "Média";
+        else return "Alta";
     }
 
     private int dpToPx(int dp) {
@@ -347,7 +378,7 @@ public class HomeFragment extends Fragment {
             int countryId = apiCountriesList.get(selectedIndex[0]).getId();
 
             // monta o request DTO (assegura que tens DeviceRequest class)
-            DeviceRequest deviceRequest = new DeviceRequest(name, serial, countryId, address, postal);
+            DeviceRequest deviceRequest = new DeviceRequest(name, serial, countryId, address, postal, true);
 
             // faz a chamada ao controller
             devicesController.createDevice(deviceRequest, new Callback<SimpleResponse>() {
@@ -356,15 +387,11 @@ public class HomeFragment extends Fragment {
                     if (!isAdded()) return;
 
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                        // sucesso no servidor — adicionar localmente e notificar adapter
-                        int position = deviceList.size();
-                        Device newDevice = new Device(name, serial); // adapta se precisares de outros campos
-                        deviceList.add(newDevice);
-                        deviceAdapter.notifyItemInserted(position);
-                        rvDevices.scrollToPosition(position);
-
                         Toast.makeText(getContext(), "Dispositivo adicionado", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
+
+// força reload da lista para obter id correto
+                        loadData();
                     } else {
                         String msg = "Erro ao adicionar dispositivo";
                         if (response.errorBody() != null) {

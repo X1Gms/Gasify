@@ -13,7 +13,7 @@
         android:networkSecurityConfig="@xml/network_security_config">
 
         <activity
-            android:name=".view.LoginActivity"
+            android:name=".view.account.LoginActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -27,19 +27,19 @@
             android:exported="false" />
 
         <activity
-            android:name=".view.RegisterActivity"
+            android:name=".view.account.RegisterActivity"
             android:exported="false" />
 
         <activity
-            android:name=".view.RecEmailActivity"
+            android:name=".view.account.RecEmailActivity"
             android:exported="false" />
 
         <activity
-            android:name=".view.RecCodeActivity"
+            android:name=".view.account.RecCodeActivity"
             android:exported="false" />
 
         <activity
-            android:name=".view.ChangePasswordActivity"
+            android:name=".view.account.ChangePasswordActivity"
             android:exported="false" />
 
     </application>

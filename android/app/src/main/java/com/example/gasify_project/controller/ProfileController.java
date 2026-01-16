@@ -6,8 +6,8 @@ import android.util.Patterns;
 
 import com.example.gasify_project.api.ApiClient;
 import com.example.gasify_project.model.SimpleResponse;
-import com.example.gasify_project.model.UpdateProfileRequest;
-import com.example.gasify_project.model.User;
+import com.example.gasify_project.model.account.UpdateProfileRequest;
+import com.example.gasify_project.model.account.User;
 import com.example.gasify_project.model.SessionManager;
 
 import java.util.regex.Pattern;
@@ -58,6 +58,19 @@ public class ProfileController {
      * @param passwordConfirmation confirmation (optional)
      */
     public void updateProfile(String fullName, String email, String password, String passwordConfirmation) {
+        updateProfile(fullName, email, password, passwordConfirmation, null);
+    }
+
+    /**
+     * Validate inputs and, if valid, call the API to update the profile with current password.
+     *
+     * @param fullName             new full name (required)
+     * @param email                new email (required)
+     * @param password             new password (optional)
+     * @param passwordConfirmation confirmation (optional)
+     * @param currentPassword      current password (required if changing password)
+     */
+    public void updateProfile(String fullName, String email, String password, String passwordConfirmation, String currentPassword) {
         if (listener != null) listener.onUpdateStarted();
 
         // --- VALIDATION ---
@@ -102,14 +115,20 @@ public class ProfileController {
                         "Senha inválida. Deve ter pelo menos 8 caracteres, incluindo minúscula, maiúscula, número e caractere especial");
                 return;
             }
+
+            if (currentPassword == null || currentPassword.isEmpty()) {
+                if (listener != null) listener.onValidationError("password", "Confirme com sua senha atual");
+                return;
+            }
         } else {
-            // omit password fields by setting to null (Gson will omit nulls)
+            // No password change: omit password fields by setting to null (Gson will omit nulls)
+            // but keep currentPassword as it's always required for any profile update
             password = null;
             passwordConfirmation = null;
         }
 
         // --- PREPARE REQUEST ---
-        UpdateProfileRequest request = new UpdateProfileRequest(fullName.trim(), email.trim(), password, passwordConfirmation);
+        UpdateProfileRequest request = new UpdateProfileRequest(fullName.trim(), email.trim(), password, passwordConfirmation, currentPassword);
 
         // Token
         String token = session.getToken();

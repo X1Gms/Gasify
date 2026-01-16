@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispositivo</title>
+    <script>
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/color.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Header -->
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/toasts.css">
+    <script src="js/toasts.js"></script>
+
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="css/device.css">
+    <script src="js/sessions.js"></script>
+    <!-- Include header -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1"></script>
+    <script src="js/device.js" defer></script>
+    <script src="js/include.js" defer></script>
+</head>
+
+<body>
+
+    <div data-include-header></div>
+
+    <main class="device-content">
+
+        <!-- TÍTULO -->
+        <h1 class="device-title">Device #01</h1>
+        <p class="device-subtitle">
+            <strong>Série:</strong> EAFC26EF
+        </p>
+
+        <!-- STATUS BUBBLES -->
+        <section class="status-grid">
+
+            <div class="status-box">
+                <h2 class="big-text">Baixa</h2>
+                <p>Presença de Gás</p>
+            </div>
+
+            <div class="status-box">
+                <h2 class="big-text">Baixa</h2>
+                <p>Presença de Monóxido</p>
+            </div>
+
+            <div class="status-box">
+                <h2 class="big-text">16ºC</h2>
+                <p>Temperatura</p>
+            </div>
+
+            <div class="status-box">
+                <h2 class="big-text">Baixa</h2>
+                <p>Humidade</p>
+            </div>
+
+        </section>
+
+        <!-- BOTÃO DE FILTRO (MENU DROPDOWN) -->
+        <div class="filter-area">
+            <button class="filter-btn" id="filterBtn">Última Hora ▼</button>
+
+            <div class="filter-menu" id="filterMenu">
+                <p class="opt">Última Hora</p>
+                <p class="opt">Última Semana</p>
+                <p class="opt">Última Quinzena</p>
+                <p class="opt">Último Mês</p>
+            </div>
+        </div>
+
+        <!-- GRÁFICOS -->
+        <section class="charts-grid">
+
+            <div class="chart-box">
+                <h3>Presença de Gás</h3>
+                <canvas id="chartGas"></canvas>
+            </div>
+
+            <div class="chart-box">
+                <h3>Monóxido de Carbono</h3>
+                <canvas id="chartCO"></canvas>
+            </div>
+
+            <div class="chart-box">
+                <h3>Temperatura</h3>
+                <canvas id="chartTemp"></canvas>
+            </div>
+
+            <div class="chart-box">
+                <h3>Humidade</h3>
+                <canvas id="chartHum"></canvas>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- MENU SCRIPT -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const btn = document.getElementById("filterBtn");
+            const menu = document.getElementById("filterMenu");
+
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                menu.classList.toggle("open");
+            };
+
+            document.addEventListener("click", () => {
+                menu.classList.remove("open");
+            });
+
+            // Quando escolheres uma opção
+            document.querySelectorAll(".filter-menu .opt").forEach(o => {
+                o.onclick = () => {
+                    btn.textContent = o.textContent + " ▼";
+                    menu.classList.remove("open");
+                };
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>
