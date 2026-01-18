@@ -53,7 +53,7 @@ function createDeviceHandler(req, res) {
     // create device
     const createDeviceSql = mysql.format(
       `INSERT INTO device (user_id, country_id, name, serial_number, address, postal_code) VALUES (?, ?, ?, ?, ?, ?)`,
-      [userId, countryId, name, serialNumber, address, postalCode]
+      [userId, countryId, name, serialNumber, address, postalCode],
     );
     mysqlPool.query(createDeviceSql, (err, result) => {
       if (err) {
@@ -90,7 +90,7 @@ function createDeviceHandler(req, res) {
 
       const insertReadingsSql = mysql.format(
         `INSERT INTO reading (device_id, gas_type, humidity, temperature, mq2, mq5, created_at) VALUES ?`,
-        [readings]
+        [readings],
       );
 
       mysqlPool.query(insertReadingsSql, (err) => {
@@ -134,7 +134,7 @@ function randomBetween(min, max, decimals = 2) {
  * @returns {Array} Array of readings with [deviceId, gasType, humidity, temperature, mq2, mq5, timestamp]
  */
 function generateFakeReadings(deviceId, count = 12) {
-  const gasTypes = ["LPG", "Methane", "CO", "Smoke"];
+  const gasTypes = ["NOTHING", "GAS", "CO"];
   const readings = [];
 
   const HUMIDITY_RANGE = { min: 35, max: 65 };

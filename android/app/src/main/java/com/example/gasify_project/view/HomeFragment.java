@@ -279,7 +279,8 @@ public class HomeFragment extends Fragment {
                         arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
 
                         cardCountryList.setVisibility(View.GONE);
-                        arrowCountry.animate().rotation(-90f).setDuration(160).start();
+                        arrowCountry.animate().cancel();
+                        arrowCountry.animate().rotation(90f).setDuration(160).start();
                         cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
                     });
 
@@ -325,7 +326,8 @@ public class HomeFragment extends Fragment {
                         arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
 
                         cardCountryList.setVisibility(View.GONE);
-                        arrowCountry.animate().rotation(-90f).setDuration(160).start();
+                        arrowCountry.animate().cancel();
+                        arrowCountry.animate().rotation(90f).setDuration(160).start();
                         cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
                     });
 
@@ -338,6 +340,7 @@ public class HomeFragment extends Fragment {
 
         // Toggle country list visibility + arrow rotation
         cardCountry.setOnClickListener(v -> {
+            arrowCountry.animate().cancel();
             if (cardCountryList.getVisibility() == View.GONE) {
                 cardCountryList.setVisibility(View.VISIBLE);
                 arrowCountry.animate().rotation(-90f).setDuration(160).start();
