@@ -218,7 +218,6 @@
     padding: 14px;
     display: grid;
     grid-template-columns: auto 1fr auto;
-    gap: 12px;
     position: relative;
     transition: background 0.3s ease;
 }
@@ -266,6 +265,10 @@
     margin: 0;
 }
 
+.notif-title{
+
+    margin-left: 10px;
+}
 .device-name {
     font-weight: bold;
     font-size: 15px; 

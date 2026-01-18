@@ -47,7 +47,17 @@ async function fetchDeviceDetails(id, range, allowToast = false) {
 }
 
 function updateDeviceUI(data, allowToast) {
-    document.querySelector(".device-title").textContent = data.name;
+    // Atualiza Título e Número de Série
+    if (document.querySelector(".device-title")) {
+        document.querySelector(".device-title").textContent = data.name;
+    }
+    
+    // FIX: Procura o elemento do número de série (ajuste a classe se necessário no seu HTML)
+    const serialElem = document.querySelector(".device-serial") || document.querySelector("#deviceSerial");
+    if (serialElem) {
+        serialElem.textContent = data.serial_number;
+    }
+
     const statusValues = document.querySelectorAll(".status-box .big-text");
 
     if (statusValues.length >= 4) {
@@ -87,9 +97,6 @@ function createChart(canvasId, label, dataArray, color, limitLine, unit, convers
         chartsInstances[canvasId].destroy();
     }
 
-    /** * ALTERAÇÃO AQUI: 
-     * Formata a label para incluir Dia/Mês além da Hora 
-     */
     const labels = dataArray.map(d => {
         const date = new Date(d.timestamp);
         const dayMonth = date.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
@@ -164,9 +171,11 @@ function createChart(canvasId, label, dataArray, color, limitLine, unit, convers
 }
 
 function setupFilters(deviceId) {
+    // FIX: Ajustado "Últimas Semanas" para "Última Semana" para coincidir com o HTML e Backend
     const rangeMap = {
         "Últimas Horas": "hour",
-        "Últimas Semanas": "week",
+        "Última Semana": "week",
+        "Últimas Semanas": "week", 
         "Última Quinzena": "fortnight",
         "Último Mês": "month"
     };
@@ -179,4 +188,4 @@ function setupFilters(deviceId) {
             document.getElementById("filterBtn").textContent = rangeText + " ▼";
         };
     });
-} 
+}
