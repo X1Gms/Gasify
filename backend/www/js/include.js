@@ -41,32 +41,45 @@ function setupNotifications() {
     const notifSidebar = document.getElementById("notifSidebar");
     const notifClose = document.getElementById("notifClose");
 
-    // ⚠️ Se não existir, não faz nada (evita erros)
     if (!notifBtn || !notifSidebar) return;
 
+    // Abrir Sidebar
     notifBtn.onclick = (e) => {
         e.stopPropagation();
         notifSidebar.classList.add("open");
     };
 
+    // Fechar Sidebar
     notifClose.onclick = () => {
         notifSidebar.classList.remove("open");
     };
 
+    // Clique fora fecha a sidebar
     document.addEventListener("click", (e) => {
         if (!notifSidebar.contains(e.target) && e.target !== notifBtn) {
             notifSidebar.classList.remove("open");
         }
     });
 
-    // Expandir detalhes
-    document.querySelectorAll(".notif-expand").forEach(btn => {
-        btn.onclick = () => {
-            const extra = btn.parentElement.querySelector(".notif-extra");
+    // Lógica de Expandir/Recolher Notificação
+    const expandBtns = document.querySelectorAll(".notif-expand");
+    
+    expandBtns.forEach(btn => {
+        btn.onclick = (e) => {
+            e.stopPropagation(); // Impede fechar a sidebar ao clicar no botão
+            
+            const item = btn.closest(".notif-item");
+            const extra = item.querySelector(".notif-extra");
             const isOpen = extra.style.display === "block";
+
+            // Fecha outros abertos (opcional, se quiseres apenas um aberto)
+            // document.querySelectorAll(".notif-extra").forEach(el => el.style.display = "none");
 
             extra.style.display = isOpen ? "none" : "block";
             btn.textContent = isOpen ? "▼" : "▲";
+            
+            // Rotação visual opcional da seta
+            btn.style.transform = isOpen ? "rotate(0deg)" : "rotate(180deg)";
         };
     });
 }

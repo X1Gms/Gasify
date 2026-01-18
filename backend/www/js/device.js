@@ -1,14 +1,14 @@
 /**
- * js/device.js - Lógica de Gráficos em PPM com Escalas Fixas e Alerta Inicial
+ * js/device.js - Lógica de Gráficos em PPM com Escalas Fixas e Data Completa
  */
 
 let chartsInstances = {}; 
 
-// Fórmulas de conversão do teu Backend (Base 4095)
+// Fórmulas de conversão do Backend (Base 4095)
 const convertCO = (v) => (v * 106.0) / 4095.0;
 const convertGas = (v) => (v * 6363.0) / 4095.0;
 
-// Valores máximos possíveis em PPM (4095 na fórmula)
+// Valores máximos possíveis em PPM
 const MAX_CO_PPM = 106;
 const MAX_GAS_PPM = 6363;
 
@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Carrega dados iniciais e PERMITE o toast de alerta (true)
     fetchDeviceDetails(deviceId, 'hour', true);
     setupFilters(deviceId);
 });
@@ -63,7 +62,6 @@ function updateDeviceUI(data, allowToast) {
         statusValues[2].textContent = data.cards.temperature ? `${data.cards.temperature}ºC` : "---";
         statusValues[3].textContent = data.cards.humidity !== null ? `${data.cards.humidity}%` : "---";
         
-        // Só mostra o toast se for o carregamento inicial (allowToast === true)
         if (data.has_active_alert && allowToast) {
             showToast('error', 'ALERTA CRÍTICO', 'Fuga detectada! Verifique o local.');
         }
@@ -74,14 +72,9 @@ function renderAllCharts(chartsData) {
     const coLimitAlto = 70;
     const gasLimitAlto = 4200;
 
-    // CO e Gás: Escala vai até o máximo teórico (106 e 6363)
     createChart("chartCO", "Monóxido (PPM)", chartsData.co, "#e67e22", coLimitAlto, " ppm", convertCO, MAX_CO_PPM);
     createChart("chartGas", "Gás (PPM)", chartsData.gas, "#f1c40f", gasLimitAlto, " ppm", convertGas, MAX_GAS_PPM);
-    
-    // Temperatura: Escala dinâmica (melhor para visualização de pequenas mudanças)
     createChart("chartTemp", "Temperatura", chartsData.temperature, "#e74c3c", null, "ºC", v => v, null);
-    
-    // Humidade: Escala fixa de 0 a 100%
     createChart("chartHum", "Humidade", chartsData.humidity, "#3498db", null, "%", v => v, 100);
 }
 
@@ -94,10 +87,16 @@ function createChart(canvasId, label, dataArray, color, limitLine, unit, convers
         chartsInstances[canvasId].destroy();
     }
 
+    /** * ALTERAÇÃO AQUI: 
+     * Formata a label para incluir Dia/Mês além da Hora 
+     */
     const labels = dataArray.map(d => {
         const date = new Date(d.timestamp);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const dayMonth = date.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
+        const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `${dayMonth} ${time}`; 
     });
+
     const values = dataArray.map(d => conversionFn(d.value));
 
     const annotations = {};
@@ -147,9 +146,16 @@ function createChart(canvasId, label, dataArray, color, limitLine, unit, convers
                 }
             },
             scales: {
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: { size: 10 }
+                    }
+                },
                 y: { 
                     beginAtZero: true,
-                    max: yMax, // Aplica o valor máximo definido (106, 6363 ou 100)
+                    max: yMax,
                     ticks: { callback: (value) => value + unit }
                 }
             }
@@ -169,9 +175,8 @@ function setupFilters(deviceId) {
         o.onclick = () => {
             const rangeText = o.textContent.trim();
             const range = rangeMap[rangeText] || "hour";
-            // Ao mudar o filtro, allowToast é false (valor por defeito omitido ou false)
             fetchDeviceDetails(deviceId, range, false);
             document.getElementById("filterBtn").textContent = rangeText + " ▼";
         };
     });
-}
+} 
