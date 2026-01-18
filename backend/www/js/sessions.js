@@ -1,10 +1,33 @@
 /**
+ * Função auxiliar para buscar dados de qualquer um dos storages
+ * (localStorage para Remember Me ativo, sessionStorage para sessão temporária)
+ */
+function getAuthItem(key) {
+    return localStorage.getItem(key) || sessionStorage.getItem(key);
+}
+
+/**
+ * Função auxiliar para guardar dados no storage correto detetado
+ */
+function setAuthItem(key, value) {
+    if (localStorage.getItem("token") || localStorage.getItem("remembered") === "true") {
+        localStorage.setItem(key, value);
+    } else {
+        sessionStorage.setItem(key, value);
+    }
+}
+
+/**
  * Verifica se o utilizador tem sessão ativa
  */
 function checkSession() {
-    const token = localStorage.getItem("token");
+    const token = getAuthItem("token");
     const path = window.location.pathname;
-    const isAuthPage = path.includes("login.html") || path.includes("register.html");
+    const isAuthPage = path.includes("login.html") || 
+                       path.includes("register.html") || 
+                       path.includes("recoverpass.html") || 
+                       path.includes("insertcode.html") || 
+                       path.includes("newpassword.html");
 
     if (!token && !isAuthPage) {
         if (path !== "/" && !path.includes("index.html")) {
@@ -20,50 +43,36 @@ function checkSession() {
 }
 
 /**
- * Função de Logout
+ * Função de Logout - Limpa ambos os storages
  */
 function logout() {
     localStorage.clear();
+    sessionStorage.clear();
     window.location.href = "login.html";
 }
 
 /**
- * Insere o nome no HTML (com insistência)
- */
-/**
- * Injeta o nome imediatamente para evitar o "User"
+ * Injeta o nome imediatamente. 
  */
 function fastInjectName() {
-    const cachedName = localStorage.getItem("userName");
-    if (!cachedName) return;
-
-    // Função que tenta encontrar o span e injetar o nome
-    const tryInject = () => {
+    const fastInterval = setInterval(() => {
+        const cachedName = getAuthItem("userName");
         const nameSpan = document.getElementById("userName");
-        if (nameSpan) {
+
+        if (nameSpan && cachedName) {
             nameSpan.textContent = cachedName;
-            return true;
+            clearInterval(fastInterval);
         }
-        return false;
-    };
+    }, 50);
 
-    // 1. Tenta injetar logo
-    if (!tryInject()) {
-        // 2. Se não conseguiu, tenta a cada 10ms (super rápido) até o HTML aparecer
-        const fastInterval = setInterval(() => {
-            if (tryInject()) clearInterval(fastInterval);
-        }, 10);
-
-        // Para não ficar a correr infinitamente se o elemento não existir
-        setTimeout(() => clearInterval(fastInterval), 2000);
-    }
+    setTimeout(() => clearInterval(fastInterval), 5000);
 }
 
 /**
- * Carrega os dados da API
+ * Carrega os dados da API e atualiza o Header
  */
 async function loadUserData() {
-    const token = localStorage.getItem("token");
+    const token = getAuthItem("token");
     if (!token) return;
 
     try {
@@ -78,19 +87,24 @@ async function loadUserData() {
         const data = await response.json();
 
         if (response.ok && data.success && data.user) {
-            localStorage.setItem("userName", data.user.fullName);
-            injectNameToHeader(); // Tenta injetar o nome novo
+            // Guarda o nome atualizado no storage correto (auto-detect)
+            setAuthItem("userName", data.user.fullName);
+            
+            const nameSpan = document.getElementById("userName");
+            if (nameSpan) {
+                nameSpan.textContent = data.user.fullName;
+            }
         }
     } catch (error) {
         console.error("Erro ao carregar dados:", error);
     }
 }
 
-// 1. Executa verificação de sessão
+// 1. Executa verificação de sessão antes de tudo
 checkSession();
 
-// 2. Tenta injetar o nome que já temos guardado mal o script corre
+// 2. Inicia o monitoramento para injeção do nome
 fastInjectName();
 
-// 3. Vai buscar dados frescos e tenta injetar de novo
+// 3. Dispara a atualização dos dados assim que a estrutura base carrega
 document.addEventListener("DOMContentLoaded", loadUserData);

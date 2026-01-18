@@ -166,7 +166,6 @@ function resetPasswordHandler(req, res) {
                 // still send neutral response
               }
 
-              const email = options.nodemailer.auth.user;
               // create email using the template
               const emailContent = createEmail(
                 "password-changed-successfully",

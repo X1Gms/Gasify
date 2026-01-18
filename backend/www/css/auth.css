@@ -249,3 +249,69 @@ body::before {
         display: block;
     }
 }
+
+/* Contentor da linha */
+.auth-options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* Texto Laranja (Igual ao link em tamanho) */
+.auth-text-orange {
+    font-size: 13px;
+    color: #ff8c00; /* Laranja */
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Texto Pequeno (Link da direita) */
+.auth-text-small {
+    font-size: 13px;
+    opacity: 0.8;
+    color: var(--text-main);
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+/* O Quadrado Personalizado */
+.remember-me-custom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.custom-box {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ff8c00; /* Linha Laranja */
+    border-radius: 4px;
+    position: relative;
+    transition: 0.2s;
+    background: transparent;
+}
+
+/* Quando estiver checado (via JS adicionamos a classe 'checked') */
+.custom-box.checked {
+    background: #ff8c00;
+}
+
+/* O "V" branco dentro do quadrado quando marcado */
+.custom-box.checked::after {
+    content: "✓";
+    position: absolute;
+    color: white;
+    font-size: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.forgot-link {
+    display: block;
+    text-align: right;
+}

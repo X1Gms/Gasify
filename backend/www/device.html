@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device #01 – RSSF / PWDAM</title>
+    <title>Dispositivo</title>
     <script>
         const theme = localStorage.getItem('theme');
         if (theme === 'dark') {
@@ -16,11 +16,16 @@
     <link rel="stylesheet" href="css/styles.css">
     <!-- Header -->
     <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/toasts.css">
+    <script src="js/toasts.js"></script>
 
     <!-- CSS específico -->
     <link rel="stylesheet" href="css/device.css">
-<script src="js/sessions.js"></script>
+    <script src="js/sessions.js"></script>
     <!-- Include header -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1"></script>
+    <script src="js/device.js" defer></script>
     <script src="js/include.js" defer></script>
 </head>
 
@@ -33,7 +38,7 @@
         <!-- TÍTULO -->
         <h1 class="device-title">Device #01</h1>
         <p class="device-subtitle">
-            Device #01 &nbsp; • &nbsp; <strong>Série:</strong> EAFC26EF
+            <strong>Série:</strong> EAFC26EF
         </p>
 
         <!-- STATUS BUBBLES -->
@@ -63,11 +68,11 @@
 
         <!-- BOTÃO DE FILTRO (MENU DROPDOWN) -->
         <div class="filter-area">
-            <button class="filter-btn" id="filterBtn">Selecionar Período ▼</button>
+            <button class="filter-btn" id="filterBtn">Última Hora ▼</button>
 
             <div class="filter-menu" id="filterMenu">
-                <p class="opt">Últimas Horas</p>
-                <p class="opt">Últimas Semanas</p>
+                <p class="opt">Última Hora</p>
+                <p class="opt">Última Semana</p>
                 <p class="opt">Última Quinzena</p>
                 <p class="opt">Último Mês</p>
             </div>

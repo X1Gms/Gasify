@@ -4,44 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperar Palavra-Passe – RSSF / PWDAM</title>
+    <title>Recuperar Palavra-Passe</title>
+    
     <script>
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-        const authImg = document.getElementById("auth-img");
-if (authImg && theme === "dark") {
-    authImg.src = "img/authimage2.png";
-}
-
+        // Tema e Imagem dinâmicos
+        document.addEventListener("DOMContentLoaded", () => {
+            const theme = localStorage.getItem('theme');
+            const authImg = document.getElementById("auth-img");
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                if (authImg) authImg.src = "img/authimage2.png";
+            } else {
+                if (authImg) authImg.src = "img/authimage.png"; // Imagem padrão light
+            }
+        });
     </script>
 
     <link rel="stylesheet" href="css/color.css">
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/auth.css">
+    
+    <link rel="stylesheet" href="css/toasts.css">
+<script src="js/toasts.js"></script>
     <script src="js/sessions.js" defer></script>
-    <script src="js/auth.js" defer></script>
-    <script src="js/eye.js" defer> </script>
+    <script src="js/recoverpass.js" defer></script>
+    <script src="js/eye.js" defer></script>
 </head>
 
 <body data-page="recover">
 
     <div class="auth-container">
 
-        <!-- COLUNA ESQUERDA -->
         <div class="auth-left">
             <div class="login-bubble">
 
                 <h1>Recuperar Palavra-Passe</h1>
                 <h3>Insira o seu e-mail para receber um código para recuperar a sua conta</h3>
 
-                <input id="recover_email" placeholder="Email">
+                <input id="recover_email" type="email" placeholder="Email">
 
                 <button id="recoverButton">Enviar</button>
 
-                <div id="recover_error"></div>
+                <div id="recover_error" style="display: none; color: #ff4d4d; margin-top: 10px; font-size: 14px;"></div>
 
                 <p class="small-muted" style="margin-top:20px;">Lembrei da Palavra-Passe?</p>
                 <p><a href="login.html">Iniciar Sessão</a></p>
@@ -49,37 +53,11 @@ if (authImg && theme === "dark") {
             </div>
         </div>
 
-        <!-- COLUNA DIREITA (IMAGEM) -->
         <div class="auth-right">
-            <img id="auth-img"  alt="Imagem Recuperar">
+            <img id="auth-img" alt="Imagem Recuperar">
         </div>
 
     </div>
 
-    <script>
-        window.onload = function () {
-            const btn = document.getElementById("recoverButton");
-
-            // apenas mostra erro por agora, podes ligar ao backend depois
-            btn.onclick = () => {
-                const email = document.getElementById("recover_email").value.trim();
-                const err = document.getElementById("recover_error");
-
-                err.textContent = "";
-                err.style.display = "none";
-
-                if (!email) {
-                    err.textContent = "Insira o email.";
-                    err.style.display = "block";
-                    return;
-                }
-
-                // Aqui futuramente fazes o fetch ao endpoint de recuperação
-                alert("Função de recuperação ainda não implementada.");
-            };
-        };
-    </script>
-
 </body>
-
 </html>

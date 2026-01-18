@@ -18,22 +18,38 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gasify_project.R;
-import com.example.gasify_project.model.DeviceFullAdapter;
-import com.example.gasify_project.model.DeviceItem;
+import com.example.gasify_project.api.ApiClient;
+import com.example.gasify_project.controller.CountryController;
+import com.example.gasify_project.controller.DevicesController;
+import com.example.gasify_project.model.country.Country;
+import com.example.gasify_project.model.country.CountriesResponse;
+import com.example.gasify_project.model.device.DeviceDetailResponse;
+import com.example.gasify_project.model.device.DeviceDto;
+import com.example.gasify_project.model.device.DeviceFullAdapter;
+import com.example.gasify_project.model.device.DeviceItem;
+import com.example.gasify_project.model.device.DeviceRequest;
+import com.example.gasify_project.model.device.DevicesResponse;
+import com.example.gasify_project.model.SimpleResponse;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDeviceActionListener {
 
@@ -55,6 +71,7 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
 
         initViews(view);
         setupRecyclerView();
+        rvDevices.setItemAnimator(new DefaultItemAnimator());
         setupListeners();
         loadDevices();
     }
@@ -77,17 +94,64 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
 
     private void loadDevices() {
         deviceList.clear();
-        deviceList.add(new DeviceItem("Device #01", "Sala de Estar", "EAFC26EF", false));
-        deviceList.add(new DeviceItem("Device #02", "Cozinha", "EAFC26EF", true));
-        deviceList.add(new DeviceItem("Device #03", "Device #03", "EAFC26EF", false));
-        deviceList.add(new DeviceItem("Device #04", "Device #04", "EAFC26EF", false));
-        deviceList.add(new DeviceItem("Device #05", "Device #05", "EAFC26EF", false));
-        deviceList.add(new DeviceItem("Device #06", "Device #06", "EAFC26EF", false));
-        deviceList.add(new DeviceItem("Device #07", "Device #07", "EAFC26EF", false));
-        deviceList.add(new DeviceItem("Device #08", "Device #08", "EAFC26EF", false));
-
         deviceAdapter.notifyDataSetChanged();
+
+        DevicesController devicesController = new DevicesController(requireContext(), ApiClient.getService());
+        devicesController.fetchMyDevices(new Callback<DevicesResponse>() {
+            @Override
+            public void onResponse(Call<DevicesResponse> call, Response<DevicesResponse> response) {
+                if (!isAdded()) return;
+
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<DeviceDto> devicesFromApi = response.body().getDevices();
+                    deviceList.clear();
+
+                    if (devicesFromApi != null) {
+                        for (DeviceDto d : devicesFromApi) {
+                            String name = d.getName() != null ? d.getName() : "Sem nome";
+                            String locatedAt = d.getLocatedAt() != null ? d.getLocatedAt() : "";
+                            String serial = d.getSerialNumber() != null ? d.getSerialNumber() : "";
+
+                            String address = "";
+                            String postalCode = "";
+
+                            // Construtor: DeviceItem(int id, String name, String locatedAt,
+                            //                           String serialNumber, boolean alarm, String address, String postalCode)
+                            DeviceItem item = new DeviceItem(
+                                    d.getId(),
+                                    name,
+                                    locatedAt,
+                                    serial,
+                                    false,
+                                    address,
+                                    postalCode
+                            );
+                            deviceList.add(item);
+                        }
+                    }
+
+                    deviceAdapter.notifyDataSetChanged();
+                } else {
+                    String msg = "Erro ao obter dispositivos";
+                    if (response.errorBody() != null) {
+                        try {
+                            msg = response.errorBody().string();
+                        } catch (IOException e) {
+                            // ignore
+                        }
+                    }
+                    Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DevicesResponse> call, Throwable t) {
+                if (!isAdded()) return;
+                Toast.makeText(getContext(), "Falha na rede: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 
     @Override
     public void onMenuClick(View view, DeviceItem device, int position) {
@@ -158,62 +222,131 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
         MaterialCardView cardCountry = dialogView.findViewById(R.id.cardCountry);
         TextView tvSelectedCountry = dialogView.findViewById(R.id.tvSelectedCountry);
         ImageView arrowCountry = dialogView.findViewById(R.id.arrowCountry);
-        ImageView ivCountryIcon = dialogView.findViewById(R.id.ivCountryIcon); // ensure this id exists in XML
+        ImageView ivCountryIcon = dialogView.findViewById(R.id.ivCountryIcon);
         MaterialCardView cardCountryList = dialogView.findViewById(R.id.cardCountryList);
         LinearLayout countryListContainer = dialogView.findViewById(R.id.countryListContainer);
         TextInputEditText editAddress = dialogView.findViewById(R.id.editTextAddress);
         TextInputEditText editPostal = dialogView.findViewById(R.id.editTextPostalCode);
         MaterialButton btnAdd = dialogView.findViewById(R.id.btnAdd);
 
-        final String[] countries = new String[]{"Portugal", "Espanha", "Brasil", "França", "Reino Unido"};
+        final List<String> fallbackCountries = Arrays.asList("Portugal", "Espanha", "Brasil", "França", "Reino Unido");
         final int[] selectedIndex = {-1};
+        final List<Country> apiCountriesList = new ArrayList<>();
 
-        // populate countryListContainer
         countryListContainer.removeAllViews();
-        for (int i = 0; i < countries.length; i++) {
-            final int idx = i;
-            TextView item = new TextView(requireContext());
-            item.setText(countries[i]);
-            item.setTextSize(16f);
-            item.setPadding(dpToPx(12), dpToPx(10), dpToPx(12), dpToPx(10));
-            item.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            // default style
-            item.setTypeface(null, Typeface.NORMAL);
-            item.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
 
-            item.setOnClickListener(v -> {
-                // update selection styling: selected -> @color/foreground, others -> @color/card_foreground
-                for (int c = 0; c < countryListContainer.getChildCount(); c++) {
-                    TextView child = (TextView) countryListContainer.getChildAt(c);
-                    if (c == idx) {
-                        child.setTypeface(null, Typeface.BOLD);
-                        child.setTextColor(ContextCompat.getColor(requireContext(), R.color.foreground)); // selected in list -> foreground
-                    } else {
-                        child.setTypeface(null, Typeface.NORMAL);
-                        child.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
-                    }
+        CountryController countryController = new CountryController(requireContext(), ApiClient.getService());
+        DevicesController devicesController = new DevicesController(requireContext(), ApiClient.getService());
+
+        countryController.fetchCountries(new Callback<CountriesResponse>() {
+            @Override
+            public void onResponse(Call<CountriesResponse> call, Response<CountriesResponse> response) {
+                if (!isAdded()) return;
+
+                List<Country> apiCountries = null;
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    apiCountries = response.body().getCountries();
                 }
-                selectedIndex[0] = idx;
-                tvSelectedCountry.setText(countries[idx]);
 
-                // tint the country icon to primary_foreground (existing)
-                ivCountryIcon.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
-                // ALSO tint the main selected text and the arrow to primary_foreground (your request)
-                tvSelectedCountry.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_foreground));
-                arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
+                final List<String> countryNames;
+                if (apiCountries != null && !apiCountries.isEmpty()) {
+                    apiCountriesList.clear();
+                    apiCountriesList.addAll(apiCountries);
 
-                // collapse list and rotate arrow back
-                cardCountryList.setVisibility(View.GONE);
-                arrowCountry.animate().rotation(-90f).setDuration(160).start();
+                    countryNames = new ArrayList<>();
+                    for (Country c : apiCountries) countryNames.add(c.getName());
+                } else {
+                    apiCountriesList.clear();
+                    countryNames = fallbackCountries;
+                }
 
-                // visually mark selected card
-                cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
-            });
+                countryListContainer.removeAllViews();
+                for (int i = 0; i < countryNames.size(); i++) {
+                    final int idx = i;
+                    TextView item = new TextView(requireContext());
+                    item.setText(countryNames.get(i));
+                    item.setTextSize(16f);
+                    item.setPadding(dpToPx(12), dpToPx(10), dpToPx(12), dpToPx(10));
+                    item.setLayoutParams(new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                    ));
+                    item.setTypeface(null, Typeface.NORMAL);
+                    item.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
 
-            countryListContainer.addView(item);
-        }
+                    item.setOnClickListener(v -> {
+                        for (int c = 0; c < countryListContainer.getChildCount(); c++) {
+                            TextView child = (TextView) countryListContainer.getChildAt(c);
+                            if (c == idx) {
+                                child.setTypeface(null, Typeface.BOLD);
+                                child.setTextColor(ContextCompat.getColor(requireContext(), R.color.foreground));
+                            } else {
+                                child.setTypeface(null, Typeface.NORMAL);
+                                child.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
+                            }
+                        }
+                        selectedIndex[0] = idx;
+                        tvSelectedCountry.setText(countryNames.get(idx));
+
+                        ivCountryIcon.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
+                        tvSelectedCountry.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_foreground));
+                        arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
+
+                        cardCountryList.setVisibility(View.GONE);
+                        arrowCountry.animate().rotation(-90f).setDuration(160).start();
+                        cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
+                    });
+
+                    countryListContainer.addView(item);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CountriesResponse> call, Throwable t) {
+                if (!isAdded()) return;
+
+                apiCountriesList.clear();
+                countryListContainer.removeAllViews();
+                for (int i = 0; i < fallbackCountries.size(); i++) {
+                    final int idx = i;
+                    TextView item = new TextView(requireContext());
+                    item.setText(fallbackCountries.get(i));
+                    item.setTextSize(16f);
+                    item.setPadding(dpToPx(12), dpToPx(10), dpToPx(12), dpToPx(10));
+                    item.setLayoutParams(new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                    ));
+                    item.setTypeface(null, Typeface.NORMAL);
+                    item.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
+
+                    item.setOnClickListener(v -> {
+                        for (int c = 0; c < countryListContainer.getChildCount(); c++) {
+                            TextView child = (TextView) countryListContainer.getChildAt(c);
+                            if (c == idx) {
+                                child.setTypeface(null, Typeface.BOLD);
+                                child.setTextColor(ContextCompat.getColor(requireContext(), R.color.foreground));
+                            } else {
+                                child.setTypeface(null, Typeface.NORMAL);
+                                child.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
+                            }
+                        }
+                        selectedIndex[0] = idx;
+                        tvSelectedCountry.setText(fallbackCountries.get(idx));
+
+                        ivCountryIcon.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
+                        tvSelectedCountry.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_foreground));
+                        arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
+
+                        cardCountryList.setVisibility(View.GONE);
+                        arrowCountry.animate().rotation(-90f).setDuration(160).start();
+                        cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
+                    });
+
+                    countryListContainer.addView(item);
+                }
+
+                Toast.makeText(getContext(), "Falha ao carregar países: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Toggle country list visibility + arrow rotation
         cardCountry.setOnClickListener(v -> {
@@ -228,9 +361,12 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
+        // ---------- Aqui: listener que usa DevicesController ----------
         btnAdd.setOnClickListener(v -> {
             String name = editDeviceName.getText() != null ? editDeviceName.getText().toString().trim() : "";
             String serial = editSerial.getText() != null ? editSerial.getText().toString().trim() : "";
+            String address = editAddress.getText() != null ? editAddress.getText().toString().trim() : "";
+            String postal = editPostal.getText() != null ? editPostal.getText().toString().trim() : "";
 
             if (name.isEmpty()) {
                 Toast.makeText(getContext(), "Por favor insira o nome do dispositivo", Toast.LENGTH_SHORT).show();
@@ -240,19 +376,66 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
                 Toast.makeText(getContext(), "Por favor insira o número de série", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (selectedIndex[0] < 0) {
+                Toast.makeText(getContext(), "Por favor selecione um país", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (apiCountriesList.isEmpty()) {
+                Toast.makeText(getContext(), "Aguarde o carregamento dos países válidos para poder adicionar o dispositivo", Toast.LENGTH_LONG).show();
+                return;
+            }
 
-            DeviceItem newDevice = new DeviceItem(name, name, serial, false);
-            deviceList.add(0, newDevice);
-            deviceAdapter.notifyItemInserted(0);
-            rvDevices.scrollToPosition(0);
-            Toast.makeText(getContext(), "Dispositivo adicionado", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
+            int countryId = apiCountriesList.get(selectedIndex[0]).getId();
+
+            DeviceRequest deviceRequest = new DeviceRequest(name, serial, countryId, address, postal, true);
+
+            devicesController.createDevice(deviceRequest, new Callback<SimpleResponse>() {
+                @Override
+                public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                    if (!isAdded()) return;
+
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        // sucesso no servidor — adicionar localmente e notificar adapter.
+                        // como o servidor não devolveu o novo id aqui (SimpleResponse), adicionamos localmente com id = -1
+                        DeviceItem newDevice = new DeviceItem(
+                                -1,
+                                name,
+                                "",       // locatedAt
+                                serial,
+                                false,
+                                address,
+                                postal
+                        );
+                        int position = deviceList.size();
+                        deviceList.add(newDevice);
+                        deviceAdapter.notifyItemInserted(position);
+                        rvDevices.scrollToPosition(position);
+
+                        Toast.makeText(getContext(), "Dispositivo adicionado", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        String msg = "Erro ao adicionar dispositivo";
+                        if (response.errorBody() != null) {
+                            try {
+                                msg = response.errorBody().string();
+                            } catch (IOException e) {
+                                // ignore
+                            }
+                        }
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SimpleResponse> call, Throwable t) {
+                    if (!isAdded()) return;
+                    Toast.makeText(getContext(), "Falha na rede: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         dialog.show();
     }
-
-
 
 
     // -----------------------
@@ -281,55 +464,185 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
         TextInputEditText editPostal = dialogView.findViewById(R.id.editTextPostalCode);
         MaterialButton btnEdit = dialogView.findViewById(R.id.btnEdit);
 
+        // Pre-fill basic fields
         editDeviceName.setText(device.getName());
         tvSerialNumber.setText(device.getSerialNumber());
 
-        final String[] countries = new String[]{"Portugal", "Espanha", "Brasil", "França", "Reino Unido"};
-        final int[] selectedIndex = {0};
-        tvSelectedCountry.setText(countries[selectedIndex[0]]);
+        // State holders
+        final List<Country> apiCountries = new ArrayList<>();
+        final Integer[] deviceCountryId = { null };
+        final int[] selectedIndex = { -1 };
+        final boolean[] countriesLoaded = { false };
+        final boolean[] deviceDetailsLoaded = { false };
 
-        countryListContainer.removeAllViews();
-        for (int i = 0; i < countries.length; i++) {
-            final int idx = i;
-            TextView item = new TextView(requireContext());
-            item.setText(countries[i]);
-            item.setTextSize(16f);
-            item.setPadding(dpToPx(12), dpToPx(10), dpToPx(12), dpToPx(10));
-            item.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            // selected item must use @color/foreground (user request)
-            if (i == selectedIndex[0]) {
-                item.setTypeface(null, Typeface.BOLD);
-                item.setTextColor(ContextCompat.getColor(requireContext(), R.color.foreground)); // SELECTED uses foreground
-            } else {
-                item.setTypeface(null, Typeface.NORMAL);
-                item.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
+        final List<String> fallbackCountries = Arrays.asList("Portugal", "Espanha", "Brasil", "França", "Reino Unido");
+
+        CountryController countryController = new CountryController(requireContext(), ApiClient.getService());
+        DevicesController devicesController = new DevicesController(requireContext(), ApiClient.getService());
+
+        // Helper method to update country selection UI
+        Runnable updateCountrySelection = () -> {
+            if (!countriesLoaded[0] || deviceCountryId[0] == null || apiCountries.isEmpty()) {
+                return;
             }
 
-            item.setOnClickListener(v -> {
-                // update selection
-                for (int c = 0; c < countryListContainer.getChildCount(); c++) {
-                    TextView child = (TextView) countryListContainer.getChildAt(c);
-                    if (c == idx) {
-                        child.setTypeface(null, Typeface.BOLD);
-                        child.setTextColor(ContextCompat.getColor(requireContext(), R.color.foreground)); // SELECTED uses foreground
-                    } else {
-                        child.setTypeface(null, Typeface.NORMAL);
-                        child.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
+            // Find and select the matching country
+            for (int i = 0; i < apiCountries.size(); i++) {
+                if (apiCountries.get(i).getId() == deviceCountryId[0]) {
+                    selectedIndex[0] = i;
+
+                    // Update UI
+                    tvSelectedCountry.setText(apiCountries.get(i).getName());
+                    tvSelectedCountry.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_foreground));
+                    cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
+                    arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
+
+                    // Update list item styling
+                    if (i < countryListContainer.getChildCount()) {
+                        TextView selectedItem = (TextView) countryListContainer.getChildAt(i);
+                        selectedItem.setTypeface(null, Typeface.BOLD);
+                        selectedItem.setTextColor(ContextCompat.getColor(requireContext(), R.color.foreground));
                     }
+                    break;
                 }
-                selectedIndex[0] = idx;
-                tvSelectedCountry.setText(countries[idx]);
+            }
+        };
 
-                cardCountryList.setVisibility(View.GONE);
-                arrowCountry.animate().rotation(90f).setDuration(160).start();
-                cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
-            });
+        // 1) Fetch device details
+        devicesController.fetchDeviceById(device.getId(), new Callback<DeviceDetailResponse>() {
+            @Override
+            public void onResponse(Call<DeviceDetailResponse> call, Response<DeviceDetailResponse> response) {
+                if (!isAdded()) return;
 
-            countryListContainer.addView(item);
-        }
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    DeviceDetailResponse detail = response.body();
 
+                    editAddress.setText(detail.getAddress() != null ? detail.getAddress() : "");
+                    editPostal.setText(detail.getPostalCode() != null ? detail.getPostalCode() : "");
+                    deviceCountryId[0] = detail.getCountryId();
+
+                    deviceDetailsLoaded[0] = true;
+                    updateCountrySelection.run();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DeviceDetailResponse> call, Throwable t) {
+                deviceDetailsLoaded[0] = true;
+            }
+        });
+
+        // 2) Fetch countries
+        countryController.fetchCountries(new Callback<CountriesResponse>() {
+            @Override
+            public void onResponse(Call<CountriesResponse> call, Response<CountriesResponse> response) {
+                if (!isAdded()) return;
+
+                List<Country> list = null;
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    list = response.body().getCountries();
+                }
+
+                final List<String> countryNames;
+                apiCountries.clear();
+
+                if (list != null && !list.isEmpty()) {
+                    apiCountries.addAll(list);
+                    countryNames = new ArrayList<>();
+                    for (Country c : list) countryNames.add(c.getName());
+                } else {
+                    countryNames = fallbackCountries;
+                }
+
+                // Build country list
+                countryListContainer.removeAllViews();
+                for (int i = 0; i < countryNames.size(); i++) {
+                    final int idx = i;
+                    TextView item = new TextView(requireContext());
+                    item.setText(countryNames.get(i));
+                    item.setTextSize(16f);
+                    item.setPadding(dpToPx(12), dpToPx(10), dpToPx(12), dpToPx(10));
+                    item.setLayoutParams(new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                    ));
+                    item.setTypeface(null, Typeface.NORMAL);
+                    item.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
+
+                    item.setOnClickListener(v -> {
+                        // Reset all items
+                        for (int c = 0; c < countryListContainer.getChildCount(); c++) {
+                            TextView child = (TextView) countryListContainer.getChildAt(c);
+                            child.setTypeface(null, Typeface.NORMAL);
+                            child.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
+                        }
+
+                        // Highlight selected
+                        item.setTypeface(null, Typeface.BOLD);
+                        item.setTextColor(ContextCompat.getColor(requireContext(), R.color.foreground));
+
+                        selectedIndex[0] = idx;
+                        tvSelectedCountry.setText(countryNames.get(idx));
+                        tvSelectedCountry.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_foreground));
+                        arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
+                        cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
+
+                        cardCountryList.setVisibility(View.GONE);
+                        arrowCountry.animate().rotation(90f).setDuration(160).start();
+                    });
+
+                    countryListContainer.addView(item);
+                }
+
+                countriesLoaded[0] = true;
+                updateCountrySelection.run();
+            }
+
+            @Override
+            public void onFailure(Call<CountriesResponse> call, Throwable t) {
+                if (!isAdded()) return;
+
+                // Fallback list
+                countryListContainer.removeAllViews();
+                for (int i = 0; i < fallbackCountries.size(); i++) {
+                    final int idx = i;
+                    TextView item = new TextView(requireContext());
+                    item.setText(fallbackCountries.get(i));
+                    item.setTextSize(16f);
+                    item.setPadding(dpToPx(12), dpToPx(10), dpToPx(12), dpToPx(10));
+                    item.setLayoutParams(new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                    ));
+                    item.setTypeface(null, Typeface.NORMAL);
+                    item.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
+
+                    item.setOnClickListener(v -> {
+                        for (int c = 0; c < countryListContainer.getChildCount(); c++) {
+                            TextView child = (TextView) countryListContainer.getChildAt(c);
+                            child.setTypeface(null, Typeface.NORMAL);
+                            child.setTextColor(ContextCompat.getColor(requireContext(), R.color.card_foreground));
+                        }
+
+                        item.setTypeface(null, Typeface.BOLD);
+                        item.setTextColor(ContextCompat.getColor(requireContext(), R.color.foreground));
+
+                        selectedIndex[0] = idx;
+                        tvSelectedCountry.setText(fallbackCountries.get(idx));
+                        tvSelectedCountry.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_foreground));
+                        arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
+                        cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
+
+                        cardCountryList.setVisibility(View.GONE);
+                        arrowCountry.animate().rotation(90f).setDuration(160).start();
+                    });
+
+                    countryListContainer.addView(item);
+                }
+
+                countriesLoaded[0] = true;
+            }
+        });
+
+        // Toggle country list
         cardCountry.setOnClickListener(v -> {
             if (cardCountryList.getVisibility() == View.GONE) {
                 cardCountryList.setVisibility(View.VISIBLE);
@@ -342,6 +655,7 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
+        // Edit button
         btnEdit.setOnClickListener(v -> {
             String newName = editDeviceName.getText() != null ? editDeviceName.getText().toString().trim() : "";
             if (newName.isEmpty()) {
@@ -349,15 +663,78 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
                 return;
             }
 
-            device.setName(newName);
-            deviceAdapter.notifyItemChanged(position);
-            Toast.makeText(getContext(), "Dispositivo editado", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
+            String newAddress = editAddress.getText() != null ? editAddress.getText().toString().trim() : "";
+            String newPostal = editPostal.getText() != null ? editPostal.getText().toString().trim() : "";
+
+            Integer countryIdToSend = null;
+            if (selectedIndex[0] >= 0 && !apiCountries.isEmpty() && selectedIndex[0] < apiCountries.size()) {
+                countryIdToSend = apiCountries.get(selectedIndex[0]).getId();
+            } else if (deviceCountryId[0] != null) {
+                countryIdToSend = deviceCountryId[0];
+            }
+
+// validação defensiva
+            if (countryIdToSend == null) {
+                Toast.makeText(getContext(), "Por favor selecione um país", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            DeviceRequest updateReq = new DeviceRequest(
+                    newName,
+                    device.getSerialNumber(),
+                    countryIdToSend, // agora garantido não-nulo
+                    newAddress,
+                    newPostal
+            );
+
+
+            devicesController.updateDevice(device.getId(), updateReq, new Callback<SimpleResponse>() {
+                @Override
+                public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                    if (!isAdded()) return;
+
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        DeviceItem updated = new DeviceItem(
+                                device.getId(),
+                                newName,
+                                newAddress,
+                                device.getSerialNumber(),
+                                device.isAlarm(),
+                                newAddress,
+                                newPostal
+                        );
+
+                        if (position >= 0 && position < deviceList.size()) {
+                            deviceList.remove(position);
+                            deviceAdapter.notifyItemRemoved(position);
+                        }
+
+                        int newPos = deviceList.size();
+                        deviceList.add(updated);
+                        deviceAdapter.notifyItemInserted(newPos);
+                        rvDevices.scrollToPosition(newPos);
+
+                        Toast.makeText(getContext(), "Dispositivo editado", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        String msg = "Erro ao editar dispositivo";
+                        if (response.errorBody() != null) {
+                            try { msg = response.errorBody().string(); } catch (IOException e) { /* ignore */ }
+                        }
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SimpleResponse> call, Throwable t) {
+                    if (!isAdded()) return;
+                    Toast.makeText(getContext(), "Falha na rede: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         dialog.show();
     }
-
 
     // -----------------------
     // DELETE DIALOG
@@ -381,15 +758,46 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
         btnDelete.setOnClickListener(v -> {
-            if (position >= 0 && position < deviceList.size()) {
-                String name = device.getName();
-                deviceList.remove(position);
-                deviceAdapter.notifyItemRemoved(position);
-                Toast.makeText(getContext(), name + " eliminado", Toast.LENGTH_SHORT).show();
-            } else {
+            if (position < 0 || position >= deviceList.size()) {
                 Toast.makeText(getContext(), "Erro ao eliminar dispositivo", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+                return;
             }
-            dialog.dismiss();
+
+            DevicesController devicesController = new DevicesController(requireContext(), ApiClient.getService());
+
+            devicesController.deleteDevice(device.getId(), new Callback<SimpleResponse>() {
+                @Override
+                public void onResponse(Call<SimpleResponse> call, Response<SimpleResponse> response) {
+                    if (!isAdded()) return;
+
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        String name = device.getName();
+                        deviceList.remove(position);
+                        deviceAdapter.notifyItemRemoved(position);
+
+                        if (!deviceList.isEmpty()) {
+                            int last = deviceList.size() - 1;
+                            rvDevices.scrollToPosition(last);
+                        }
+
+                        Toast.makeText(getContext(), name + " eliminado", Toast.LENGTH_SHORT).show();
+                    } else {
+                        String msg = "Erro ao eliminar dispositivo";
+                        if (response.errorBody() != null) {
+                            try { msg = response.errorBody().string(); } catch (IOException e) { /* ignore */ }
+                        }
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
+                    }
+                    dialog.dismiss();
+                }
+
+                @Override
+                public void onFailure(Call<SimpleResponse> call, Throwable t) {
+                    if (!isAdded()) return;
+                    Toast.makeText(getContext(), "Falha na rede: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         dialog.show();

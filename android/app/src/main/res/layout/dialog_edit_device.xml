@@ -44,7 +44,8 @@
         app:cardBackgroundColor="@color/card"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:outlineSpotShadowColor="@color/shadow_color">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -86,7 +87,8 @@
         app:cardBackgroundColor="@color/disabled"
         app:layout_constraintTop_toBottomOf="@id/cardDeviceName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:outlineSpotShadowColor="@color/shadow_color">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -124,7 +126,8 @@
         app:cardBackgroundColor="@color/primary"
         app:layout_constraintTop_toBottomOf="@id/cardSerialNumber"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:outlineSpotShadowColor="@color/shadow_color">
 
         <LinearLayout
             android:id="@+id/countryDropdown"
@@ -199,7 +202,8 @@
         app:cardBackgroundColor="@color/card"
         app:layout_constraintTop_toBottomOf="@id/cardCountryList"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:outlineSpotShadowColor="@color/shadow_color">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -241,7 +245,8 @@
         app:cardBackgroundColor="@color/card"
         app:layout_constraintTop_toBottomOf="@id/cardAddress"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:outlineSpotShadowColor="@color/shadow_color">
 
         <LinearLayout
             android:layout_width="match_parent"

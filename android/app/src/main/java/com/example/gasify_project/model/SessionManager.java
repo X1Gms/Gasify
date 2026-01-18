@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Patterns;
 
+import com.example.gasify_project.model.account.User;
+
 public class SessionManager {
     private static final String PREFS_NAME = "GasifySession";
     private static final String KEY_TOKEN = "token";

@@ -13,14 +13,21 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.gasify_project.controller.NotificationsController;
 import com.example.gasify_project.model.SessionManager;
+import com.example.gasify_project.model.SimpleResponse;
 import com.example.gasify_project.view.DevicesFragment;
 import com.example.gasify_project.view.HomeFragment;
-import com.example.gasify_project.view.LoginActivity;
+import com.example.gasify_project.view.account.LoginActivity;
 import com.example.gasify_project.view.NotificationsFragment;
-import com.example.gasify_project.view.ProfileFragment;
+import com.example.gasify_project.view.account.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialCardView btnNotifications;
 
     private TextView tvUserName; // new: shows cached user name
+    private TextView tvNotificationBadge; // shows unread count badge
 
     private SharedPreferences sessionPrefs;
     private SharedPreferences.OnSharedPreferenceChangeListener prefsChangeListener;
@@ -58,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
 
         // find tvUserName (make sure this id exists in your layout)
         tvUserName = findViewById(R.id.tvUserName);
+        // notification badge
+        tvNotificationBadge = findViewById(R.id.tvNotificationBadge);
 
         // Load default fragment
         if (savedInstanceState == null) {
@@ -112,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        // Refresh notification badge on start
+        refreshNotificationBadge();
     }
 
     @Override
@@ -131,13 +143,82 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void refreshNotificationBadge() {
+        NotificationsController controller = new NotificationsController(this, com.example.gasify_project.api.ApiClient.getService());
+        controller.fetchNotifications(new retrofit2.Callback<com.example.gasify_project.model.notification.NotificationsResponse>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.gasify_project.model.notification.NotificationsResponse> call, retrofit2.Response<com.example.gasify_project.model.notification.NotificationsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    int unread = response.body().getUnread_count();
+                    runOnUiThread(() -> {
+                        if (tvNotificationBadge != null) {
+                            if (unread > 0) {
+                                tvNotificationBadge.setText(String.valueOf(unread));
+                                tvNotificationBadge.setVisibility(android.view.View.VISIBLE);
+                            } else {
+                                tvNotificationBadge.setVisibility(android.view.View.GONE);
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<com.example.gasify_project.model.notification.NotificationsResponse> call, Throwable t) {
+                runOnUiThread(() -> {
+                    if (tvNotificationBadge != null) tvNotificationBadge.setVisibility(android.view.View.GONE);
+                });
+            }
+        });
+    }
+
     private void setupButtons() {
         if (btnThemeToggle != null) {
             btnThemeToggle.setOnClickListener(v -> toggleTheme());
         }
 
         if (btnNotifications != null) {
-            btnNotifications.setOnClickListener(v -> openNotificationsFragment());
+            btnNotifications.setOnClickListener(v -> {
+                NotificationsController controller = new NotificationsController(MainActivity.this, com.example.gasify_project.api.ApiClient.getService());
+                controller.fetchNotifications(new retrofit2.Callback<com.example.gasify_project.model.notification.NotificationsResponse>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<com.example.gasify_project.model.notification.NotificationsResponse> call, retrofit2.Response<com.example.gasify_project.model.notification.NotificationsResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            java.util.List<com.example.gasify_project.model.notification.NotificationDto> items = response.body().getNotifications();
+                            if (items != null) {
+                                for (com.example.gasify_project.model.notification.NotificationDto dto : items) {
+                                    if (dto.getRead_at() == null) {
+                                        String nowIso;
+                                        try {
+                                            SimpleDateFormat sdf =
+                                                    new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.UK);
+                                            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                            nowIso = sdf.format(new Date(System.currentTimeMillis()));
+                                        } catch (Exception e) {
+                                            nowIso = "";
+                                        }
+
+                                        controller.markNotificationAsRead(dto.getId(), nowIso, new retrofit2.Callback<SimpleResponse>() {
+                                            @Override public void onResponse(retrofit2.Call<com.example.gasify_project.model.SimpleResponse> call, retrofit2.Response<com.example.gasify_project.model.SimpleResponse> resp) {}
+                                            @Override public void onFailure(retrofit2.Call<com.example.gasify_project.model.SimpleResponse> call, Throwable t) {}
+                                        });
+                                    }
+                                }
+                            }
+                            runOnUiThread(() -> {
+                                if (tvNotificationBadge != null) tvNotificationBadge.setVisibility(android.view.View.GONE);
+                            });
+                        }
+                        // Open notifications after attempting to mark as read
+                        openNotificationsFragment();
+                    }
+                    @Override
+                    public void onFailure(retrofit2.Call<com.example.gasify_project.model.notification.NotificationsResponse> call, Throwable t) {
+                        // open anyway
+                        openNotificationsFragment();
+                    }
+                });
+            });
         }
     }
 

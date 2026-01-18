@@ -24,7 +24,25 @@ function getMyDeviceHandler(req, res) {
 
   // check ownership
   const checkOwnershipSql = mysql.format(
-    `SELECT d.id, EXISTS(SELECT 1 FROM reading r JOIN mcu_detection md ON md.reading_id = r.id WHERE r.device_id = d.id AND md.canceled = 0) as has_active_alert FROM device d WHERE d.id = ? AND d.user_id = ?`,
+    `
+    SELECT
+      d.id,
+      d.name,
+      d.serial_number,
+      d.address,
+      d.postal_code,
+      c.id as country_id,
+      c.name AS country,
+      EXISTS(
+        SELECT 1
+        FROM reading r
+        JOIN mcu_detection md ON md.reading_id = r.id
+        WHERE r.device_id = d.id AND md.canceled = 0
+      ) as has_active_alert
+    FROM device d
+    JOIN country c ON c.id = d.country_id
+    WHERE d.id = ? AND d.user_id = ?
+    `,
     [deviceId, userId]
   );
   mysqlPool.query(checkOwnershipSql, (err, results) => {
@@ -42,6 +60,8 @@ function getMyDeviceHandler(req, res) {
         message: "Device not found",
       });
     }
+
+    const device = results[0];
 
     // get latest readings
     const getLateastReadingSql = mysql.format(
@@ -73,7 +93,13 @@ function getMyDeviceHandler(req, res) {
         const response = formatResponse(latestReadingRows[0], historyRows);
         return res.json({
           success: true,
-          has_active_alert: !!results[0].has_active_alert, // ensure boolean
+          name: device.name,
+          serial_number: device.serial_number,
+          address: device.address,
+          postal_code: device.postal_code,
+          country_id: device.country_id,
+          country: device.country,
+          has_active_alert: !!device.has_active_alert, // ensure boolean
           ...response,
         });
       });

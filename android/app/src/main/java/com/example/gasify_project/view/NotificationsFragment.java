@@ -12,11 +12,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gasify_project.R;
-import com.example.gasify_project.model.AlarmNotification;
-import com.example.gasify_project.model.NotificationAdapter;
+import com.example.gasify_project.model.notification.AlarmNotification;
+import com.example.gasify_project.model.notification.NotificationAdapter;
+import com.example.gasify_project.controller.NotificationsController;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class NotificationsFragment extends Fragment {
 
@@ -50,37 +55,39 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void loadNotifications() {
-        // TODO: Load from database or API
-        // Sample data
-        notificationList.add(new AlarmNotification(
-                "1",
-                "Device #01",
-                "Portugal",
-                "Baixo",
-                "Elevada",
-                "Ativo",
-                System.currentTimeMillis()
-        ));
+        // Load notifications from API
+        NotificationsController controller = new NotificationsController(getContext(), com.example.gasify_project.api.ApiClient.getService());
+        controller.fetchNotifications(new retrofit2.Callback<com.example.gasify_project.model.notification.NotificationsResponse>() {
+            @Override
+            public void onResponse(retrofit2.Call<com.example.gasify_project.model.notification.NotificationsResponse> call, retrofit2.Response<com.example.gasify_project.model.notification.NotificationsResponse> response) {
+                notificationList.clear();
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    java.util.List<com.example.gasify_project.model.notification.NotificationDto> items = response.body().getNotifications();
+                    if (items != null) {
+                        notificationList.addAll(com.example.gasify_project.model.notification.NotificationMapper.fromDtoList(items));
+                    }
+                }
 
-        notificationList.add(new AlarmNotification(
-                "2",
-                "Device #02",
-                "Portugal",
-                "Elevado",
-                "Baixo",
-                "Cancelado",
-                System.currentTimeMillis() - 3600000 // 1 hour ago
-        ));
+                if (notificationList.isEmpty()) {
+                    emptyState.setVisibility(View.VISIBLE);
+                    rvNotifications.setVisibility(View.GONE);
+                } else {
+                    emptyState.setVisibility(View.GONE);
+                    rvNotifications.setVisibility(View.VISIBLE);
+                }
 
-        if (notificationList.isEmpty()) {
-            emptyState.setVisibility(View.VISIBLE);
-            rvNotifications.setVisibility(View.GONE);
-        } else {
-            emptyState.setVisibility(View.GONE);
-            rvNotifications.setVisibility(View.VISIBLE);
-        }
+                notificationAdapter.notifyDataSetChanged();
+            }
 
-        notificationAdapter.notifyDataSetChanged();
+            @Override
+            public void onFailure(retrofit2.Call<com.example.gasify_project.model.notification.NotificationsResponse> call, Throwable t) {
+                // On failure, show empty state
+                notificationList.clear();
+                emptyState.setVisibility(View.VISIBLE);
+                rvNotifications.setVisibility(View.GONE);
+                notificationAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void addNotification(AlarmNotification notification) {
@@ -90,4 +97,6 @@ public class NotificationsFragment extends Fragment {
         notificationAdapter.notifyItemInserted(0);
         rvNotifications.smoothScrollToPosition(0);
     }
+
+
 }

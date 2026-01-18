@@ -1,26 +1,41 @@
 package com.example.gasify_project.api;
 
-import com.example.gasify_project.model.DeleteAccountRequest;
-import com.example.gasify_project.model.LoginResponse;
-import com.example.gasify_project.model.MeResponse;
+import com.example.gasify_project.model.country.CountriesResponse;
+import com.example.gasify_project.model.account.DeleteAccountRequest;
+import com.example.gasify_project.model.device.DeviceDetailResponse;
+import com.example.gasify_project.model.device.DeviceRequest;
+import com.example.gasify_project.model.device.DevicesResponse;
+import com.example.gasify_project.model.account.ForgotPasswordRequest;
+import com.example.gasify_project.model.account.LoginResponse;
+import com.example.gasify_project.model.account.MeResponse;
+import com.example.gasify_project.model.account.RegisterRequest;
+import com.example.gasify_project.model.account.ResetPasswordRequest;
 import com.example.gasify_project.model.SimpleResponse;
-import com.example.gasify_project.model.UpdateProfileRequest;
-import com.example.gasify_project.model.User;
+import com.example.gasify_project.model.account.UpdateProfileRequest;
+import com.example.gasify_project.model.account.User;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import com.example.gasify_project.model.account.VerifyCodeRequest;
+import com.example.gasify_project.model.notification.NotificationsResponse;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public class ApiClient {
     private static final String BASE_URL = "http://10.0.2.2:8081/";
     private static ApiService instance;
 
     public interface ApiService {
+        @GET("countries")
+        Call<CountriesResponse> getCountries(@Header("Authorization") String authorization);
+
         @POST("auth/login")
         Call<LoginResponse> login(@Body User user);
 
@@ -38,76 +53,40 @@ public class ApiClient {
 
         @GET("users/me")
         Call<MeResponse> getMe(@Header("Authorization") String authorization);
-
+        @GET("users/me/devices")
+        Call<DevicesResponse> getMyDevices(@Header("Authorization") String authorization);
+        @GET("users/me/notifications")
+        Call<NotificationsResponse> getNotifications(@Header("Authorization") String authorization);
+        @PATCH("users/me/notifications/{id}")
+        Call<SimpleResponse> markNotificationRead(@Header("Authorization") String authorization, @Path("id") int id, @Body java.util.Map<String, String> body);
+        @GET("users/me/devices/{id}")
+        Call<DeviceDetailResponse> getDevice(
+                @Header("Authorization") String authorization,
+                @Path("id") int id,
+                @Query("range") String range
+        );
+        @POST("users/me/devices")
+        Call<SimpleResponse> createDevice(
+                @Header("Authorization") String authorization,
+                @Body DeviceRequest deviceRequest
+        );
+        @PATCH("users/me/devices/{id}")
+        Call<SimpleResponse> updateDevice(
+                @Header("Authorization") String authorization,
+                @Path("id") int id,
+                @Body DeviceRequest deviceRequest
+        );
+        @DELETE("users/me/devices/{id}")
+        Call<SimpleResponse> deleteDevice(
+                @Header("Authorization") String authorization,
+                @Path("id") int id
+        );
         @PATCH("users/me")
         Call<SimpleResponse> updateProfile(@Header("Authorization") String token, @Body UpdateProfileRequest request);
 
         @HTTP(method = "DELETE", path = "users/me", hasBody = true)
         Call<SimpleResponse> deleteAccount(@Header("Authorization") String token, @Body DeleteAccountRequest request);
     }
-
-    public static class RegisterRequest {
-        private String fullName;
-        private String email;
-        private String password;
-        private String passwordConfirmation;
-
-        public RegisterRequest(String fullName, String email, String password, String passwordConfirmation) {
-            this.fullName = fullName;
-            this.email = email;
-            this.password = password;
-            this.passwordConfirmation = passwordConfirmation;
-        }
-
-        // Getters
-        public String getFullName() { return fullName; }
-        public String getEmail() { return email; }
-        public String getPassword() { return password; }
-        public String getPasswordConfirmation() { return passwordConfirmation; }
-    }
-
-    public static class ForgotPasswordRequest {
-        private String email;
-
-        public ForgotPasswordRequest(String email) {
-            this.email = email;
-        }
-
-        public String getEmail() { return email; }
-    }
-
-    public static class VerifyCodeRequest {
-        private String email;
-        private String code;
-
-        public VerifyCodeRequest(String email, String code) {
-            this.email = email;
-            this.code = code;
-        }
-
-        public String getEmail() { return email; }
-        public String getCode() { return code; }
-    }
-
-    public static class ResetPasswordRequest {
-        private String email;
-        private String code;
-        private String password;
-        private String passwordConfirmation;
-
-        public ResetPasswordRequest(String email, String code, String password, String passwordConfirmation) {
-            this.email = email;
-            this.code = code;
-            this.password = password;
-            this.passwordConfirmation = passwordConfirmation;
-        }
-
-        public String getEmail() { return email; }
-        public String getCode() { return code; }
-        public String getPassword() { return password; }
-        public String getPasswordConfirmation() { return passwordConfirmation; }
-    }
-
     public static ApiService getService() {
         if (instance == null) {
             Retrofit retrofit = new Retrofit.Builder()

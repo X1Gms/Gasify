@@ -4,22 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login – RSSF / PWDAM</title>
+    <title>Login</title>
     <script>
         const theme = localStorage.getItem('theme');
         if (theme === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
         const authImg = document.getElementById("auth-img");
-if (authImg && theme === "dark") {
-    authImg.src = "img/authimage2.png";
-}
+        if (authImg && theme === "dark") {
+            authImg.src = "img/authimage2.png";
+        }
 
     </script>
 
     <link rel="stylesheet" href="css/color.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/toasts.css">
+    <script src="js/toasts.js"></script>
     <script src="js/sessions.js" defer></script>
     <script src="js/login.js" defer></script>
     <script src="js/eye.js" defer> </script>
@@ -52,6 +54,17 @@ if (authImg && theme === "dark") {
                         </svg>
                     </span>
                 </div>
+                <div class="auth-options-row">
+                    <label class="remember-me-custom" onclick="toggleRemember()">
+                        <input type="checkbox" id="rememberMe" style="display: none;">
+                        <div class="custom-box" id="customBox"></div>
+                        <span class="auth-text-orange">Lembrar-me</span>
+                    </label>
+
+                    <a href="recoverpass.html" class="auth-text-small forgot-link">
+                        Esqueci-me da <br> palavra-passe
+                    </a>
+                </div>
 
                 <button id="loginButton">Entrar</button>
 
@@ -65,7 +78,7 @@ if (authImg && theme === "dark") {
 
         <!-- COLUNA DIREITA (IMAGEM) -->
         <div class="auth-right">
-            <img id="auth-img"  alt="Imagem Login">
+            <img id="auth-img" alt="Imagem Login">
         </div>
 
     </div>
@@ -76,6 +89,25 @@ if (authImg && theme === "dark") {
             const loginBtn = document.getElementById("loginButton");
             if (loginBtn && typeof loginPage === "function") loginBtn.onclick = loginPage;
         };
+    </script>
+
+
+    <script>
+
+        function toggleRemember() {
+            const checkbox = document.getElementById("rememberMe");
+            const box = document.getElementById("customBox");
+
+            // Inverte o estado do input escondido
+            checkbox.checked = !checkbox.checked;
+
+            // Muda o visual do quadrado
+            if (checkbox.checked) {
+                box.classList.add("checked");
+            } else {
+                box.classList.remove("checked");
+            }
+        }
     </script>
 
 </body>

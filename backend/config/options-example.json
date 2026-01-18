@@ -8,7 +8,8 @@
     "user": "root",
     "password": "root",
     "database": "gasify",
-    "connectionLimit": 10
+    "connectionLimit": 10,
+    "multipleStatements": true
   },
   "auth": {
     "saltRounds": 12
@@ -29,5 +30,13 @@
   "forgotPassword": {
     "codeLength": 6,
     "codeExpirationTimeInMinutes": 5
+  },
+  "ttn": {
+    "appId": "",
+    "devId": "",
+    "apiKey": "",
+    "region": "eu1",
+    "fPort": 2,
+    "priority": "HIGH"
   }
 }

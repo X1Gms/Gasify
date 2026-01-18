@@ -1,8 +1,5 @@
 const { Router } = require("express");
 
-// import middlewares
-const { requireAuth } = require("../middlewares/require-auth");
-
 // import handlers
 const {
   getCountriesHandler,

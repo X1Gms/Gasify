@@ -50,7 +50,7 @@
     --danger-soft: #ffe5e5;
 
     --success-bg: rgba(100, 200, 100, 0.18);
-    --success-border: rgba(100, 200, 100, 0.45);
+    --success-border: rgb(32, 70, 32);
     --success-text: #1b5e20;
 
     /* ===== OVERLAY ===== */
@@ -115,7 +115,7 @@
 
     --success-bg: rgba(90, 200, 120, 0.20);
     --success-border: rgba(90, 200, 120, 0.45);
-    --success-text: #9BE7B0;
+    --success-text: #42bb64;
 
     /* ===== OVERLAY ===== */
     --overlay-bg: rgba(0, 0, 0, 0.70);

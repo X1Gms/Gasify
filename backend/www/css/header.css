@@ -1,5 +1,5 @@
 /* ======================
-   HEADER (FIXED)
+    HEADER (FIXED)
 ====================== */
 .top-bar {
     position: fixed;
@@ -9,12 +9,12 @@
     margin: 0 auto;
 
     width: auto;
-    max-width: 1050px;
+    max-width: 1060px;
 
     background: var(--bg-card);
     backdrop-filter: blur(12px);
     border-radius: 16px;
-    padding: 14px 20px;
+    padding: 12px 20px;
     border: 1px solid var(--glass-border);
     box-shadow: 0 4px 18px var(--shadow-main);
 
@@ -22,33 +22,51 @@
     align-items: center;
     gap: 20px;
     z-index: 998;
+    min-height: 85px; /* Altura ajustada para as duas linhas */
 }
 
 
 /* ======================
-   MENU BUTTON
+    MENU BUTTON
 ====================== */
 .menu-btn {
     font-size: 26px;
     background: none;
+    font-weight: bolder;
     border: none;
     cursor: pointer;
-    color: var(--text-main);
-}
-
-/* ======================
-   WELCOME TEXT
-====================== */
-.welcome-text {
-    margin: 0;
-    flex-grow: 1;
-    font-weight: bold;
-    font-size: 22px;
     color: var(--primary-dark);
 }
 
 /* ======================
-   ACTION BUTTONS
+    WELCOME TEXT (CORRIGIDO)
+====================== */
+.welcome-text {
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column; /* Força o span para a linha de baixo */
+    font-weight: bold;
+    font-size: 22px; 
+    color: var(--text-main);
+    /* Removido o uppercase daqui */
+    text-transform: none; 
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+}
+
+/* Estilo para o span id="userName" */
+#userName {
+    font-size: 24px; 
+    font-weight: bold;
+    /* Garante que o nome não fica em maiúsculas */
+    text-transform: none; 
+     color: var(--primary-dark);
+    margin-top: 2px;
+}
+
+/* ======================
+    ACTION BUTTONS
 ====================== */
 .top-actions {
     display: flex;
@@ -71,7 +89,7 @@
 }
 
 /* ======================
-   SIDEBAR LEFT
+    SIDEBAR LEFT
 ====================== */
 .sidebar {
     position: fixed;
@@ -95,7 +113,7 @@
 }
 
 /* ======================
-   SIDEBAR HEADER
+    SIDEBAR HEADER
 ====================== */
 .sidebar-header {
     padding-top: 40px;
@@ -117,7 +135,7 @@
 }
 
 /* ======================
-   SIDEBAR MENU
+    SIDEBAR MENU
 ====================== */
 .sidebar-menu,
 .sidebar-footer {
@@ -146,7 +164,7 @@
 }
 
 /* ======================
-   SIDEBAR FOOTER TEXT
+    SIDEBAR FOOTER TEXT
 ====================== */
 .sidebar-bottom-text {
     text-align: center;
@@ -156,7 +174,7 @@
 }
 
 /* ======================
-   RIGHT SIDEBAR (NOTIFICATIONS)
+    RIGHT SIDEBAR (NOTIFICATIONS)
 ====================== */
 .notif-sidebar {
     position: fixed;
@@ -178,7 +196,7 @@
 }
 
 /* ======================
-   NOTIF HEADER
+    NOTIF HEADER
 ====================== */
 .notif-header {
     display: flex;
@@ -201,7 +219,7 @@
 }
 
 /* ======================
-   NOTIF LIST
+    NOTIF LIST
 ====================== */
 .notif-list {
     display: flex;
@@ -210,7 +228,7 @@
 }
 
 /* ======================
-   NOTIF ITEM
+    NOTIF ITEM
 ====================== */
 .notif-item {
     background: var(--bg-card);
@@ -232,7 +250,7 @@
 }
 
 /* ======================
-   NOTIF INFO
+    NOTIF INFO
 ====================== */
 .notif-info strong {
     display: block;
@@ -258,7 +276,7 @@
 }
 
 /* ======================
-   NOTIF EXTRA
+    NOTIF EXTRA
 ====================== */
 .notif-extra {
     display: none;
@@ -274,7 +292,7 @@
 }
 
 /* ======================
-   NOTIF EXPAND BTN
+    NOTIF EXPAND BTN
 ====================== */
 .notif-expand {
     background: none;

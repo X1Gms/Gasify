@@ -1,0 +1,28 @@
+{
+  "server": {
+    "PORT": 3000,
+    "mqtt": {
+      "PORT": 1800
+    }
+  },
+  "security": {
+    "3DES": []
+  },
+  "ttn": {
+    "apikey": "",
+    "username": "",
+    "url": "",
+    "connectTimeout": 4000,
+    "clean": true
+  },
+  "mysql": {
+    "multipleStatements": true,
+    "host": "localhost",
+    "database": "gasify",
+    "user": "root",
+    "password": "root"
+  },
+  "notification": {
+    "webhookUrl": ""
+  }
+}

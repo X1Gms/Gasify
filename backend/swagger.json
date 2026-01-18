@@ -34,6 +34,24 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "User already exists (returns success to prevent user enumeration)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "201": {
             "description": "User registered successfully",
             "content": {
@@ -376,7 +394,7 @@
       },
       "patch": {
         "summary": "Update current user",
-        "description": "Update user profile information. Password fields are optional - if provided, both password and passwordConfirmation must be included and meet security requirements.",
+        "description": "Update user profile information. At least one field (fullName, email, or newPassword) must be provided. Password fields are optional - if provided, both newPassword and newPasswordConfirmation must be included and meet security requirements. currentPassword is required if newPassword is provided.",
         "tags": ["Users"],
         "security": [
           {
@@ -395,7 +413,8 @@
                   "summary": "Update only profile information",
                   "value": {
                     "fullName": "John Lee",
-                    "email": "john.lee@example.com"
+                    "email": "john.lee@example.com",
+                    "currentPassword": "OldPassword123!"
                   }
                 },
                 "updateWithPassword": {
@@ -403,8 +422,9 @@
                   "value": {
                     "fullName": "John Lee",
                     "email": "john.lee@example.com",
-                    "password": "NewPassword123!",
-                    "passwordConfirmation": "NewPassword123!"
+                    "newPassword": "NewPassword123!",
+                    "newPasswordConfirmation": "NewPassword123!",
+                    "currentPassword": "OldPassword123!"
                   }
                 }
               }
@@ -431,9 +451,10 @@
                 },
                 "examples": {
                   "missingFields": {
-                    "summary": "Missing required fields",
+                    "summary": "Missing fields",
                     "value": {
-                      "message": "Missing fields, expected: fullName, email"
+                      "success": false,
+                      "message": "At least one field is expected: fullName, email, newPassword"
                     }
                   },
                   "invalidEmail": {
@@ -457,7 +478,19 @@
                   "incompletePasswordFields": {
                     "summary": "Both password fields required",
                     "value": {
-                      "message": "Both password and passwordConfirmation are required"
+                      "message": "Both newPassword and newPasswordConfirmation are required"
+                    }
+                  },
+                  "missingCurrentPassword": {
+                    "summary": "Missing current password",
+                    "value": {
+                      "message": "Current password is required to change password"
+                    }
+                  },
+                  "samePassword": {
+                    "summary": "New password same as current",
+                    "value": {
+                      "message": "New password cannot be the same as the current password"
                     }
                   }
                 }
@@ -476,6 +509,16 @@
           },
           "404": {
             "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already in use",
             "content": {
               "application/json": {
                 "schema": {
@@ -532,12 +575,38 @@
               }
             }
           },
-          "401": {
-            "description": "Unauthorized",
+          "400": {
+            "description": "Missing password field",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DefaultResponse"
+                },
+                "examples": {
+                  "missingPassword": {
+                    "value": {
+                      "success": false,
+                      "message": "Missing fields, expected: password"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized or incorrect password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                },
+                "examples": {
+                  "incorrectPassword": {
+                    "value": {
+                      "success": false,
+                      "message": "Incorrect password"
+                    }
+                  }
                 }
               }
             }
@@ -580,7 +649,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DefaultResponse"
+                  "$ref": "#/components/schemas/GetNotificationsResponse"
                 }
               }
             }
@@ -621,7 +690,7 @@
     "/users/me/notifications/{id}": {
       "patch": {
         "summary": "Update a current user notification",
-        "description": "At the moment, this is only used to mark a notification as read, but it can be used to update other fields in the future because it is scalable.",
+        "description": "Marks a notification as read by setting its read_at timestamp. This endpoint does not require a request body - it automatically marks the notification as read when called. The endpoint is designed to be scalable for future updates to other notification fields.",
         "tags": ["Users"],
         "security": [
           {
@@ -645,18 +714,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "notifications": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -666,18 +724,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "notifications": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -687,18 +734,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "notifications": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -708,18 +744,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "notifications": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -729,18 +754,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "notifications": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/DefaultResponse"
                 }
               }
             }
@@ -835,12 +849,24 @@
               },
               "examples": {
                 "createDevice": {
+                  "summary": "Create device without fake readings",
                   "value": {
                     "name": "My Device",
                     "serialNumber": "SN123456",
                     "countryId": 1,
                     "address": "123 Main St",
                     "postalCode": "1000-001"
+                  }
+                },
+                "createDeviceWithReadings": {
+                  "summary": "Create device with fake readings",
+                  "value": {
+                    "name": "My Device",
+                    "serialNumber": "SN123456",
+                    "countryId": 1,
+                    "address": "123 Main St",
+                    "postalCode": "1000-001",
+                    "seedReadings": true
                   }
                 }
               }
@@ -859,11 +885,36 @@
             }
           },
           "400": {
-            "description": "Missing fields",
+            "description": "Missing fields or invalid seedReadings value",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DefaultResponse"
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/DefaultResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "missingFields": {
+                    "value": {
+                      "error": "Missing fields, expected: name, serialNumber, countryId, address, postalCode"
+                    }
+                  },
+                  "invalidSeedReadings": {
+                    "value": {
+                      "success": false,
+                      "message": "Expected seedReadings to be a boolean value, got string"
+                    }
+                  }
                 }
               }
             }
@@ -1158,6 +1209,60 @@
           }
         }
       }
+    },
+    "/users/me/devices/{id}/alert": {
+      "delete": {
+        "summary": "Cancel device alert",
+        "tags": ["Users"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the device",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Device alert cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Device not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1182,11 +1287,17 @@
           "name": {
             "type": "string"
           },
-          "code": {
-            "type": "string"
+          "iso_code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code (2 characters)"
+          },
+          "emergency_number": {
+            "type": "string",
+            "maxLength": 10,
+            "description": "Emergency phone number for the country"
           }
         },
-        "required": ["id", "name", "code"]
+        "required": ["id", "name", "iso_code", "emergency_number"]
       },
       "GetCountriesResponse": {
         "type": "object",
@@ -1219,6 +1330,10 @@
           },
           "postalCode": {
             "type": "string"
+          },
+          "seedReadings": {
+            "type": "boolean",
+            "description": "If true, creates 12 fake readings for the newly created device. If false or not provided, only creates the device without readings. If provided, must be a valid boolean value."
           }
         },
         "required": [
@@ -1246,6 +1361,27 @@
         "properties": {
           "success": {
             "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "serial_number": {
+            "type": "string"
+          },
+          "has_active_alert": {
+            "type": "boolean"
+          },
+          "address": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
+          },
+          "country_id": {
+            "type": "integer"
+          },
+          "country": {
+            "type": "string"
           },
           "cards": {
             "type": "object",
@@ -1328,14 +1464,20 @@
           "user_id": {
             "type": "integer"
           },
+          "country_id": {
+            "type": "integer"
+          },
           "name": {
             "type": "string"
           },
           "serial_number": {
             "type": "string"
           },
-          "located_at": {
-            "type": ["string", "null"]
+          "address": {
+            "type": "string"
+          },
+          "postal_code": {
+            "type": "string"
           },
           "created_at": {
             "type": "string",
@@ -1344,15 +1486,23 @@
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "has_active_alert": {
+            "type": "boolean",
+            "description": "Indicates if the device has an active alert (non-canceled MCU detection)"
           }
         },
         "required": [
           "id",
           "user_id",
+          "country_id",
           "name",
           "serial_number",
+          "address",
+          "postal_code",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "has_active_alert"
         ]
       },
       "GetMyDevicesResponse": {
@@ -1360,6 +1510,23 @@
         "properties": {
           "success": {
             "type": "boolean"
+          },
+          "cards": {
+            "type": "object",
+            "properties": {
+              "total_devices": {
+                "type": "integer"
+              },
+              "devices_with_active_alert": {
+                "type": "integer"
+              },
+              "avg_gas": {
+                "type": "number"
+              },
+              "avg_co": {
+                "type": "number"
+              }
+            }
           },
           "devices": {
             "type": "array",
@@ -1464,12 +1631,6 @@
               "updatedAt": {
                 "type": "string",
                 "format": "date-time"
-              },
-              "iat": {
-                "type": "integer"
-              },
-              "exp": {
-                "type": "integer"
               }
             }
           }
@@ -1482,25 +1643,30 @@
           "fullName": {
             "type": "string",
             "minLength": 3,
-            "description": "User's full name (minimum 3 characters)"
+            "description": "User's full name (minimum 3 characters, optional)"
           },
           "email": {
             "type": "string",
             "format": "email",
-            "description": "User's email address"
+            "description": "User's email address (optional)"
           },
-          "password": {
+          "newPassword": {
             "type": "string",
             "minLength": 8,
-            "description": "New password (optional). Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character. If provided, passwordConfirmation is also required."
+            "description": "New password (optional). Must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character. If provided, newPasswordConfirmation is also required."
           },
-          "passwordConfirmation": {
+          "newPasswordConfirmation": {
             "type": "string",
             "minLength": 8,
-            "description": "Password confirmation (required if password is provided). Must match the password field."
+            "description": "Password confirmation (required if newPassword is provided). Must match the newPassword field."
+          },
+          "currentPassword": {
+            "type": "string",
+            "description": "Current password (required if newPassword is provided)."
           }
         },
-        "required": ["fullName", "email"]
+        "minProperties": 1,
+        "description": "At least one property must be provided (fullName, email, or newPassword)"
       },
       "DeleteMeRequestBody": {
         "type": "object",
@@ -1603,6 +1769,112 @@
           }
         },
         "required": ["email", "code", "password", "passwordConfirmation"]
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "read_at": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "device": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "serial_number": {
+                "type": "string"
+              },
+              "address": {
+                "type": "string"
+              },
+              "postal_code": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "serial_number",
+              "address",
+              "postal_code"
+            ]
+          },
+          "reading": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "gas_type": {
+                "type": "string"
+              },
+              "gas": {
+                "type": ["number", "null"],
+                "description": "MQ2 sensor reading (Methane/LPG/Smoke)"
+              },
+              "co": {
+                "type": ["number", "null"],
+                "description": "MQ5 sensor reading (CO)"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": ["id", "gas_type", "created_at"]
+          },
+          "detection": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "canceled": {
+                "type": "boolean"
+              }
+            },
+            "required": ["id", "canceled"]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "created_at",
+          "device",
+          "reading",
+          "detection"
+        ]
+      },
+      "GetNotificationsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "unread_count": {
+            "type": "integer",
+            "description": "Total number of unread notifications"
+          },
+          "notifications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            }
+          }
+        },
+        "required": ["success", "unread_count", "notifications"]
       }
     },
     "securitySchemes": {

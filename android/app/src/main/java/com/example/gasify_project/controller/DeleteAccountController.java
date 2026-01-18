@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.gasify_project.api.ApiClient;
-import com.example.gasify_project.model.DeleteAccountRequest;
+import com.example.gasify_project.model.account.DeleteAccountRequest;
 import com.example.gasify_project.model.SessionManager;
 import com.example.gasify_project.model.SimpleResponse;
 

@@ -40,6 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         app:cardElevation="2dp"
+        android:outlineSpotShadowColor="@color/shadow_color"
         app:cardCornerRadius="12dp"
         app:cardBackgroundColor="@color/card"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
@@ -77,6 +78,7 @@
 
     <!-- Serial Number Input -->
     <com.google.android.material.card.MaterialCardView
+        android:outlineSpotShadowColor="@color/shadow_color"
         android:id="@+id/cardSerialNumber"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -120,6 +122,7 @@
     <!-- Country Dropdown (card that toggles an inline list) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardCountry"
+        android:outlineSpotShadowColor="@color/shadow_color"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -195,6 +198,7 @@
     <!-- Address Input -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardAddress"
+        android:outlineSpotShadowColor="@color/shadow_color"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
@@ -237,6 +241,7 @@
     <!-- Postal Code Input -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardPostalCode"
+        android:outlineSpotShadowColor="@color/shadow_color"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"

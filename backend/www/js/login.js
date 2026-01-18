@@ -1,22 +1,17 @@
-// ===============================================================
-// LOGIN – Standalone (Substitui o auth.js)
-// ===============================================================
+/**
+ * login.js - Lógica de Autenticação com Toasts e Remember Me
+ */
 
 const API_BASE = "http://localhost:8081"; 
+
 async function loginPage() {
     const email = document.getElementById("login_email").value.trim();
     const password = document.getElementById("login_pass").value;
-    const errorDiv = document.getElementById("login_error");
-
-    // Reset de mensagens
-    if (errorDiv) {
-        errorDiv.textContent = "";
-        errorDiv.style.display = "none";
-    }
+    const rememberMe = document.getElementById("rememberMe").checked; // Captura o estado da checkbox
 
     // 1. Validação simples
     if (!email || !password) {
-        showError("Preencha todos os campos.");
+        showToast('error', 'Campos em Falta', 'Por favor, introduza o seu email e palavra-passe.');
         return;
     }
 
@@ -32,35 +27,37 @@ async function loginPage() {
 
         const data = await res.json();
 
-        // 3. Verificação de Erro (401 Unauthorized ou 400 Bad Request)
+        // 3. Verificação de Erro
         if (!res.ok) {
-            showError(data.message || "Email ou password incorretos.");
+            showToast('error', 'Falha no Login', data.message || 'Email ou password incorretos.');
             return;
         }
 
-        // 4. SUCESSO: Guardar Token e ID do utilizador
-        // Guardamos o token para usar em pedidos futuros (Authorization: Bearer <token>)
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.user.id);
+        // 4. SUCESSO: Gestão de Sessão (Remember Me)
+        // Se Remember Me estiver ativo, usamos localStorage (permanente)
+        // Se não, usamos sessionStorage (apaga ao fechar a aba/navegador)
+        const storage = rememberMe ? localStorage : sessionStorage;
 
-        // Se o teu sessions.js tiver uma função de inicialização, podes chamá-la aqui
-        // Ex: saveSession(data.token, data.user);
+        // Limpar possíveis dados antigos de ambos para evitar conflitos
+        localStorage.clear();
+        sessionStorage.clear();
 
-        // 5. Redirecionar
-        window.location.href = "home.html";
+        storage.setItem("token", data.token);
+        storage.setItem("userId", data.user.id);
+        storage.setItem("userName", data.user.fullName);
+        // Guardamos também se o utilizador queria ser lembrado para o sessions.js saber onde procurar
+        storage.setItem("remembered", rememberMe);
+
+        // 5. Toast de Sucesso
+        showToast('success', 'Bem-vindo!', `Login efetuado com sucesso. A entrar no sistema...`);
+
+        // 6. Redirecionar
+        setTimeout(() => {
+            window.location.href = "home.html";
+        }, 1500);
 
     } catch (err) {
         console.error("Erro na ligação:", err);
-        showError("Erro de ligação ao servidor.");
-    }
-
-    // Função interna para mostrar erros na UI
-    function showError(msg) {
-        if (errorDiv) {
-            errorDiv.textContent = msg;
-            errorDiv.style.display = "block";
-        } else {
-            alert(msg);
-        }
+        showToast('error', 'Erro de Servidor', 'Não foi possível ligar ao servidor. Tente mais tarde.');
     }
 }
