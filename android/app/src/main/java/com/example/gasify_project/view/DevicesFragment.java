@@ -292,7 +292,8 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
                         arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
 
                         cardCountryList.setVisibility(View.GONE);
-                        arrowCountry.animate().rotation(-90f).setDuration(160).start();
+                        arrowCountry.animate().cancel();
+                        arrowCountry.animate().rotation(90f).setDuration(160).start();
                         cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
                     });
 
@@ -337,7 +338,8 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
                         arrowCountry.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.primary_foreground));
 
                         cardCountryList.setVisibility(View.GONE);
-                        arrowCountry.animate().rotation(-90f).setDuration(160).start();
+                        arrowCountry.animate().cancel();
+                        arrowCountry.animate().rotation(90f).setDuration(160).start();
                         cardCountry.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary));
                     });
 
@@ -350,6 +352,7 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
 
         // Toggle country list visibility + arrow rotation
         cardCountry.setOnClickListener(v -> {
+            arrowCountry.animate().cancel();
             if (cardCountryList.getVisibility() == View.GONE) {
                 cardCountryList.setVisibility(View.VISIBLE);
                 arrowCountry.animate().rotation(-90f).setDuration(160).start();
@@ -395,24 +398,10 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
                     if (!isAdded()) return;
 
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                        // sucesso no servidor — adicionar localmente e notificar adapter.
-                        // como o servidor não devolveu o novo id aqui (SimpleResponse), adicionamos localmente com id = -1
-                        DeviceItem newDevice = new DeviceItem(
-                                -1,
-                                name,
-                                "",       // locatedAt
-                                serial,
-                                false,
-                                address,
-                                postal
-                        );
-                        int position = deviceList.size();
-                        deviceList.add(newDevice);
-                        deviceAdapter.notifyItemInserted(position);
-                        rvDevices.scrollToPosition(position);
-
+                        // sucesso no servidor — recarregar lista da API para obter ID correto
                         Toast.makeText(getContext(), "Dispositivo adicionado", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
+                        loadDevices();
                     } else {
                         String msg = "Erro ao adicionar dispositivo";
                         if (response.errorBody() != null) {
@@ -643,8 +632,7 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
         });
 
         // Toggle country list
-        cardCountry.setOnClickListener(v -> {
-            if (cardCountryList.getVisibility() == View.GONE) {
+        cardCountry.setOnClickListener(v -> {            arrowCountry.animate().cancel();            if (cardCountryList.getVisibility() == View.GONE) {
                 cardCountryList.setVisibility(View.VISIBLE);
                 arrowCountry.animate().rotation(-90f).setDuration(160).start();
             } else {
@@ -694,25 +682,20 @@ public class DevicesFragment extends Fragment implements DeviceFullAdapter.OnDev
                     if (!isAdded()) return;
 
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                        DeviceItem updated = new DeviceItem(
-                                device.getId(),
-                                newName,
-                                newAddress,
-                                device.getSerialNumber(),
-                                device.isAlarm(),
-                                newAddress,
-                                newPostal
-                        );
-
+                        // Atualizar item na posição original
                         if (position >= 0 && position < deviceList.size()) {
-                            deviceList.remove(position);
-                            deviceAdapter.notifyItemRemoved(position);
+                            DeviceItem updated = new DeviceItem(
+                                    device.getId(),
+                                    newName,
+                                    "",  // locatedAt
+                                    device.getSerialNumber(),
+                                    device.isAlarm(),
+                                    newAddress,
+                                    newPostal
+                            );
+                            deviceList.set(position, updated);
+                            deviceAdapter.notifyItemChanged(position);
                         }
-
-                        int newPos = deviceList.size();
-                        deviceList.add(updated);
-                        deviceAdapter.notifyItemInserted(newPos);
-                        rvDevices.scrollToPosition(newPos);
 
                         Toast.makeText(getContext(), "Dispositivo editado", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();

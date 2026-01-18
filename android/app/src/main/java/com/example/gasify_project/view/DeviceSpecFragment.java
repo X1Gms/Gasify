@@ -236,14 +236,14 @@ public class DeviceSpecFragment extends Fragment {
     private String mapToCo(Double v){
         if (v == null) return "Nula";
         if(v <= 34) return "Baixa";
-        else if(v > 34 && v <= 69) return "Média";
+        else if(v > 34 && v < 70) return "Média";
         else return "Alta";
     }
 
     private String mapToGas(Double v){
         if (v == null) return "Nulo";
         if(v <= 2100) return "Baixa";
-        else if(v > 2100 && v <= 4199) return "Média";
+        else if(v > 2100 && v < 4200) return "Média";
         else return "Alta";
     }
 

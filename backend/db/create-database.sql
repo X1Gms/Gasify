@@ -180,13 +180,13 @@ INSERT INTO user (full_name, email, password_hash) VALUES
 -- INSERT COUNTRIES
 -- ==================================
 INSERT INTO country (name, iso_code, emergency_number) VALUES
-('Portugal', 'PT', '112'),
-('Espanha', 'ES', '112'),
-('França', 'FR', '112'),
-('Estados Unidos', 'US', '911'),
 ('Alemanha', 'DE', '112'),
+('Espanha', 'ES', '112'),
+('Estados Unidos', 'US', '911'),
+('França', 'FR', '112'),
 ('Itália', 'IT', '112'),
-('Países Baixos', 'NL', '112');
+('Países Baixos', 'NL', '112'),
+('Portugal', 'PT', '112');
 
 -- ==================================
 -- INSERT DEVICES
