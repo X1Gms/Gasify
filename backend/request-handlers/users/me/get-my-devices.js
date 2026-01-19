@@ -23,7 +23,7 @@ function getMyDevicesHandler(req, res) {
         SELECT 1
         FROM reading r
         JOIN mcu_detection md ON md.reading_id = r.id
-        WHERE r.device_id = d.id AND md.canceled = 0
+        WHERE r.device_id = d.id AND md.canceled = -1
       ) AS has_active_alert
     FROM device d
     INNER JOIN country c ON c.id = d.country_id
@@ -36,7 +36,7 @@ function getMyDevicesHandler(req, res) {
           SELECT 1
           FROM reading r2
           JOIN mcu_detection md ON md.reading_id = r2.id
-          WHERE r2.device_id = d.id AND md.canceled = 0
+          WHERE r2.device_id = d.id AND md.canceled = -1
         )
         THEN d.id
       END) AS devicesWithActiveAlert,
@@ -46,7 +46,7 @@ function getMyDevicesHandler(req, res) {
     LEFT JOIN reading r ON r.device_id = d.id
     WHERE d.user_id = ?;
     `,
-    [userId, userId]
+    [userId, userId],
   );
 
   mysqlPool.query(getInfosAndDevicesSql, (err, rows) => {

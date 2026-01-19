@@ -37,13 +37,13 @@ function getMyDeviceHandler(req, res) {
         SELECT 1
         FROM reading r
         JOIN mcu_detection md ON md.reading_id = r.id
-        WHERE r.device_id = d.id AND md.canceled = 0
+        WHERE r.device_id = d.id AND md.canceled = -1
       ) as has_active_alert
     FROM device d
     JOIN country c ON c.id = d.country_id
     WHERE d.id = ? AND d.user_id = ?
     `,
-    [deviceId, userId]
+    [deviceId, userId],
   );
   mysqlPool.query(checkOwnershipSql, (err, results) => {
     if (err) {
@@ -66,7 +66,7 @@ function getMyDeviceHandler(req, res) {
     // get latest readings
     const getLateastReadingSql = mysql.format(
       "SELECT * FROM reading WHERE device_id = ? ORDER BY created_at DESC LIMIT 1",
-      [deviceId]
+      [deviceId],
     );
     mysqlPool.query(getLateastReadingSql, (err, latestReadingRows) => {
       if (err) {
@@ -80,7 +80,7 @@ function getMyDeviceHandler(req, res) {
       const rangeCondition = getRangeCondition(range);
       const getHistoryReadingsSql = mysql.format(
         `SELECT * FROM reading WHERE device_id = ? AND created_at >= NOW() - INTERVAL ${rangeCondition} ORDER BY created_at ASC`,
-        [deviceId]
+        [deviceId],
       );
       mysqlPool.query(getHistoryReadingsSql, (err, historyRows) => {
         if (err) {
