@@ -83,7 +83,7 @@ CREATE TABLE `notification` (
   CONSTRAINT `fk_notification_mcu_detection`
     FOREIGN KEY (`mcu_detection_id`)
     REFERENCES `mcu_detection` (`id`)
-    ON DELETE RESTRICT
+    ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE INDEX `idx_notification_user` ON `notification` (`user_id`);
