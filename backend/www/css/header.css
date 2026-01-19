@@ -266,9 +266,17 @@
 }
 
 .notif-title{
-
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
     margin-left: 10px;
 }
+.notif-title-content{
+    display: flex;
+    flex-direction: column;
+}
+
+
 .device-name {
     font-weight: bold;
     font-size: 15px; 
@@ -333,4 +341,15 @@
 
 .text-right {
     text-align: right;
+}
+
+/* Esconde a barra de scroll no Chrome, Safari e Opera */
+.notif-list::-webkit-scrollbar {
+    display: none;
+}
+
+/* Garante que o IE, Edge e Firefox também escondem (reforço) */
+.notif-list {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }

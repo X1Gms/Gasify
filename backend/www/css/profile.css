@@ -53,7 +53,9 @@
     outline: none;
 }
 
-/* Password wrapper */
+/* ======================
+   PASSWORD WRAPPER
+====================== */
 .password-wrapper {
     position: relative;
     margin: 8px 0;

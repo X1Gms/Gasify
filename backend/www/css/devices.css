@@ -235,8 +235,8 @@
 
 /* Confirmar */
 .confirm-btn-modal {
-    background: var(--danger);
-    color: var(--bg-main);
+    background: var(--danger)!important;
+    color: var(--bg-main)!important;
     border: none;
     padding: 12px 22px;
     font-size: 16px;

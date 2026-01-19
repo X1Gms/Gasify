@@ -1,4 +1,9 @@
 // ===============================================================
+// GLOBAL VARIABLES FOR POLLING
+// ===============================================================
+let lastNotifJson = ""; // Para comparar dados e evitar re-renderizações
+
+// ===============================================================
 // GET HEADER
 // ===============================================================
 
@@ -40,6 +45,12 @@ function setupNotifications() {
     const notifBtn = document.getElementById("inboxBtn");
     const notifSidebar = document.getElementById("notifSidebar");
     const notifClose = document.getElementById("notifClose");
+
+    // --- LÓGICA DE POLLING (Auto-Refresh) ---
+    // Faz o fetch inicial e depois repete a cada 2 segundos
+    fetchNotifications();
+    setInterval(fetchNotifications, 2000);
+    // ----------------------------------------
 
     if (!notifBtn || !notifSidebar) return;
 
@@ -113,17 +124,31 @@ async function fetchNotifications() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            renderNotifications(data.notifications);
-            updateNotificationBadge(data.unread_count);
+            // --- SMART UPDATE ---
+            // Cria string do objeto para comparar com o anterior
+            const currentJson = JSON.stringify(data.notifications);
+
+            // Só renderiza se houver diferenças (evita piscar o ecrã)
+            if (currentJson !== lastNotifJson) {
+                lastNotifJson = currentJson;
+                renderNotifications(data.notifications);
+                updateNotificationBadge(data.unread_count);
+            }
         }
     } catch (error) {
-        console.error("Erro ao carregar notificações:", error);
+        // console.error("Erro ao carregar notificações:", error); // Comentado para não poluir consola no polling
     }
 }
 
 function renderNotifications(notifications) {
     const listContainer = document.querySelector(".notif-list");
     if (!listContainer) return;
+
+    // --- SCROLL ---
+    listContainer.style.maxHeight = "100%"; 
+    listContainer.style.overflowY = "auto"; 
+    listContainer.style.scrollbarWidth = "none"; // Firefox
+    // --------------
 
     if (notifications.length === 0) {
         listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Sem alertas registados.</p>';
@@ -137,6 +162,23 @@ function renderNotifications(notifications) {
             day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
         });
 
+        // --- LÓGICA DE TÍTULO DINÂMICO ---
+        let titleText = "Alarme"; // Valor por defeito
+        switch (n.alert_state) {
+            case 'ALERT_PENDING':
+                titleText = "Alarme Acionado";
+                break;
+            case 'ALERT_OFF':
+                titleText = "Alarme Cancelado";
+                break;
+            case 'ALERT_ON':
+                titleText = "Alarme Enviado";
+                break;
+            default:
+                titleText = "Alarme Acionado"; // Fallback
+        }
+        // ---------------------------------
+
         const coPpm = convCO(n.reading.co);
         const gasPpm = convGas(n.reading.gas);
         const coStatus = coPpm <= 34 ? "Baixa" : (coPpm <= 69 ? "Média" : "Elevada");
@@ -146,16 +188,18 @@ function renderNotifications(notifications) {
         const notifItem = document.createElement("div");
         notifItem.className = `notif-item ${isRead ? '' : 'unread'}`;
         notifItem.dataset.id = n.id;
-        notifItem.dataset.isRead = isRead; // Guarda estado local
+        notifItem.dataset.isRead = isRead; 
 
         notifItem.innerHTML = `
             <div class="notif-icon">
                 <svg viewBox="0 0 30 24"><path d="M3 24C2.175 24 1.46875 23.7063 0.88125 23.1188C0.29375 22.5312 0 21.825 0 21V3C0 2.175 0.29375 1.46875 0.88125 0.88125C1.46875 0.29375 2.175 0 3 0H27C27.825 0 28.5312 0.29375 29.1188 0.88125C29.7063 1.46875 30 2.175 30 3V21C30 21.825 29.7063 22.5312 29.1188 23.1188C28.5312 23.7063 27.825 24 27 24H3ZM15 13.5L3 6V21H27V6L15 13.5ZM15 10.5L27 3H3L15 10.5Z" /></svg>
             </div>
             <div class="notif-info">
-            <div class="notif-title">
-                <strong>Alarme Acionado</strong>
-                <span class="notif-date">${date}</span>
+                <div class="notif-title">
+                    <div class="notif-title-content">
+                        <strong>${titleText}</strong> <span class="notif-date">${date}</span>
+                    </div>
+                    <button class="notif-expand">▼</button>
                 </div>
                 <div class="notif-devices">
                     <div>
@@ -184,7 +228,6 @@ function renderNotifications(notifications) {
                     </div>
                 </div>
             </div>
-            <button class="notif-expand">▼</button>
         `;
 
         const expandBtn = notifItem.querySelector(".notif-expand");

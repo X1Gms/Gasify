@@ -1,274 +1,123 @@
-    <!DOCTYPE html>
-    <html lang="pt">
+<!DOCTYPE html>
+<html lang="pt">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dispositivos</title>
-        <script>
-            const theme = localStorage.getItem('theme');
-            if (theme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
-        </script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispositivos</title>
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 
-        <link rel="stylesheet" href="css/color.css">
-        <link rel="stylesheet" href="css/styles.css">
+    <script>
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
 
-        <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/color.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/devices.css">
+    <link rel="stylesheet" href="css/toasts.css">
 
-        <link rel="stylesheet" href="css/devices.css">
-        <link rel="stylesheet" href="css/toasts.css">
-<script src="js/toasts.js"></script>
-        <script src="js/sessions.js"></script>
-        <script src="js/devices.js" defer></script>
-        <script src="js/include.js" defer></script>
-    </head>
+    <script src="js/toasts.js"></script>
+    <script src="js/sessions.js"></script>
+    <script src="js/include.js" defer></script>
+    <script src="js/devices.js" defer></script>
+</head>
 
-    <body>
-            <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<body>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <symbol id="icon-device" viewBox="0 0 27 19">
+            <path d="M2.63415 15.8049H23.7073V7.90244H2.63415V15.8049ZM19.7561 13.8293C20.3049 13.8293 20.7713 13.6372 21.1555 13.253C21.5396 12.8689 21.7317 12.4024 21.7317 11.8537C21.7317 11.3049 21.5396 10.8384 21.1555 10.4543C20.7713 10.0701 20.3049 9.87805 19.7561 9.87805C19.2073 9.87805 18.7409 10.0701 18.3567 10.4543C17.9726 10.8384 17.7805 11.3049 17.7805 11.8537C17.7805 12.4024 17.9726 12.8689 18.3567 13.253C18.7409 13.6372 19.2073 13.8293 19.7561 13.8293ZM26.3415 5.26829H22.6207L19.9866 2.63415H6.35488L3.72073 5.26829H0L4.51097 0.757317C4.75244 0.515854 5.03232 0.329268 5.35061 0.197561C5.6689 0.0658537 6.00366 0 6.35488 0H19.9866C20.3378 0 20.6726 0.0658537 20.9909 0.197561C21.3091 0.329268 21.589 0.515854 21.8305 0.757317L26.3415 5.26829ZM2.63415 18.439C1.90976 18.439 1.28963 18.1811 0.77378 17.6652C0.257927 17.1494 0 16.5293 0 15.8049V5.26829H26.3415V15.8049C26.3415 16.5293 26.0835 17.1494 25.5677 17.6652C25.0518 18.1811 24.4317 18.439 23.7073 18.439H2.63415Z" />
+        </symbol>
+    </svg>
 
-            <symbol id="icon-device" viewBox="0 0 27 19">
-                <path
-                    d="M2.63415 15.8049H23.7073V7.90244H2.63415V15.8049ZM19.7561 13.8293C20.3049 13.8293 20.7713 13.6372 21.1555 13.253C21.5396 12.8689 21.7317 12.4024 21.7317 11.8537C21.7317 11.3049 21.5396 10.8384 21.1555 10.4543C20.7713 10.0701 20.3049 9.87805 19.7561 9.87805C19.2073 9.87805 18.7409 10.0701 18.3567 10.4543C17.9726 10.8384 17.7805 11.3049 17.7805 11.8537C17.7805 12.4024 17.9726 12.8689 18.3567 13.253C18.7409 13.6372 19.2073 13.8293 19.7561 13.8293ZM26.3415 5.26829H22.6207L19.9866 2.63415H6.35488L3.72073 5.26829H0L4.51097 0.757317C4.75244 0.515854 5.03232 0.329268 5.35061 0.197561C5.6689 0.0658537 6.00366 0 6.35488 0H19.9866C20.3378 0 20.6726 0.0658537 20.9909 0.197561C21.3091 0.329268 21.589 0.515854 21.8305 0.757317L26.3415 5.26829ZM2.63415 18.439C1.90976 18.439 1.28963 18.1811 0.77378 17.6652C0.257927 17.1494 0 16.5293 0 15.8049V5.26829H26.3415V15.8049C26.3415 16.5293 26.0835 17.1494 25.5677 17.6652C25.0518 18.1811 24.4317 18.439 23.7073 18.439H2.63415Z" />
-            </symbol>
+    <div data-include-header></div>
 
-        </svg>
+    <main class="devices-content">
 
-        <div data-include-header></div>
-
-        <main class="devices-content">
-
-            <button class="add-device-btn">
-                <div class="device-icon"><svg class="icon">
-                                <use href="#icon-device"></use>
-                            </svg></div>
-                <span>Adicionar Dispositivo</span>
-            </button>
-
-            <section class="device-list">
-
-                <div class="device-card">
-
-                    <div class="device-left">
-                        <div class="device-icon"><svg class="icon">
-                                <use href="#icon-device"></use>
-                            </svg></div>
-                        <div>
-                            <strong>Device #01</strong>
-                            <p>Device #01</p>
-                            <p class="serial">Número de Série : EAFC26EF</p>
-                        </div>
-                    </div>
-
-                    <button class="dots-btn">⋮</button>
-
-                    <div class="device-menu">
-                        <p class="opt">Editar</p>
-                        <p class="opt delete">Eliminar</p>
-                    </div>
-
-                </div>
-
-                <div class="device-card alarm">
-
-                    <div class="device-left">
-                        <div class="device-icon red"><svg class="icon">
-                                <use href="#icon-device"></use>
-                            </svg></div>
-                        <div>
-                            <strong>Device #02</strong>
-                            <p>Device #02</p>
-                            <p class="serial">Número de Série : A982BC11</p>
-                        </div>
-                    </div>
-
-                    <button class="cancel-btn">Cancelar Alarme</button>
-
-                </div>
-
-            </section>
-
-        </main>
-
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-
-                document.addEventListener("click", (e) => {
-
-                    // Se clicou no botão de 3 pontos
-                    if (e.target.classList.contains("dots-btn")) {
-
-                        const card = e.target.closest(".device-card");
-                        const menu = card.querySelector(".device-menu");
-
-                        // Fechar tudo antes de abrir um novo
-                        document.querySelectorAll(".device-menu").forEach(m => m.style.display = "none");
-                        document.querySelectorAll(".device-card").forEach(c => c.classList.remove("active"));
-
-                        // Abrir apenas do card clicado
-                        card.classList.add("active");
-                        menu.style.display = "block";
-
-                        e.stopPropagation();
-                        return;
-                    }
-
-                    // Clicou fora → fecha tudo
-                    document.querySelectorAll(".device-menu").forEach(m => m.style.display = "none");
-                    document.querySelectorAll(".device-card").forEach(c => c.classList.remove("active"));
-
-                });
-
-            });
-
-
-            document.addEventListener("DOMContentLoaded", () => {
-
-                const overlay = document.getElementById("modalOverlay");
-
-                const addModal = document.getElementById("addDeviceModal");
-                const editModal = document.getElementById("editDeviceModal");
-                const deleteModal = document.getElementById("deleteDeviceModal");
-                const cancelAlarmModal = document.getElementById("cancelAlarmModal"); // Novo
-
-                const addBtn = document.querySelector(".add-device-btn");
-
-                /* ---------- FUNÇÕES ---------- */
-
-                function openModal(modal) {
-                    overlay.classList.add("show");
-                    [addModal, editModal, deleteModal, cancelAlarmModal].forEach(m => m.classList.remove("show"));
-                    modal.classList.add("show");
-                }
-
-                function closeModal() {
-                    overlay.classList.remove("show");
-                    [addModal, editModal, deleteModal, cancelAlarmModal].forEach(m => m.classList.remove("show"));
-                }
-
-                /* ---------- ADD ---------- */
-                addBtn.onclick = () => openModal(addModal);
-
-                /* ---------- EDIT ---------- */
-                document.querySelectorAll(".opt:not(.delete)").forEach(btn => {
-                    btn.onclick = (e) => {
-                        e.stopPropagation();
-                        openModal(editModal);
-                    };
-                });
-
-                /* ---------- DELETE ---------- */
-                document.querySelectorAll(".opt.delete").forEach(btn => {
-                    btn.onclick = (e) => {
-                        e.stopPropagation();
-                        openModal(deleteModal);
-                    };
-                });
-
-                /* ---------- CANCEL ALARM (Novo) ---------- */
-                document.addEventListener("click", (e) => {
-                    if (e.target.classList.contains("cancel-btn")) {
-                        openModal(cancelAlarmModal);
-                    }
-                });
-
-                /* ---------- FECHAR ---------- */
-                document.querySelectorAll("[data-close]").forEach(btn => {
-                    btn.onclick = closeModal;
-                });
-
-                overlay.onclick = (e) => {
-                    if (e.target === overlay) closeModal();
-                };
-
-            });
-
-        </script>
-
-
-        <div class="modal-overlay" id="modalOverlay">
-
-            <div class="modal" id="addDeviceModal">
-                <button class="modal-close" data-close>✖</button>
-
-                <h2>Adicionar Dispositivo</h2>
-
-                <div class="modal-form">
-                    <input type="text" placeholder="Nome do Dispositivo">
-                    <input type="text" placeholder="Código de ID">
-
-                                                <select>
-        <option value="">Selecione o País</option>
-        <option value="1">Portugal</option>
-        <option value="2">Espanha</option>
-        <option value="3">França</option>
-        </select>
-
-                    <input type="text" placeholder="Morada">
-                    <input type="text" placeholder="Código Postal">
-
-                    <button class="primary-modal-btn">Adicionar</button>
-                </div>
+        <button class="add-device-btn">
+            <div class="device-icon">
+                <svg class="icon"><use href="#icon-device"></use></svg>
             </div>
+            <span>Adicionar Dispositivo</span>
+        </button>
 
-            <div class="modal" id="editDeviceModal">
-                <button class="modal-close" data-close>✖</button>
+        <section class="device-list">
+            <p style="text-align:center; opacity:0.5; width:100%;">A carregar dispositivos...</p>
+        </section>
 
-                <h2>Editar Dispositivo</h2>
+    </main>
 
-                <div class="modal-form">
-                    <input type="text" placeholder="Nome do Dispositivo">
+    <div class="modal-overlay" id="modalOverlay">
 
-                    <input type="text" value="EAFC26EF" disabled class="disabled">
-
-                    <select>
-                        <option>Portugal</option>
-                        <option>Espanha</option>
-                        <option>França</option>
-                    </select>
-
-                    <input type="text" placeholder="Morada">
-                    <input type="text" placeholder="Código Postal">
-
-                    <button class="primary-modal-btn">Editar</button>
-                </div>
+        <div class="modal" id="addDeviceModal">
+            <button class="modal-close" data-close>✖</button>
+            <h2>Adicionar Dispositivo</h2>
+            <div class="modal-form">
+                <input type="text" placeholder="Nome do Dispositivo">
+                <input type="text" placeholder="Código de ID">
+                <select>
+                    <option value="">Selecione o País</option>
+                </select>
+                <input type="text" placeholder="Morada">
+                <input type="text" placeholder="Código Postal">
+                <button class="primary-modal-btn">Adicionar</button>
             </div>
-
-            <div class="modal" id="deleteDeviceModal">
-                <button class="modal-close" data-close>✖</button>
-
-                <h2>Eliminar Dispositivo</h2>
-
-                <p class="modal-text">
-                    Esta ação é totalmente irreversível e removerá permanentemente todos os dados associados ao dispositivo.
-                    <br><br>
-                    Deseja realmente proceder com a remoção?
-                </p>
-
-                <div class="modal-actions">
-                    <button class="confirm-btn-modal">Eliminar</button>
-                    <button class="cancel-btn-modal" data-close>Cancelar</button>
-                </div>
-            </div>
-
-            <div class="modal" id="cancelAlarmModal">
-                <button class="modal-close" data-close>✖</button>
-
-                <h2>Cancelar Alarme</h2>
-
-                <p class="modal-text">
-                    Para Cancelar o Alarme tem de ir ao dispositivo móvel.
-                </p>
-
-                <div class="modal-actions">
-                    <button class="primary-modal-btn" data-close style="width: 100%;">OK</button>
-                </div>
-            </div>
-
         </div>
 
+        <div class="modal" id="editDeviceModal">
+            <button class="modal-close" data-close>✖</button>
+            <h2>Editar Dispositivo</h2>
+            <div class="modal-form">
+                <input type="text" placeholder="Nome do Dispositivo">
+                <input type="text" disabled class="disabled">
+                <select></select>
+                <input type="text" placeholder="Morada">
+                <input type="text" placeholder="Código Postal">
+                <button class="primary-modal-btn">Editar</button>
+            </div>
+        </div>
 
-    </body>
+        <div class="modal" id="deleteDeviceModal">
+            <button class="modal-close" data-close>✖</button>
+            <h2>Eliminar Dispositivo</h2>
+            <p class="modal-text">
+                Esta ação é totalmente irreversível e removerá permanentemente todos os dados associados ao dispositivo.
+                <br><br>
+                Deseja realmente proceder com a remoção?
+            </p>
+            <div class="modal-actions">
+                <button class="confirm-btn-modal">Eliminar</button>
+                <button class="cancel-btn-modal" data-close>Cancelar</button>
+            </div>
+        </div>
 
-    </html>
+        <div class="modal" id="cancelAlarmModal">
+            <button class="modal-close" data-close>✖</button>
+            <h2>Cancelar Alarme?</h2>
+            <p class="modal-text">
+                Tem a certeza que pretende cancelar este alerta?
+            </p>
+            <div class="modal-actions">
+                <button class="confirm-btn-modal" style="background-color: var(--warning); color: #000;">Sim, cancelar</button>
+                <button class="cancel-btn-modal" data-close>Voltar</button>
+            </div>
+        </div>
+
+        <div class="modal" id="cancelSuccessModal">
+            <button class="modal-close" data-close>✖</button>
+            <h2>Alarme Cancelado</h2>
+            <p class="modal-text">
+                O alarme foi desativado com sucesso. O sistema voltará ao monitoramento normal.
+            </p>
+            <div class="modal-actions">
+                <button class="primary-modal-btn" data-close style="width: 100%;">OK</button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

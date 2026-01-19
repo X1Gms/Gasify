@@ -1,10 +1,50 @@
 /**
  * js/home.js - Lógica da Página Home
+ * Dashboard com Auto-Refresh e Cancelamento de Alarme com Logs
  */
 
-// Fórmulas de conversão fornecidas para PPM
+let homeAlarmIdToCancel = null;
+let lastHomeJson = ""; 
+
+// Conversões
 const convertCO = (v) => (v * 106.0) / 4095.0;
 const convertGas = (v) => (v * 6363.0) / 4095.0;
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetchDevices();
+    fetchCountries();
+
+    // Auto-Refresh (Polling) a cada 2 segundos
+    setInterval(fetchDevices, 2000);
+
+    // Listener Modal Adicionar
+    const btnAdicionar = document.querySelector("#addDeviceModal .primary-modal-btn");
+    if (btnAdicionar) {
+        btnAdicionar.addEventListener("click", handleCreateDevice);
+    }
+
+    // Listener Botão "Sim, cancelar"
+    const btnConfirmCancel = document.querySelector("#cancelAlarmModal .confirm-btn-modal");
+    if (btnConfirmCancel) {
+        const newBtn = btnConfirmCancel.cloneNode(true);
+        btnConfirmCancel.parentNode.replaceChild(newBtn, btnConfirmCancel);
+        newBtn.addEventListener("click", confirmHomeAlarmCancellation);
+    }
+
+    // Listener Botão "OK" Sucesso
+    const btnSuccessOk = document.querySelector("#cancelSuccessModal .primary-modal-btn");
+    if (btnSuccessOk) {
+        btnSuccessOk.addEventListener("click", () => {
+            if (window.closeModal) window.closeModal();
+            lastHomeJson = ""; 
+            fetchDevices();
+        });
+    }
+});
+
+/* ==========================================================
+   2. FETCH E RENDERIZAÇÃO
+   ========================================================== */
 
 async function fetchDevices() {
     const token = localStorage.getItem("token");
@@ -22,53 +62,56 @@ async function fetchDevices() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            renderStatusCards(data.cards, data.devices.length);
-            renderDevices(data.devices);
-        } else {
-            showToast('error', 'Erro de Dados', 'Não foi possível sincronizar os dispositivos.');
+            const currentJson = JSON.stringify({ cards: data.cards, devices: data.devices });
+
+            // Só atualiza se houver diferenças para evitar piscar
+            if (currentJson !== lastHomeJson) {
+                lastHomeJson = currentJson;
+                renderStatusCards(data.cards, data.devices.length);
+                renderDevices(data.devices);
+            }
         }
     } catch (error) {
-        console.error("Erro ao carregar dispositivos:", error);
-        showToast('error', 'Erro de Rede', 'Falha ao ligar ao servidor.');
+        // Silencioso
     }
 }
 
-/**
- * Preenche os blocos de status com a lógica PPM e mapeamento Baixa/Média/Alta
- */
 function renderStatusCards(cards, totalDevices) {
     const statusValues = document.querySelectorAll(".status-box .big-text");
 
     if (statusValues.length >= 4 && cards) {
         statusValues[0].textContent = cards.total_devices ?? totalDevices ?? 0;
 
-        // Mapeamento de Gás (Médio) -> PPM
+        // Gás
         const gasPpm = cards.avg_gas !== null ? convertGas(cards.avg_gas) : null;
-        if (gasPpm === null) {
-            statusValues[1].textContent = "---";
-        } else {
-            if (gasPpm <= 2100) statusValues[1].textContent = "Baixa";
-            else if (gasPpm <= 4199) statusValues[1].textContent = "Média";
-            else statusValues[1].textContent = "Alta";
-        }
+        statusValues[1].textContent = getStatusText(gasPpm, 2100, 4199);
 
-        // Mapeamento de CO (Médio) -> PPM
+        // CO
         const coPpm = cards.avg_co !== null ? convertCO(cards.avg_co) : null;
-        if (coPpm === null) {
-            statusValues[2].textContent = "---";
-        } else {
-            if (coPpm <= 34) statusValues[2].textContent = "Baixa";
-            else if (coPpm <= 69) statusValues[2].textContent = "Média";
-            else statusValues[2].textContent = "Alta";
-        }
+        statusValues[2].textContent = getStatusText(coPpm, 34, 69);
 
-        statusValues[3].textContent = cards.active_alerts || 0;
+        // ALERTAS ATIVOS (Bubble que deve subir)
+        const activeAlertsElem = statusValues[3];
+        const currentVal = parseInt(activeAlertsElem.textContent) || 0;
+        
+        // Aqui usamos o valor vindo do backend (cards.active_alerts ou devices_with_active_alert)
+        // Garante que o backend retorna "active_alerts" ou "devices_with_active_alert"
+        const newVal = cards.active_alerts ?? cards.devices_with_active_alert ?? 0;
+
+        if (currentVal !== newVal) {
+            animateValue(activeAlertsElem, currentVal, newVal, 1000);
+            activeAlertsElem.style.color = newVal > 0 ? "var(--danger)" : "";
+        }
     }
 }
 
-/**
- * Renderiza os cartões com estrutura para alinhar o botão à direita
- */
+function getStatusText(val, lowLimit, mediumLimit) {
+    if (val === null) return "---";
+    if (val <= lowLimit) return "Baixa";
+    if (val <= mediumLimit) return "Média";
+    return "Alta";
+}
+
 function renderDevices(devices) {
     const deviceList = document.querySelector(".device-list");
     if (!deviceList) return;
@@ -91,7 +134,7 @@ function renderDevices(devices) {
             
             <div class="device-actions">
                 ${device.has_active_alert 
-                    ? `<button class="cancel-btn" onclick="handleCancelClick(event)">Cancelar Alarme</button>` 
+                    ? `<button class="cancel-btn" onclick="prepareCancel(${device.id})">Cancelar Alarme</button>` 
                     : ''
                 }
             </div>
@@ -106,16 +149,66 @@ function renderDevices(devices) {
     });
 }
 
-function handleCancelClick(event) {
-    event.stopPropagation();
-    const overlay = document.getElementById("modalOverlay");
-    const cancelModal = document.getElementById("cancelAlarmModal");
+/* ==========================================================
+   3. CANCELAMENTO DE ALARME
+   ========================================================== */
 
-    if (overlay && cancelModal) {
-        overlay.classList.add("show");
-        cancelModal.classList.add("show");
+// Função chamada pelo botão HTML
+window.prepareCancel = function(id) {
+    homeAlarmIdToCancel = id;
+    console.log("Preparar cancelamento para Device ID:", id); // DEBUG
+    if (window.openModal) window.openModal("cancelAlarmModal");
+};
+
+async function confirmHomeAlarmCancellation() {
+    if (!homeAlarmIdToCancel) {
+        console.error("Nenhum ID de alarme selecionado para cancelar.");
+        return;
+    }
+    
+    const token = localStorage.getItem("token");
+    console.log("A tentar cancelar alarme. ID:", homeAlarmIdToCancel, "Token:", token ? "OK" : "MISSING");
+
+    const btn = document.querySelector("#cancelAlarmModal .confirm-btn-modal");
+    const originalText = btn.innerText;
+    btn.innerText = "A processar...";
+    btn.disabled = true;
+
+    try {
+        const res = await fetch(`http://localhost:8081/users/me/devices/${homeAlarmIdToCancel}/alert`, {
+            method: "DELETE",
+            headers: { 
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        console.log("Resposta API Cancelamento:", res.status); // DEBUG
+
+        if (res.ok) {
+            if (window.openModal) window.openModal("cancelSuccessModal");
+            lastHomeJson = ""; // Limpa cache para atualizar
+            fetchDevices();    // Atualiza imediatamente
+        } else {
+            const err = await res.json();
+            console.error("Erro API:", err);
+            showToast('error', 'Erro', err.message || 'Falha ao cancelar.');
+            if (window.closeModal) window.closeModal();
+        }
+    } catch (e) {
+        console.error("Erro Fetch:", e);
+        showToast('error', 'Rede', 'Erro de comunicação.');
+        if (window.closeModal) window.closeModal();
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+        homeAlarmIdToCancel = null;
     }
 }
+
+/* ==========================================================
+   4. CRIAÇÃO DE DISPOSITIVO
+   ========================================================== */
 
 async function handleCreateDevice() {
     const token = localStorage.getItem("token");
@@ -127,33 +220,32 @@ async function handleCreateDevice() {
         countryId: parseInt(modal.querySelector('select').value),
         address: modal.querySelector('input[placeholder="Morada"]').value.trim(),
         postalCode: modal.querySelector('input[placeholder="Código Postal"]').value.trim(),
-        seedReadings: document.getElementById("seedReadings").checked
+        seedReadings: document.getElementById("seedReadings") ? document.getElementById("seedReadings").checked : false
     };
 
     if (!deviceData.name || !deviceData.serialNumber || !deviceData.countryId) {
-        showToast('error', 'Campos Incompletos', 'Nome, ID e País são obrigatórios.');
+        showToast('error', 'Campos', 'Preencha os dados obrigatórios.');
         return;
     }
 
     try {
-        const response = await fetch("http://localhost:8081/users/me/devices", {
+        const res = await fetch("http://localhost:8081/users/me/devices", {
             method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
+            headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
             body: JSON.stringify(deviceData)
         });
 
-        if (response.status === 201) {
-            showToast('success', 'Sucesso', 'Dispositivo criado!');
-            setTimeout(() => location.reload(), 1500);
+        if (res.status === 201) {
+            showToast('success', 'Criado', 'Dispositivo adicionado!');
+            if (window.closeModal) window.closeModal();
+            lastHomeJson = "";
+            fetchDevices();
         } else {
-            const data = await response.json();
+            const data = await res.json();
             showToast('error', 'Erro', data.message);
         }
-    } catch (error) {
-        showToast('error', 'Erro', 'Falha na comunicação.');
+    } catch (e) {
+        showToast('error', 'Rede', 'Falha na comunicação.');
     }
 }
 
@@ -164,22 +256,27 @@ async function fetchCountries() {
         if (response.ok && data.success) {
             const select = document.querySelector("#addDeviceModal select");
             if (select) {
-                select.innerHTML = '<option value="">Selecione o País</option>';
-                data.countries.forEach(c => {
-                    const opt = document.createElement("option");
-                    opt.value = c.id;
-                    opt.textContent = c.name;
-                    select.appendChild(opt);
-                });
+                const options = data.countries.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                select.innerHTML = '<option value="">Selecione o País</option>' + options;
             }
         }
     } catch (e) { console.error(e); }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    fetchDevices();
-    fetchCountries();
-    
-    const btnAdicionar = document.querySelector("#addDeviceModal .primary-modal-btn");
-    if (btnAdicionar) btnAdicionar.addEventListener("click", handleCreateDevice);
-});
+/* ==========================================================
+   5. ANIMAÇÃO DE NÚMEROS
+   ========================================================== */
+function animateValue(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start);
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        } else {
+            obj.innerHTML = end;
+        }
+    };
+    window.requestAnimationFrame(step);
+}
