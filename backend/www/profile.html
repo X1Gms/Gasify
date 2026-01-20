@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil</title>
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+
     <script>
         const theme = localStorage.getItem('theme');
         if (theme === 'dark') {
@@ -16,11 +18,11 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="css/profile.css">
-
-    <script src="js/eye.js" defer></script>
     <link rel="stylesheet" href="css/toasts.css">
-<script src="js/toasts.js"></script>
+
+    <script src="js/toasts.js"></script>
     <script src="js/sessions.js"></script>
+    <script src="js/eye.js" defer></script>
     <script src="js/profile.js" defer></script>
     <script src="js/include.js" defer></script>
 </head>
@@ -41,10 +43,22 @@
             <input type="email" id="email" placeholder="email@example.com">
 
             <label>Palavra-Passe</label>
-            <input type="password" id="password" placeholder="••••••••">
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="••••••••">
+                <span class="toggle-pass" onclick="togglePassword('password', this)">
+                    <svg class="eye-closed" viewBox="0 0 24 24"><path d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5ZM12 16A4 4 0 1 1 12 8A4 4 0 0 1 12 16Z" /></svg>
+                    <svg class="eye-open" viewBox="0 0 24 24"><path d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5Z" /><path d="M4 4L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                </span>
+            </div>
 
             <label>Confirmar Palavra-Passe</label>
-            <input type="password" id="password2" placeholder="••••••••">
+            <div class="password-wrapper">
+                <input type="password" id="password2" placeholder="••••••••">
+                <span class="toggle-pass" onclick="togglePassword('password2', this)">
+                    <svg class="eye-closed" viewBox="0 0 24 24"><path d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5ZM12 16A4 4 0 1 1 12 8A4 4 0 0 1 12 16Z" /></svg>
+                    <svg class="eye-open" viewBox="0 0 24 24"><path d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5Z" /><path d="M4 4L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                </span>
+            </div>
 
             <div class="btn-row">
                 <button class="edit-btn">Editar Perfil</button>
@@ -65,7 +79,9 @@
                 <div class="password-wrapper">
                     <input type="password" id="deletePassword" placeholder="Palavra-passe">
                     <span class="toggle-pass" onclick="togglePassword('deletePassword', this)">
-                        </span>
+                        <svg class="eye-closed" viewBox="0 0 24 24"><path d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5ZM12 16A4 4 0 1 1 12 8A4 4 0 0 1 12 16Z" /></svg>
+                        <svg class="eye-open" viewBox="0 0 24 24"><path d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5Z" /><path d="M4 4L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+                    </span>
                 </div>
 
                 <div class="modal-actions">
@@ -87,6 +103,8 @@
                 <div class="password-wrapper">
                     <input type="password" id="confirmEditPassword" placeholder="Palavra-passe atual">
                     <span class="toggle-pass" onclick="togglePassword('confirmEditPassword', this)">
+                        <svg class="eye-closed" viewBox="0 0 24 24"><path d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5ZM12 16A4 4 0 1 1 12 8A4 4 0 0 1 12 16Z" /></svg>
+                        <svg class="eye-open" viewBox="0 0 24 24"><path d="M12 4.5C6.5 4.5 2 8.1 0.5 12C2 15.9 6.5 19.5 12 19.5C17.5 19.5 22 15.9 23.5 12C22 8.1 17.5 4.5 12 4.5Z" /><path d="M4 4L20 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
                     </span>
                 </div>
 
@@ -100,9 +118,7 @@
     </main>
 
     <script>
-        /**
-         * Lógica de abertura/fecho dos Modais
-         */
+        // Lógica de abertura/fecho dos Modais
         const setupModal = (btnClass, overlayId, closeId, cancelId) => {
             const btn = document.querySelector(btnClass);
             const overlay = document.getElementById(overlayId);
@@ -111,18 +127,15 @@
 
             if (!btn || !overlay) return;
 
-            // Abrir
             btn.onclick = (e) => {
                 e.preventDefault();
                 overlay.classList.add("show");
             };
 
-            // Fechar (Botão X e Botão Cancelar)
             close.onclick = cancel.onclick = () => {
                 overlay.classList.remove("show");
             };
 
-            // Fechar ao clicar fora do modal (no overlay)
             overlay.addEventListener("click", (e) => {
                 if (e.target === overlay) {
                     overlay.classList.remove("show");
@@ -130,19 +143,9 @@
             });
         };
 
-        // Ativar os dois modais de forma independente
         setupModal(".delete-btn", "deleteOverlay", "closeDeleteModal", "cancelDelete");
         setupModal(".edit-btn", "editOverlay", "closeEditModal", "cancelEdit");
-
-        /**
-         * Função simples para ver/esconder password
-         */
-        function togglePassword(id, el) {
-            const input = document.getElementById(id);
-            if (input) {
-                input.type = input.type === "password" ? "text" : "password";
-            }
-        }
+        
     </script>
 
 </body>
