@@ -1,0 +1,154 @@
+/* =======================================
+   STORE LAYOUT
+======================================= */
+body {
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+.store-header {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--glass-border);
+    background: var(--bg-card);
+}
+
+.store-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.store-logo svg { width: 32px; height: 32px; fill: var(--primary); }
+
+.store-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* =======================================
+   PRODUCT PAGE
+======================================= */
+.product-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .product-wrapper { grid-template-columns: 1fr; }
+}
+
+.product-image-container {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 30px var(--shadow);
+}
+
+.product-image-container svg { width: 200px; height: 200px; fill: var(--text-main); }
+
+.product-details h1 { font-size: 38px; margin: 0 0 15px 0; color: var(--text-main); }
+.product-desc { color: var(--text-muted); font-size: 16px; line-height: 1.6; margin-bottom: 30px; }
+
+/* SELETOR DE PLANOS */
+.plan-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.plan-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background: var(--bg-input);
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.plan-option input[type="radio"] {
+    accent-color: var(--primary);
+    transform: scale(1.5);
+    margin-right: 15px;
+}
+
+.plan-option:hover { border-color: var(--text-muted); }
+
+.plan-option.selected {
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.05);
+}
+
+.plan-info { display: flex; align-items: center; }
+.plan-name { font-weight: bold; font-size: 18px; display: block; }
+.plan-cost { font-weight: bold; color: var(--primary); font-size: 18px; }
+
+.hw-price-display {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--text-main);
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.quantity-control input {
+    width: 80px; padding: 10px; text-align: center; font-size: 18px;
+    border-radius: 8px; border: 2px solid var(--glass-border);
+    background: var(--bg-input); color: var(--text-main);
+}
+
+.btn-block {
+    width: 100%; display: block; text-align: center; padding: 15px;
+    font-size: 18px; text-decoration: none; border: none; cursor: pointer;
+}
+
+/* =======================================
+   CHECKOUT PAGE
+======================================= */
+.checkout-wrapper { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; }
+@media (max-width: 900px) { .checkout-wrapper { grid-template-columns: 1fr; } }
+
+.form-section, .order-summary {
+    background: var(--bg-card); padding: 30px; border-radius: 20px;
+    border: 1px solid var(--glass-border); box-shadow: 0 10px 30px var(--shadow);
+}
+
+.form-title { margin-top: 0; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+.input-group { margin-bottom: 15px; }
+.input-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 14px; font-weight: bold; }
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; color: var(--text-muted); }
+.summary-divider { height: 1px; background: var(--glass-border); margin: 15px 0; }
+.summary-total { display: flex; justify-content: space-between; font-size: 22px; font-weight: bold; color: var(--text-main); margin-top: 10px; }
+
+/* Modal Sucesso */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--bg-card); padding: 40px; border-radius: 20px; max-width: 450px; width: 90%; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.success-check-icon { width: 80px; height: 80px; fill: #2ecc71; margin-bottom: 20px; }

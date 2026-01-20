@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Gasify</title>
+    
+    <link rel="stylesheet" href="css/color.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/store.css">
+    <link rel="stylesheet" href="css/toasts.css">
+    
+    <script src="js/store.js" defer></script>
+</head>
+<body>
+
+    <header class="store-header">
+        <a href="store.html" class="store-logo">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            Gasify Checkout
+        </a>
+    </header>
+
+    <main class="store-container">
+        <div class="checkout-wrapper">
+            
+            <div class="form-section">
+                <form id="checkoutForm">
+                    <h3 class="form-title">Dados de Envio</h3>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Nome Completo</label>
+                            <input type="text" id="name" required placeholder="Ex: João Silva">
+                        </div>
+                        <div class="input-group">
+                            <label>NIF</label>
+                            <input type="text" id="nif" required placeholder="Ex: 123456789">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>E-mail (Para a Fatura)</label>
+                        <input type="email" id="email" required placeholder="email@exemplo.com">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Morada Completa</label>
+                        <input type="text" id="address" required placeholder="Rua Principal, nº 10, 1000-001 Lisboa">
+                    </div>
+
+                    <hr style="border:0; border-top:1px solid var(--glass-border); margin: 30px 0;">
+
+                    <h3 class="form-title">Pagamento Seguro</h3>
+
+                    <div class="input-group">
+                        <label>Número do Cartão</label>
+                        <input type="text" placeholder="0000 0000 0000 0000" maxlength="19">
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Validade</label>
+                            <input type="text" placeholder="MM/AA" maxlength="5">
+                        </div>
+                        <div class="input-group">
+                            <label>CVV</label>
+                            <input type="text" placeholder="123" maxlength="3">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="payButton" class="btn btn-primary btn-block" style="margin-top: 20px;">
+                        A carregar preço...
+                    </button>
+                </form>
+            </div>
+
+            <div class="order-summary">
+                <h3 style="margin-top:0">Resumo do Pedido</h3>
+                
+                <div class="summary-row">
+                    <span>Sensor de Gás (x<span id="summQty">1</span>)</span>
+                    <span id="summHwTotal">--€</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span id="summPlanName">Subscrição</span>
+                    <span id="summPlanPrice">--€</span>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-row">
+                    <span>Total Hardware (Hoje)</span>
+                    <span id="summHwFinal">--€</span>
+                </div>
+                <div class="summary-row" style="color:var(--primary)">
+                    <span>Total Serviço (Hoje)</span>
+                    <span id="summPlanFinal">--€</span>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-total">
+                    <span>Total a Pagar</span>
+                    <span id="summTotal">--€</span>
+                </div>
+
+                <p id="summNote" style="font-size:12px; color:var(--text-muted); margin-top:20px; text-align:center;">
+                    </p>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="successOverlay">
+        <div class="modal">
+            <svg class="success-check-icon" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <h2>Encomenda Confirmada!</h2>
+            <p class="modal-text">
+                Obrigado pela sua compra, <strong id="successName"></strong>. <br><br>
+                O pagamento foi processado com sucesso. Enviámos a confirmação e a fatura para: <br>
+                <strong id="successEmail" style="color:var(--primary); font-size:18px;"></strong>
+            </p>
+            <button class="btn btn-primary btn-block" onclick="window.location.href='home.html'">
+                Voltar à Dashboard
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>

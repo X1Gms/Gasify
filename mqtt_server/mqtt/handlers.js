@@ -67,7 +67,7 @@ const handleMessage = async (_, message) => {
                 await deviceService.registerDetection(myArray[index]);
                 const userID = await userService.findUserIdByDeviceMac(data.mac);
                 const user = await userService.findUserById(userID);
-                await deviceService.registerDetection(data.status);
+                await deviceService.registerDetection(myArray[index]);
                 const device = await deviceService.findDeviceByMac(data.mac);
                 // console.log(device)
                 const address = `${device.address} ${device.postal_code} ${device.country_name} identified as ${device.name}`

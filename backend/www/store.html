@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Sensor Gasify</title>
+    
+    <link rel="stylesheet" href="css/color.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/store.css">
+</head>
+<body>
+
+    <header class="store-header">
+        <a href="#" class="store-logo">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            Gasify Store
+        </a>
+    </header>
+
+    <main class="store-container">
+        <div class="product-wrapper">
+            
+            <div class="product-image-container">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+            </div>
+
+            <div class="product-details">
+                <h1>Sensor de Gás Inteligente</h1>
+                <p class="product-desc">
+                    Proteção total contra fugas de gás e monóxido de carbono.
+                    Monitorização em tempo real via app, fácil instalação Wi-Fi e bateria de longa duração.
+                </p>
+
+                <div class="hw-price-display">
+                    Hardware: 50.00€ <small style="font-size:16px; font-weight:normal; color:var(--text-muted)">/unidade</small>
+                </div>
+
+                <div class="plan-selector">
+                    <label class="plan-option" onclick="selectPlan(this)">
+                        <div class="plan-info">
+                            <input type="radio" name="plan" value="free">
+                            <div>
+                                <span class="plan-name">Plano Básico</span>
+                                <small style="color:var(--text-muted)">Apenas alertas por email</small>
+                            </div>
+                        </div>
+                        <div class="plan-cost">0.00€ <small>/mês</small></div>
+                    </label>
+
+                    <label class="plan-option selected" onclick="selectPlan(this)">
+                        <div class="plan-info">
+                            <input type="radio" name="plan" value="premium" checked>
+                            <div>
+                                <span class="plan-name">Plano Premium</span>
+                                <small style="color:var(--text-muted)">SMS, Chamadas, Histórico</small>
+                            </div>
+                        </div>
+                        <div class="plan-cost">4.99€ <small>/mês</small></div>
+                    </label>
+                </div>
+
+                <div class="quantity-control">
+                    <label for="sensorQty">Quantidade de Sensores:</label>
+                    <input type="number" id="sensorQty" value="1" min="1" max="50">
+                </div>
+
+                <button id="btnBuy" class="btn btn-primary btn-block">
+                    Continuar para Pagamento
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Função visual para selecionar o plano
+        function selectPlan(label) {
+            // Remove a classe 'selected' de todos
+            document.querySelectorAll('.plan-option').forEach(el => el.classList.remove('selected'));
+            // Adiciona ao clicado
+            label.classList.add('selected');
+            // Força a seleção do radio button dentro do label
+            const radio = label.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+        }
+
+        // Lógica de Redirecionamento
+        document.getElementById("btnBuy").addEventListener("click", () => {
+            const qtyInput = document.getElementById("sensorQty");
+            const planInput = document.querySelector('input[name="plan"]:checked');
+
+            if (!qtyInput || !planInput) {
+                alert("Erro: Por favor selecione um plano e uma quantidade.");
+                return;
+            }
+
+            const qty = qtyInput.value;
+            const plan = planInput.value;
+
+            console.log(`A redirecionar: Quantidade ${qty}, Plano ${plan}`);
+            
+            // Redireciona para checkout.html levando os dados na URL
+            window.location.href = `checkout.html?qty=${qty}&plan=${plan}`;
+        });
+    </script>
+
+</body>
+</html>

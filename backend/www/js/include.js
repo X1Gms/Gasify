@@ -144,6 +144,19 @@ function renderNotifications(notifications) {
     const listContainer = document.querySelector(".notif-list");
     if (!listContainer) return;
 
+    // --- 1. MEMORIZAR ESTADO (Quais estão abertas?) ---
+    // Antes de apagar tudo, vemos quais IDs estão expandidos
+    const expandedIds = new Set();
+    const currentItems = listContainer.querySelectorAll(".notif-item");
+    currentItems.forEach(item => {
+        const extra = item.querySelector(".notif-extra");
+        // Se display for block, significa que está aberta
+        if (extra && extra.style.display === "block") {
+            expandedIds.add(parseInt(item.dataset.id));
+        }
+    });
+    // --------------------------------------------------
+
     // --- SCROLL ---
     listContainer.style.maxHeight = "100%"; 
     listContainer.style.overflowY = "auto"; 
@@ -163,21 +176,21 @@ function renderNotifications(notifications) {
         });
 
         // --- LÓGICA DE TÍTULO DINÂMICO ---
-        let titleText = "Alarme"; // Valor por defeito
+        let titleText = "Alarme"; 
         switch (n.alert_state) {
-            case 'ALERT_PENDING':
-                titleText = "Alarme Acionado";
-                break;
-            case 'ALERT_OFF':
-                titleText = "Alarme Cancelado";
-                break;
-            case 'ALERT_ON':
-                titleText = "Alarme Enviado";
-                break;
-            default:
-                titleText = "Alarme Acionado"; // Fallback
+            case 'ALERT_PENDING': titleText = "Alarme Acionado"; break;
+            case 'ALERT_OFF': titleText = "Alarme Cancelado"; break;
+            case 'ALERT_ON': titleText = "Alarme Enviado"; break;
+            default: titleText = "Alarme Acionado"; 
         }
-        // ---------------------------------
+        let myCanceled = "Em espera"; 
+
+                switch (n.alert_state) {
+            case 'ALERT_PENDING': myCanceled = "Em espera"; break;
+            case 'ALERT_OFF': myCanceled = "Resolvido"; break;
+            case 'ALERT_ON': myCanceled = "Ativo"; break;
+            default: myCanceled = "Em espera"; 
+        }
 
         const coPpm = convCO(n.reading.co);
         const gasPpm = convGas(n.reading.gas);
@@ -185,11 +198,17 @@ function renderNotifications(notifications) {
         const gasStatus = gasPpm <= 2100 ? "Baixo" : (gasPpm <= 4199 ? "Médio" : "Elevado");
         const isRead = n.read_at !== null;
 
+        // --- 2. RESTAURAR ESTADO ---
+        // Se o ID estava na lista de abertos, definimos o estilo para abrir logo
+        const isExpanded = expandedIds.has(n.id);
+        const displayStyle = isExpanded ? "block" : "none";
+        const rotateStyle = isExpanded ? "rotate(180deg)" : "rotate(0deg)";
+        // ---------------------------
+
         const notifItem = document.createElement("div");
         notifItem.className = `notif-item ${isRead ? '' : 'unread'}`;
         notifItem.dataset.id = n.id;
-        notifItem.dataset.isRead = isRead; 
-
+        notifItem.dataset.isRead = isRead;
         notifItem.innerHTML = `
             <div class="notif-icon">
                 <svg viewBox="0 0 30 24"><path d="M3 24C2.175 24 1.46875 23.7063 0.88125 23.1188C0.29375 22.5312 0 21.825 0 21V3C0 2.175 0.29375 1.46875 0.88125 0.88125C1.46875 0.29375 2.175 0 3 0H27C27.825 0 28.5312 0.29375 29.1188 0.88125C29.7063 1.46875 30 2.175 30 3V21C30 21.825 29.7063 22.5312 29.1188 23.1188C28.5312 23.7063 27.825 24 27 24H3ZM15 13.5L3 6V21H27V6L15 13.5ZM15 10.5L27 3H3L15 10.5Z" /></svg>
@@ -199,7 +218,7 @@ function renderNotifications(notifications) {
                     <div class="notif-title-content">
                         <strong>${titleText}</strong> <span class="notif-date">${date}</span>
                     </div>
-                    <button class="notif-expand">▼</button>
+                    <button class="notif-expand" style="transform: ${rotateStyle}">▼</button>
                 </div>
                 <div class="notif-devices">
                     <div>
@@ -211,7 +230,7 @@ function renderNotifications(notifications) {
                         <p class="muted">Série</p>
                     </div>
                 </div>
-                <div class="notif-extra" style="display: none;">
+                <div class="notif-extra" style="display: ${displayStyle};">
                     <div class="extra-grid">
                         <div>
                             <p class="device-name ${coStatus === 'Elevada' ? 'danger-text' : ''}">${coStatus}</p>
@@ -223,7 +242,7 @@ function renderNotifications(notifications) {
                         </div>
                     </div>
                     <div class="extra-footer">
-                        <p class="device-name">${n.detection.canceled ? 'Resolvido' : 'Ativo'}</p>
+                        <p class="device-name">${myCanceled}</p>
                         <p class="muted">Estado do Alarme</p>
                     </div>
                 </div>
@@ -262,7 +281,7 @@ async function markAsRead(id, element) {
         });
         if (response.ok) {
             element.classList.remove("unread");
-            element.dataset.isRead = "true"; // Atualiza estado local para não repetir PATCH
+            element.dataset.isRead = "true";
         }
     } catch (e) { console.error(e); }
 }
